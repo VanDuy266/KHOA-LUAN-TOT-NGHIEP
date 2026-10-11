@@ -1,0 +1,21 @@
+{
+  "utc": "2026-10-11T19:07:48.013787+00:00",
+  "pytest": {
+    "tests": 17,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "notebook_executed": true,
+  "documents_generated": true,
+  "server_health": {
+    "status": 200,
+    "body": "ok"
+  },
+  "document_checks": {
+    "tables": 4,
+    "figures": 2,
+    "slides": 12
+  },
+  "pip_check": "passed"
+}

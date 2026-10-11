@@ -1,0 +1,106 @@
+{
+  "run_utc": "2026-10-11T19:07:41.957091+00:00",
+  "seed": 42,
+  "python": "3.12.14",
+  "numpy": "2.3.5",
+  "pandas": "2.2.3",
+  "sklearn": "1.8.0",
+  "dataset_commit": "f75a9dcb0a38244225b5807722ceac39e0cb4a20",
+  "n_cycles": 468,
+  "n_excluded": 0,
+  "features": [
+    "cycle",
+    "voltage_mean",
+    "voltage_min",
+    "voltage_max",
+    "voltage_std",
+    "voltage_slope",
+    "current_mean",
+    "current_std",
+    "temperature_mean",
+    "temperature_max",
+    "temperature_slope"
+  ],
+  "validation": "LeaveOneGroupOut by battery; no tuning; macro mean across 3 batteries",
+  "demo_model": "Random Forest refit on all primary data; demo predictions are not test results",
+  "parameters": {
+    "Mean baseline": {
+      "constant": null,
+      "quantile": null,
+      "strategy": "mean"
+    },
+    "Cycle Ridge": {
+      "memory": null,
+      "steps": [
+        [
+          "standardscaler",
+          "StandardScaler()"
+        ],
+        [
+          "ridge",
+          "Ridge()"
+        ]
+      ],
+      "transform_input": null,
+      "verbose": false
+    },
+    "Signal Ridge": {
+      "memory": null,
+      "steps": [
+        [
+          "standardscaler",
+          "StandardScaler()"
+        ],
+        [
+          "ridge",
+          "Ridge(alpha=10.0)"
+        ]
+      ],
+      "transform_input": null,
+      "verbose": false
+    },
+    "Random Forest": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "criterion": "squared_error",
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_leaf_nodes": null,
+      "max_samples": null,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 5,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 200,
+      "n_jobs": 2,
+      "oob_score": false,
+      "random_state": 42,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "HistGradientBoosting": {
+      "categorical_features": "from_dtype",
+      "early_stopping": false,
+      "interaction_cst": null,
+      "l2_regularization": 1.0,
+      "learning_rate": 0.1,
+      "loss": "squared_error",
+      "max_bins": 255,
+      "max_depth": null,
+      "max_features": 1.0,
+      "max_iter": 150,
+      "max_leaf_nodes": 15,
+      "min_samples_leaf": 20,
+      "monotonic_cst": null,
+      "n_iter_no_change": 10,
+      "quantile": null,
+      "random_state": 42,
+      "scoring": "loss",
+      "tol": 1e-07,
+      "validation_fraction": 0.1,
+      "verbose": 0,
+      "warm_start": false
+    }
+  }
+}
