@@ -1,0 +1,18 @@
+{
+  "source": "https://github.com/psanabriaUC/BatteryDatasetImplementation",
+  "commit": "0007aead10cb85aafdd11fb3de1d64186c7c6c05",
+  "country": "United States (NASA); not Vietnam",
+  "battery_count": 4,
+  "all_measurement_rows": 2089048,
+  "charge_rows": 1903327,
+  "measurement_rows": 185721,
+  "discharge_cycles": 636,
+  "feature_rows": 636,
+  "excluded_cycles": 0,
+  "missing_values": 0,
+  "duplicates_removed": 0,
+  "invalid_rows_removed": 2,
+  "nominal_capacity_ah": 2.0,
+  "soh_above_100_cycle_count": 7,
+  "notes": "All signals: charge+discharge. SOH labels: discharge only. MAT mirror; publisher S3 bytes not verified."
+}

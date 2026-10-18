@@ -1,12 +1,12 @@
 {
-  "run_utc": "2026-10-11T19:07:41.957091+00:00",
+  "run_utc": "2026-10-18T22:01:12.893140+00:00",
   "seed": 42,
   "python": "3.12.14",
   "numpy": "2.3.5",
   "pandas": "2.2.3",
   "sklearn": "1.8.0",
-  "dataset_commit": "f75a9dcb0a38244225b5807722ceac39e0cb4a20",
-  "n_cycles": 468,
+  "dataset_commit": "0007aead10cb85aafdd11fb3de1d64186c7c6c05",
+  "n_cycles": 636,
   "n_excluded": 0,
   "features": [
     "cycle",
@@ -21,7 +21,7 @@
     "temperature_max",
     "temperature_slope"
   ],
-  "validation": "LeaveOneGroupOut by battery; no tuning; macro mean across 3 batteries",
+  "validation": "LeaveOneGroupOut by battery; no tuning; macro mean across 4 batteries",
   "demo_model": "Random Forest refit on all primary data; demo predictions are not test results",
   "parameters": {
     "Mean baseline": {

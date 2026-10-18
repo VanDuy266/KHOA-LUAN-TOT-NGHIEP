@@ -1,7 +1,7 @@
 {
-  "utc": "2026-10-11T19:07:48.013787+00:00",
+  "utc": "2026-10-18T22:01:26.120261+00:00",
   "pytest": {
-    "tests": 17,
+    "tests": 23,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -12,10 +12,7 @@
     "status": 200,
     "body": "ok"
   },
-  "document_checks": {
-    "tables": 4,
-    "figures": 2,
-    "slides": 12
-  },
-  "pip_check": "passed"
+  "browser_uploaded_csv_prediction": "passed; screenshot docs/images/02-du-doan.png",
+  "dataset_array_check": "passed; reports/dataset_check.json",
+  "windows_launcher": "reviewed only; not executed on Windows"
 }

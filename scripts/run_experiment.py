@@ -1,6 +1,7 @@
-"""Run the preregistered, fixed-parameter leave-one-battery-out comparison."""
+"""So sánh mô hình bằng cách giữ riêng từng pin để kiểm thử. Tham số cố định."""
 import os
-os.environ.setdefault("MPLCONFIGDIR", "/tmp/battery-soh-matplotlib")
+import tempfile
+os.environ.setdefault("MPLCONFIGDIR", os.path.join(tempfile.gettempdir(), "battery-soh-matplotlib"))
 os.environ.setdefault("OMP_NUM_THREADS", "2")
 os.environ.setdefault("OPENBLAS_NUM_THREADS", "2")
 import hashlib
@@ -45,37 +46,15 @@ def models():
 def main():
     report = ROOT / "reports"
     report.mkdir(exist_ok=True)
-    manifest = json.loads((ROOT / "data/manifest.json").read_text())
-    records, audit, exclusions = [], [], []
-    for item in manifest["files"]:
-        p = ROOT / "data/raw" / item["name"]
-        if hashlib.sha256(p.read_bytes()).hexdigest() != item["sha256"]:
-            raise ValueError(f"Checksum mismatch: {p.name}")
-        df = pd.read_csv(p)
-        battery = item["name"].split("_")[0]
-        primary = battery in manifest["primary_batteries"]
-        audit.append(dict(battery=battery, rows=len(df), cycles=df.cycle.nunique(),
-                          missing_values=int(df.isna().sum().sum()),
-                          min_soh_pct=float(df.SOH.min()*100),
-                          max_soh_pct=float(df.SOH.max()*100),
-                          zero_capacity_cycles=int(df.loc[df.capacity <= 0, "cycle"].nunique()),
-                          primary=primary))
-        if not primary:
-            continue
-        for cycle, group in df.groupby("cycle", sort=True):
-            try:
-                target = validate_target(group)
-                record = extract_window(group, cycle)
-            except ValueError as error:
-                exclusions.append(dict(battery=battery, cycle=int(cycle), reason=str(error)))
-                continue
-            records.append(dict(battery=battery, soh_pct=target, **record))
-    pd.DataFrame(audit).to_csv(report / "data_audit.csv", index=False)
-    pd.DataFrame(exclusions, columns=["battery", "cycle", "reason"]).to_csv(report / "excluded_cycles.csv", index=False)
-    data = pd.DataFrame(records)
-    if len(data) < 30 or data.battery.nunique() != 3:
-        raise ValueError("Thực nghiệm yêu cầu đủ ba pin và ít nhất 30 chu kỳ hợp lệ")
+    manifest = json.loads((ROOT / "data/manifest.json").read_text(encoding="utf-8"))
+    # Mỗi dòng là một chu kỳ xả, không phải một thời điểm đo.
+    data = pd.read_csv(ROOT / "data/clean/cycle_features.csv")
+    exclusions = pd.read_csv(report / "excluded_cycles.csv")
+    expected = set(manifest["primary_batteries"])
+    if set(data.battery.unique()) != expected or len(data) < 30:
+        raise ValueError("Chưa đủ các pin và chu kỳ trong manifest; chạy prepare_data.py")
     data.to_csv(report / "features.csv", index=False)
+    # Bốn vòng: mỗi vòng học từ ba pin và dự đoán pin còn lại.
     scores, predictions = [], []
     for train, test in LeaveOneGroupOut().split(data, groups=data.battery):
         assert set(data.iloc[train].battery).isdisjoint(data.iloc[test].battery)
@@ -96,7 +75,8 @@ def main():
     scores.to_csv(report / "metrics_by_battery.csv", index=False)
     summary.to_csv(report / "metrics_summary.csv", index=False)
     predictions.to_csv(report / "predictions.csv", index=False)
-    fig, axes = plt.subplots(1, 3, figsize=(15, 4), sharey=True)
+    fig, axes = plt.subplots(2, 2, figsize=(12, 8), sharey=True)
+    axes = axes.ravel()
     for ax, battery in zip(axes, sorted(data.battery.unique())):
         part = predictions[(predictions.battery == battery) & (predictions.model == "Random Forest")]
         ax.plot(part.cycle, part.actual_soh, label="Measured SOH")
@@ -114,7 +94,8 @@ def main():
     fig.tight_layout()
     fig.savefig(report / "model_comparison.png", dpi=180)
     plt.close(fig)
-    # Fixed demo choice decided before viewing scores; not selected on test performance.
+    # Chọn RF cố định cho demo, không chọn theo điểm kiểm thử.
+    # Mô hình demo học lại cả 4 pin nên không dùng đánh giá chất lượng.
     model, columns = models()["Random Forest"]
     model.fit(data[columns], data.soh_pct)
     artifact_dir = ROOT / "artifacts"
@@ -127,12 +108,12 @@ def main():
         python=platform.python_version(), numpy=np.__version__, pandas=pd.__version__,
         sklearn=sklearn.__version__, dataset_commit=manifest["commit"],
         n_cycles=len(data), n_excluded=len(exclusions), features=FEATURES,
-        validation="LeaveOneGroupOut by battery; no tuning; macro mean across 3 batteries",
+        validation="LeaveOneGroupOut by battery; no tuning; macro mean across 4 batteries",
         demo_model="Random Forest refit on all primary data; demo predictions are not test results",
         parameters={name:model.get_params(deep=False) for name,(model,_) in models().items()})
     (report / "run_metadata.json").write_text(json.dumps(metadata, indent=2, default=str) + "\n")
     print(summary.to_string(index=False))
-    print(f"Validated {len(data)} cycles; exclusions={len(exclusions)}; 15 fitted evaluation models")
+    print(f"Validated {len(data)} cycles; exclusions={len(exclusions)}; 20 fitted evaluation models")
 
 
 if __name__ == "__main__":

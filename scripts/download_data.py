@@ -1,4 +1,4 @@
-"""Download pinned public mirror files with TLS and recorded SHA-256 checks."""
+"""Tải bốn file MATLAB từ bản lưu công khai và kiểm tra SHA-256."""
 import hashlib
 import json
 from pathlib import Path
@@ -8,8 +8,8 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def main():
-    manifest = json.loads((ROOT / "data/manifest.json").read_text())
-    target = ROOT / "data/raw"
+    manifest = json.loads((ROOT / "data/manifest.json").read_text(encoding="utf-8"))
+    target = ROOT / "data/mat"
     target.mkdir(parents=True, exist_ok=True)
     for item in manifest["files"]:
         dest = target / item["name"]
@@ -18,8 +18,7 @@ def main():
                 raise RuntimeError(f"Checksum khác; giữ nguyên file hiện có: {dest}")
             print(f"Verified {dest.name}")
             continue
-        url = ("https://raw.githubusercontent.com/standing-o/SoH_estimation_of_Lithium-ion_battery/"
-               + manifest["commit"] + "/" + item["path"])
+        url = item["url"]
         with urlopen(url, timeout=90) as response:
             content = response.read()
         if hashlib.sha256(content).hexdigest() != item["sha256"]:

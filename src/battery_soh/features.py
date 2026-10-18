@@ -1,4 +1,4 @@
-"""Features use only observations at t <= 120 s; capacity is a label only."""
+"""Đặc trưng chỉ dùng 120 giây đầu; capacity chỉ dùng tạo nhãn."""
 import numpy as np
 import pandas as pd
 
@@ -10,13 +10,13 @@ SIGNALS = ["time", "terminal_voltage", "terminal_current", "temperature"]
 
 
 def extract_window(frame: pd.DataFrame, cycle: int) -> dict:
-    """Estimate after the first 120 seconds, never from full-discharge duration."""
+    """Kiểm tra dữ liệu rồi tính thống kê tín hiệu đầu chu kỳ xả."""
     missing = set(SIGNALS) - set(frame.columns)
     if missing:
         raise ValueError(f"Thiếu cột: {sorted(missing)}")
     if not np.isfinite(cycle) or cycle < 1 or int(cycle) != cycle:
         raise ValueError("Chu kỳ phải là số nguyên dương")
-    # Validate the time axis first; future signal values are intentionally unused.
+    # Kiểm tra thời gian; các tín hiệu sau 120 giây không được dùng.
     time = pd.to_numeric(frame["time"], errors="raise")
     if not np.isfinite(time).all() or (time < 0).any():
         raise ValueError("Thời gian phải hữu hạn và không âm")
@@ -31,19 +31,30 @@ def extract_window(frame: pd.DataFrame, cycle: int) -> dict:
     active = window.loc[window.terminal_current < -0.1]
     if len(active) < 3 or active.time.max() - active.time.min() < 30:
         raise ValueError("Cần ít nhất 3 mẫu xả với dòng < -0.1 A trải dài >=30 giây")
+    # v: điện áp; i: dòng điện; t: nhiệt độ. Mỗi mảng chỉ thuộc cửa sổ xả.
     v, i, t = active.terminal_voltage, active.terminal_current, active.temperature
     if not v.between(0, 5).all() or not t.between(-40, 100).all():
         raise ValueError("Điện áp hoặc nhiệt độ ngoài miền hợp lệ cho cell lithium-ion")
-    return dict(cycle=int(cycle), voltage_mean=v.mean(), voltage_min=v.min(),
-                voltage_max=v.max(), voltage_std=v.std(ddof=0),
-                voltage_slope=np.polyfit(active.time, v, 1)[0],
-                current_mean=i.mean(), current_std=i.std(ddof=0),
-                temperature_mean=t.mean(), temperature_max=t.max(),
-                temperature_slope=np.polyfit(active.time, t, 1)[0])
+    return {
+        "cycle": int(cycle),
+        "voltage_mean": v.mean(),
+        "voltage_min": v.min(),
+        "voltage_max": v.max(),
+        "voltage_std": v.std(ddof=0),
+        "voltage_slope": np.polyfit(active.time, v, 1)[0],
+        "current_mean": i.mean(),
+        "current_std": i.std(ddof=0),
+        "temperature_mean": t.mean(),
+        "temperature_max": t.max(),
+        "temperature_slope": np.polyfit(active.time, t, 1)[0],
+    }
 
 
 def validate_target(frame: pd.DataFrame, nominal_ah: float = 2.0) -> float:
-    if nominal_ah <= 0:
+    """Xác nhận một chu kỳ có một nhãn nhất quán theo dung lượng danh định."""
+    if frame.empty:
+        raise ValueError("Không có dữ liệu chu kỳ để xác minh nhãn")
+    if not np.isfinite(nominal_ah) or nominal_ah <= 0:
         raise ValueError("Dung lượng danh định phải dương")
     if not {"capacity", "SOH"}.issubset(frame.columns):
         raise ValueError("Thiếu capacity hoặc SOH để xác minh nhãn")

@@ -3,5 +3,7 @@ __pycache__/
 .pytest_cache/
 .cache/
 data/raw/
+data/mat/
+data/clean/
 artifacts/
 *.log

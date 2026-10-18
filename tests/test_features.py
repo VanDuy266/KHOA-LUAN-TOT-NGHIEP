@@ -75,6 +75,11 @@ def test_label_consistency(cycle):
         validate_target(cycle)
 
 
+def test_rejects_empty_labels(cycle):
+    with pytest.raises(ValueError, match="Không có dữ liệu"):
+        validate_target(cycle.iloc[:0])
+
+
 def test_saved_artifact_matches_features():
     import joblib
     artifact = joblib.load(ROOT / "artifacts/random_forest.joblib")
@@ -88,7 +93,7 @@ def test_evaluation_covers_each_battery_once_per_model():
     metrics = pd.read_csv(ROOT / "reports/metrics_by_battery.csv")
     data = pd.read_csv(ROOT / "reports/features.csv")
     pred = pd.read_csv(ROOT / "reports/predictions.csv")
-    assert len(metrics) == 15
+    assert len(metrics) == 20
     assert not pred.duplicated(["model", "battery", "cycle"]).any()
     assert pred.groupby("model").size().eq(len(data)).all()
     for row in metrics.itertuples():

@@ -1,64 +1,87 @@
 # Khóa luận: Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy
 
-Sinh viên: **Nguyễn Văn Duy** · MSSV: **2311553949** · Lớp: **23DTH2A**. Giảng viên theo phiếu đăng ký: **ThS. Vương Xuân Chí**.
+Nguyễn Văn Duy · MSSV 2311553949 · Lớp 23DTH2A · GVHD theo phiếu: ThS. Vương Xuân Chí.
 
-Dự án có pipeline SOH, thực nghiệm leave-one-battery-out, ứng dụng Streamlit, kiểm thử, báo cáo và slide. Đây là bản triển khai nghiên cứu trên cell lithium-ion, chưa được xác nhận trên xe điện thực tế hoặc nghiệm thu bởi giảng viên.
+Sản phẩm dùng **Python 3.12, pandas, scipy, scikit-learn, matplotlib và Streamlit**. Code dùng hàm, vòng lặp và mô hình có sẵn của thư viện; có tài liệu giải thích để sinh viên chạy lại và bảo vệ.
 
-## Tải bộ bàn giao
+## Tải về
 
-[Tải ZIP gồm mã nguồn, dữ liệu, mô hình và tài liệu](delivery/KhoaLuan_NguyenVanDuy.zip?raw=true). SHA-256 của gói nằm trong `delivery/KhoaLuan_NguyenVanDuy.sha256`.
+- [Code, mô hình, dữ liệu xả, notebook, báo cáo Word và slide](delivery/KhoaLuan_NguyenVanDuy.zip?raw=true).
+- [Dataset sạch đầy đủ 2.089.048 dòng](delivery/Dataset_Pin_NASA_2tr_dong.zip?raw=true).
 
-Giải nén, mở thư mục `KHOA-LUAN-TOT-NGHIEP`, rồi làm theo hướng dẫn chạy dưới đây. Gói không chứa môi trường Python `.venv`; hãy chạy setup để cài thư viện. Nếu GitHub chỉ hiển thị thông tin file ZIP, chọn **Download raw file** để tải.
+Gói dataset tách riêng để không phải tải dữ liệu lớn khi chỉ xem code. SHA-256 nằm cạnh từng ZIP. Nếu GitHub không tự tải, chọn **Download raw file**. Bộ code không kèm `.venv`; vẫn cần cài Python/thư viện.
 
-## Chạy lại
+## Chạy sản phẩm trên Windows / VS Code
 
-Yêu cầu Python 3.12; khoảng 1 GB dung lượng trống. Chạy từ thư mục repository:
+Mở đúng thư mục có README này, không mở terminal ở trong `app`. Cài Python 3.12 rồi mở PowerShell:
 
-```bash
-bash scripts/setup.sh
-.venv/bin/python -m streamlit run app/streamlit_app.py --server.headless=true --server.address=0.0.0.0 --server.port=8501
+```powershell
+py -3.12 --version
+powershell -ExecutionPolicy Bypass -File .\chay_windows.ps1
 ```
 
-Setup cài từ lockfile, tải 8 CSV đã ghim checksum, huấn luyện trên 3 pin chính, chạy kiểm thử và tạo tài liệu. Không cần API key. Cần truy cập PyPI và raw.githubusercontent.com. Không tải mô hình joblib từ người dùng hoặc nguồn không tin cậy.
+Nếu chưa có 3.12, cài bằng `py install 3.12` khi Python Install Manager hỗ trợ, hoặc tải Python 3.12 từ python.org. Script chạy từng bước và dừng ngay khi có lỗi. Lần đầu phải đợi pip cài xong; không bấm Ctrl+C. Tham số ExecutionPolicy chỉ áp dụng tiến trình chạy script này.
 
-Chạy riêng các bước:
+Chạy thủ công nếu muốn học từng bước:
 
-```bash
-.venv/bin/python scripts/download_data.py
-.venv/bin/python scripts/run_experiment.py
-.venv/bin/python -m pytest -q
-.venv/bin/python scripts/build_documents.py
-.venv/bin/python scripts/build_notebook.py
+```powershell
+py -3.12 -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r requirements-app.txt
+.\.venv\Scripts\python.exe scripts\download_data.py
+.\.venv\Scripts\python.exe scripts\prepare_data.py
+.\.venv\Scripts\python.exe scripts\run_experiment.py
+.\.venv\Scripts\python.exe -m streamlit run app\streamlit_app.py
 ```
 
-## Thiết kế và kết quả
+Sau lần chuẩn bị thành công, chỉ cần lệnh cuối để mở ứng dụng. Khi chạy trên máy cá nhân, mở địa chỉ localhost mà Streamlit in ra, thường là cổng 8501. Dừng bằng Ctrl+C.
 
-- Nhãn: `SOH (%) = 100 × capacity (Ah) / 2 Ah`. Đã kiểm tra nhãn với cột SOH của nguồn chuyển đổi.
-- Đầu vào: số chu kỳ và thống kê điện áp, dòng điện, nhiệt độ trong 120 giây đầu. Không sử dụng dung lượng xả, SOH nhãn hoặc thời gian xả toàn chu kỳ.
-- Ba pin B05/B07/B18, 468 chu kỳ; giữ toàn bộ một pin làm kiểm thử ở mỗi vòng. Không tinh chỉnh bằng tập kiểm thử.
-- Random Forest: macro MAE 1,241; RMSE 1,628 điểm phần trăm SOH. Cycle Ridge: MAE 4,392.
-- Mô hình demo Random Forest được chọn cố định trước khi xem điểm số, rồi huấn luyện lại trên tất cả dữ liệu chính. Dự đoán demo trên CSV mẫu không phải kết quả kiểm thử.
+## Chạy toàn bộ nghiên cứu và tạo lại tài liệu
 
-Các số liệu đầy đủ nằm trong `reports/metrics_by_battery.csv`, `reports/metrics_summary.csv` và `reports/run_metadata.json`.
+Linux: `bash scripts/setup.sh`. Windows: cài `requirements.txt` thay cho `requirements-app.txt`, rồi chạy thêm `scripts/check_dataset.py`, `scripts/analyze_results.py`, `python -m pytest -q`, `scripts/build_notebook.py` và `scripts/build_documents.py` bằng Python của `.venv`.
 
-## Dữ liệu và giới hạn
+Cần khoảng 2 GB ổ đĩa cho môi trường và CSV. Không cần GPU hoặc API key. `requirements-app.txt` chỉ cài phần chạy sản phẩm; `requirements.txt` thêm kiểm thử và xuất Word/PowerPoint/notebook; `requirements.lock.txt` ghim môi trường Linux đã kiểm thử. Script Windows đã được kiểm tra nội dung nhưng chưa được thực thi trực tiếp trên Windows trong môi trường Linux này.
 
-CSV do repository công khai `standing-o/SoH_estimation_of_Lithium-ion_battery` chuyển đổi, dẫn nguồn NASA. Commit và SHA-256 nằm trong `data/manifest.json`; giấy phép của repository nguồn được giữ trong `data/SOURCE_LICENSE.txt`. Checksum xác nhận đúng phiên bản chuyển đổi, không xác nhận đúng với NASA gốc.
+## Dataset đã kiểm tra
 
-Chưa truy cập được NASA/CALCE gốc do chính sách mạng. B05/B07 có trục thời gian giống nhau hoàn toàn trong CSV; đây là dấu hiệu cần đối chiếu bước chuyển đổi. Các pin bổ sung có SOH rất thấp hoặc dung lượng bằng 0 nên chỉ được kiểm kê, chưa dùng cho kết luận chính. Vì vậy kết quả là **thực nghiệm trên bản chuyển đổi**, chưa đủ làm bằng chứng chất lượng trên dữ liệu gốc hoặc pin xe điện thực tế. Không khẳng định kết quả đạt yêu cầu nộp khóa luận trước khi giảng viên duyệt nguồn dữ liệu và hình thức báo cáo.
+| Nội dung | Số lượng |
+| --- | ---: |
+| Dòng sạc/xả ban đầu | 2.089.050 |
+| Dòng sạc thiếu tín hiệu bị loại | 2 |
+| Dòng sạch | **2.089.048** |
+| Trong đó: dòng sạc sạch | 1.903.327 |
+| Trong đó: dòng xả | 185.721 |
+| Mẫu học máy theo chu kỳ xả | **636** |
+| Pin độc lập | **4** |
 
-## Các tệp chính
+Không nhân bản, không nội suy để tăng dòng. Không thiếu/vô hạn hoặc trùng khóa sau làm sạch. `scripts/check_dataset.py` kiểm tra CSV theo khối và so các mảng với MATLAB. Xem [từ điển dữ liệu và nguồn](data/README.md).
 
-| Đường dẫn | Nội dung |
+NASA là nguồn thí nghiệm Hoa Kỳ; **không phải dữ liệu Việt Nam**. File MATLAB từ bản lưu công khai dẫn nguồn NASA, ghim commit và checksum. Danh mục NASA và mô tả thí nghiệm đã được đọc; chưa xác thực byte với archive S3 của đơn vị phát hành. Hơn hai triệu dòng đo vẫn chỉ là bốn pin, không phải hai triệu mẫu SOH độc lập.
+
+## Mô hình và kết quả hiện tại
+
+- SOH (%) = 100 × dung lượng xả / 2 Ah. Giữ nguyên giá trị hơi trên 100% nếu dung lượng đo vượt danh định.
+- 11 đặc trưng: số chu kỳ và thống kê điện áp, dòng, nhiệt độ trong 120 giây đầu xả. Không dùng capacity hoặc SOH làm đầu vào.
+- Giữ riêng từng pin để test: 4 vòng, 5 mô hình, 20 lần fit. Không chia ngẫu nhiên thời điểm trong cùng pin.
+- Random Forest: macro MAE **2,724**, RMSE **3,189** điểm phần trăm SOH. Cycle Ridge: MAE **4,074**.
+- Đã có phân tích bỏ đặc trưng và kiểm thử 70/30 theo thời gian. Trong thiết kế thời gian, RF kém baseline SOH cuối đã biết; không tuyên bố dự báo RUL.
+
+Các số 1,24 ở phiên bản ba pin cũ không mô tả bộ bốn pin hiện tại. Mô hình demo fit lại cả bốn pin nên dự đoán CSV mẫu không phải điểm test độc lập.
+
+## Cấu trúc dễ theo dõi
+
+| File / thư mục | Vai trò |
 | --- | --- |
-| `docs/bao-cao-khoa-luan.md` | Báo cáo với kết quả thực đo và hạn chế |
-| `docs/bao-cao-khoa-luan.docx` | Bản Word để chỉnh theo mẫu trường |
-| `docs/slide-bao-ve.pptx` | Slide trình bày |
-| `docs/huong-dan-bao-ve.md` | Kịch bản demo và câu hỏi thường gặp |
-| `notebooks/01_eda.ipynb` | Notebook khám phá dữ liệu đã thực thi |
-| `src/battery_soh/features.py` | Kiểm tra dữ liệu và đặc trưng cửa sổ |
-| `scripts/run_experiment.py` | So sánh mô hình và lưu kết quả |
-| `app/streamlit_app.py` | Ứng dụng minh họa tiếng Việt |
-| `tests/` | Kiểm thử chống rò rỉ, dữ liệu và luồng demo |
+| `scripts/download_data.py` | Tải dữ liệu và kiểm tra checksum |
+| `scripts/prepare_data.py` | Đọc MATLAB, làm sạch, xuất CSV và đặc trưng |
+| `scripts/check_dataset.py` | Kiểm chứng toàn bộ dataset |
+| `src/battery_soh/features.py` | Đặc trưng 120 giây dùng chung |
+| `scripts/run_experiment.py` | Huấn luyện, kiểm thử và lưu mô hình |
+| `scripts/analyze_results.py` | Bỏ đặc trưng, đánh giá theo thời gian |
+| `app/streamlit_app.py` | Giao diện dữ liệu, kết quả và dự đoán CSV |
+| `notebooks/01_eda.ipynb` | Notebook đã thực thi |
+| `docs/giai-thich-code.md` | Giải thích từng bước và cách trình bày |
+| `docs/bao-cao-khoa-luan.docx` | Báo cáo có kết quả thực nghiệm |
+| `docs/slide-bao-ve.pptx` | Slide bảo vệ |
+| `reports/` | Thống kê, chỉ số, dự đoán test, hình và nhật ký |
 
-Dữ liệu và mô hình sinh ra được bỏ qua bởi Git; chạy setup để khôi phục. Kết quả CSV, hình và tài liệu được giữ để xem xét. Không tự động commit, push hay Publish.
+Không nhận mô hình joblib từ nguồn không tin cậy. Kết quả chỉ được kiểm chứng trên cell thử nghiệm, chưa trên pack/xe điện Việt Nam. Sinh viên cần kiểm tra, hiểu và trao đổi với giảng viên về mẫu trường, tài liệu chuyên ngành và tiêu chí nghiệm thu trước bản nộp chính thức.

@@ -10,7 +10,10 @@ mkdir -p "$MPLCONFIGDIR" "$PIP_CACHE_DIR"
 python3 -m venv .venv
 .venv/bin/python -m pip install --disable-pip-version-check -r requirements.lock.txt
 .venv/bin/python scripts/download_data.py
+.venv/bin/python scripts/prepare_data.py
+.venv/bin/python scripts/check_dataset.py
 .venv/bin/python scripts/run_experiment.py
+.venv/bin/python scripts/analyze_results.py
 .venv/bin/python -m pytest -q --junitxml=reports/pytest-results.xml
 .venv/bin/python scripts/build_notebook.py
 .venv/bin/python scripts/build_documents.py

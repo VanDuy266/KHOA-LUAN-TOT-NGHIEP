@@ -1,52 +1,45 @@
 {
-  "repository": "https://github.com/standing-o/SoH_estimation_of_Lithium-ion_battery",
-  "commit": "f75a9dcb0a38244225b5807722ceac39e0cb4a20",
-  "original_source_claim": "NASA PCoE; not independently verified against original MAT files",
+  "repository": "https://github.com/psanabriaUC/BatteryDatasetImplementation",
+  "commit": "0007aead10cb85aafdd11fb3de1d64186c7c6c05",
+  "source_page": "https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/",
+  "source_status": "MAT-format files from public mirror; NASA catalog and mirror README read; not byte-verified against publisher S3 archive",
+  "nominal_capacity_ah": 2.0,
   "primary_batteries": [
-    "B05",
-    "B07",
-    "B18"
+    "B0005",
+    "B0006",
+    "B0007",
+    "B0018"
   ],
   "files": [
     {
-      "name": "B05_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B05_discharge_soh.csv",
-      "sha256": "9ca506d0b683c2d64941873846452731d157444f68053aa7088e1b7c73c9ba43"
+      "name": "B0005.mat",
+      "url": "https://raw.githubusercontent.com/psanabriaUC/BatteryDatasetImplementation/0007aead10cb85aafdd11fb3de1d64186c7c6c05/battery_data/B0005.mat",
+      "sha256": "0eae4585baf3f200c09fe24c5ab884f1889679fc75206ca1aa19da704104f0b0",
+      "size_bytes": 15956874
     },
     {
-      "name": "B07_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B07_discharge_soh.csv",
-      "sha256": "e714e23d5349fe5de0e69fb4aaf90f524f39c0203dd880e2d345c29e1f0312eb"
+      "name": "B0006.mat",
+      "url": "https://raw.githubusercontent.com/psanabriaUC/BatteryDatasetImplementation/0007aead10cb85aafdd11fb3de1d64186c7c6c05/battery_data/B0006.mat",
+      "sha256": "fa818ab4db5db8ab21e910b6dd6c3e20d3761bb9672089e1a4de8f96074616c5",
+      "size_bytes": 16028159
     },
     {
-      "name": "B18_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B18_discharge_soh.csv",
-      "sha256": "7129801014b711d76fe8939cebc8de2ec5dbe8e4b47dcd331fc16f0761b4712c"
+      "name": "B0007.mat",
+      "url": "https://raw.githubusercontent.com/psanabriaUC/BatteryDatasetImplementation/0007aead10cb85aafdd11fb3de1d64186c7c6c05/battery_data/B0007.mat",
+      "sha256": "d022afa086efaf54ab5b63f05220f5be178c8027e2fa8d68589db0e85a441a3b",
+      "size_bytes": 16049460
     },
     {
-      "name": "B33_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B33_discharge_soh.csv",
-      "sha256": "b55ab1429e52d8c529df579ff23aa6d10b62924a7a0a6a021a0d7f316ff8c4a5"
+      "name": "B0018.mat",
+      "url": "https://raw.githubusercontent.com/psanabriaUC/BatteryDatasetImplementation/0007aead10cb85aafdd11fb3de1d64186c7c6c05/battery_data/B0018.mat",
+      "sha256": "d1e6c923a43ea1c9666b3a90bbb521757a067fd60b4d17dbfaa49c50b179da69",
+      "size_bytes": 8502218
     },
     {
-      "name": "B34_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B34_discharge_soh.csv",
-      "sha256": "ed08eec2552808241f068abbad08c98d4dce1f265e913211c11236d4e071c8a9"
-    },
-    {
-      "name": "B46_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B46_discharge_soh.csv",
-      "sha256": "e1a426a7993b18536a4168a9e8de22dd2e8dd2469ee18249e2a88ecedf278c7d"
-    },
-    {
-      "name": "B47_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B47_discharge_soh.csv",
-      "sha256": "e2dd46c094c85556bf3e1ee1e276496cd22adb932e1e414bf74379df029466b9"
-    },
-    {
-      "name": "B48_discharge_soh.csv",
-      "path": "1_Calculation_and_Visulaliztion_of_SoH/dataset/B48_discharge_soh.csv",
-      "sha256": "0726428c8a2293f5c96c9c81fd514a9b34f0c0aadff14ab2cd9ca7d873ff8c59"
+      "name": "README.txt",
+      "url": "https://raw.githubusercontent.com/psanabriaUC/BatteryDatasetImplementation/0007aead10cb85aafdd11fb3de1d64186c7c6c05/battery_data/README.txt",
+      "sha256": "2b0614ccfdde3ca9c0466ad3e0c03903a1dbe98aec22dbe7ea410219cde51f90",
+      "size_bytes": 2834
     }
   ]
 }

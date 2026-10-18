@@ -1,0 +1,3 @@
+battery,operation_type,operation_index,cycle,time,reason
+B0018,charge,115,46,4528.156,Missing or non-finite measured signals
+B0018,charge,115,46,4786.328,Missing or non-finite measured signals
