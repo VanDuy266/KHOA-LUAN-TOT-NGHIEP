@@ -42,11 +42,21 @@ Thử bỏ số chu kỳ hoặc nhiệt độ để quan sát thay đổi. Đây
 
 Thiết kế theo thời gian dùng 70% đầu một pin để học, 30% sau để test. Baseline dùng SOH cuối cùng đã biết trong train. RF không hơn baseline này trên dữ liệu hiện tại; cần báo cáo thật vì bài toán ngoại suy tương lai khác với ước lượng trên pin mới.
 
-### Bước 6 — streamlit_app.py
+### Bước 6 — streamlit_app.py và các màn hình
 
-Phần Dữ liệu cho xem số dòng và SOH theo pin. Phần Đánh giá mô hình hiển thị kết quả test. Phần Ước lượng cho tải CSV một chu kỳ, nhập số chu kỳ và gọi đúng `extract_window` như lúc train. Kết quả ngoài miền đặc trưng đã học được cảnh báo.
+File chính chỉ kiểm tra dữ liệu, nạp CSS, tạo thanh điều hướng và gọi màn hình được chọn. Mỗi màn hình có hàm `render()` trong `app/screens`, không dùng hệ thống class phức tạp:
 
-Mẫu có sẵn B0005 dùng minh họa thao tác và đã nằm trong train demo. Không dùng kết quả mẫu đó để nói mô hình đạt độ chính xác kiểm thử.
+- `overview.py`: số liệu tổng quan và hồ sơ Nguyễn Văn Duy, MSSV 2311553949, Khoa Học Dữ Liệu.
+- `explorer.py`: lọc pin/chu kỳ, tra cứu tín hiệu thật, xuất CSV.
+- `evaluation.py`: chọn mô hình, xem MAE/RMSE/R² và dự đoán trên pin giữ riêng.
+- `forecast.py`: nhập CSV, nhận kết quả, lưu tạm trong phiên để tải file không làm mất kết quả.
+- `profile.py`: nguồn dữ liệu, thuật ngữ và tài liệu.
+
+`app/charts.py` gọi Altair để tạo biểu đồ. `app/labels.py` ánh xạ tên cột sang tiếng Việt trên một bản sao; không đổi tên cột trong pipeline tính toán. `app/app_data.py` dùng cache theo thời điểm sửa file để tránh đọc lại 185.721 dòng mỗi khi bấm bộ lọc. Dữ liệu upload không nằm trong cache dùng chung và không được thêm vào dữ liệu huấn luyện.
+
+`app/prediction.py` kiểm tra CSV một pin/một chu kỳ, quy đổi tên cột tiếng Việt nếu có rồi gọi `extract_window` dùng chung với train. Khi đầu vào thay đổi, giao diện không hiển thị nhầm kết quả cũ. Mẫu B0005 đã nằm trong train demo nên không dùng kết quả đó làm điểm kiểm thử.
+
+`app/styles.css` chỉ tạo màu sắc, khoảng cách và hiệu ứng nhẹ, không tham gia tính SOH. `.streamlit/config.toml` quy định theme sáng và giới hạn upload.
 
 ## Những chỗ có thể chỉnh để học
 

@@ -253,9 +253,13 @@ Mô hình chính vì vậy được giới thiệu như bộ ước lượng SOH
 
 ### 4.6. Sản phẩm và kiểm thử
 
-Ứng dụng Streamlit có ba phần: xem dữ liệu, xem kết quả kiểm thử, tải CSV một chu kỳ để dự đoán. Đầu vào yêu cầu time, terminal_voltage, terminal_current và temperature; cycle nhập riêng hoặc phải nhất quán với CSV. Dữ liệu không đủ cửa sổ hoặc sai cấu trúc được báo lỗi bằng thông điệp cụ thể.
+Ứng dụng PinLab xây dựng bằng Streamlit có năm mục: Tổng quan, Tra cứu pin, Đánh giá mô hình, Dự đoán SOH và Hồ sơ đề tài. Giao diện có thanh điều hướng, các bảng và biểu đồ tương tác với nhãn tiếng Việt. Thông tin người thực hiện là Nguyễn Văn Duy, MSSV 2311553949, chuyên ngành Khoa Học Dữ Liệu. Đầu vào yêu cầu time, terminal_voltage, terminal_current và temperature; cycle nhập riêng hoặc phải nhất quán với CSV. Dữ liệu không đủ cửa sổ hoặc sai cấu trúc được báo lỗi bằng thông điệp cụ thể.
 
-Ứng dụng cảnh báo khi đặc trưng ngoài miền huấn luyện, cho tải mẫu và kết quả dự đoán. Dự đoán chỉ lưu từ mô hình cục bộ do pipeline tạo; không nhận file mô hình joblib từ người dùng. Đây là phần mềm nghiên cứu, không đưa ra quyết định thay pin hoặc chứng nhận an toàn.
+Trang tra cứu cho chọn nhiều pin, lọc khoảng chu kỳ và xem điện áp, dòng, nhiệt độ của một chu kỳ. Trang đánh giá cho chọn mô hình và pin kiểm thử, đối chiếu SOH thực tế–dự đoán và tải bảng tiếng Việt. Trang dự đoán nhận cả tên cột gốc hoặc tên tiếng Việt, từ chối file trộn nhiều pin/chu kỳ, giữ kết quả khi tải và ẩn kết quả cũ khi thay đầu vào. Ứng dụng cảnh báo khi đặc trưng ngoài miền huấn luyện, cho tải mẫu và kết quả dự đoán. Dự đoán chỉ lưu từ mô hình cục bộ do pipeline tạo; không nhận file mô hình joblib từ người dùng. Đây là phần mềm nghiên cứu, không đưa ra quyết định thay pin hoặc chứng nhận an toàn.
+
+![Tổng quan PinLab và thông tin sinh viên](images/00-tong-quan.png)
+
+![Giao diện đánh giá mô hình](images/03-danh-gia.png)
 
 ![Giao diện xem dữ liệu chạy thực tế](images/01-du-lieu.png)
 

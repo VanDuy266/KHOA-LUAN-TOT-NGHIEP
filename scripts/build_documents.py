@@ -121,7 +121,7 @@ def main():
         ("Kết quả thực nghiệm", [f"RF macro MAE: {rf.mae:.3f} điểm phần trăm SOH", f"RF macro RMSE: {rf.rmse:.3f}", "Không gọi MAE là độ chính xác phần trăm"]),
         ("So sánh mô hình", []),
         ("Dự đoán trên pin giữ riêng", []),
-        ("Demo", ["Tab dữ liệu và kết quả kiểm thử", "Nhận CSV một chu kỳ; kiểm tra đơn vị và cửa sổ", "Mẫu demo đã học, không phải test độc lập"]),
+        ("Demo", ["PinLab: tổng quan, tra cứu, đánh giá, dự đoán, hồ sơ", "CSV một chu kỳ; tên cột gốc hoặc tiếng Việt", "Mẫu demo đã học, không phải test độc lập"]),
         ("Phân tích bổ sung", ["Bỏ nhóm đặc trưng: chênh lệch không đủ kết luận nhân quả", "Kiểm thử 70/30 theo thời gian: RF kém baseline SOH cuối đã biết", "Không dùng kết quả này để tuyên bố dự đoán RUL"]),
         ("Hạn chế", ["2 triệu phép đo vẫn chỉ là 4 pin và 636 mẫu SOH", "Chưa có dữ liệu Việt Nam hoặc xe vận hành thực tế", "File MAT từ bản lưu, chưa đối chiếu byte với archive S3"]),
         ("Kết luận và bước tiếp theo", ["Pipeline, dữ liệu sạch, kiểm thử, demo và tài liệu tái lập", "Bổ sung pin và điều kiện vận hành; đối chiếu kho phát hành", "Giảng viên xác nhận phạm vi và hình thức bản nộp"]),

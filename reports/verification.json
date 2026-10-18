@@ -1,7 +1,7 @@
 {
-  "utc": "2026-10-18T22:01:26.120261+00:00",
+  "utc": "2026-10-18T22:42:29.656873+00:00",
   "pytest": {
-    "tests": 23,
+    "tests": 35,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -14,5 +14,15 @@
   },
   "browser_uploaded_csv_prediction": "passed; screenshot docs/images/02-du-doan.png",
   "dataset_array_check": "passed; reports/dataset_check.json",
-  "windows_launcher": "reviewed only; not executed on Windows"
+  "windows_launcher": "reviewed only; not executed on Windows",
+  "interface": {
+    "name": "PinLab",
+    "pages": 5,
+    "browser_pages": "passed",
+    "uploaded_csv_soh_pct": 91.47,
+    "download_retains_result": true,
+    "mobile_viewport_width": 390,
+    "mobile_document_width": 390,
+    "reduced_motion_css": true
+  }
 }

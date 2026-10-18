@@ -9,7 +9,7 @@
 5. Trình bày bốn vòng giữ riêng pin; fit trên ba pin, test pin còn lại.
 6. So sánh kết quả thật theo từng pin, bao gồm trường hợp Ridge tốt hơn RF và Signal Ridge thất bại.
 7. Nêu phân tích thời gian: RF kém baseline SOH cuối đã biết, không tuyên bố dự đoán RUL.
-8. Chạy demo: xem dữ liệu, xem test, tải mẫu hoặc upload CSV, nhận SOH và tải kết quả.
+8. Chạy demo qua 5 mục: Tổng quan → Tra cứu pin → Đánh giá mô hình → Dự đoán SOH → Hồ sơ đề tài. Thử lọc chu kỳ, chọn mô hình, upload CSV và tải kết quả tiếng Việt.
 9. Kết luận đúng phạm vi, nói rõ chưa có dữ liệu Việt Nam hoặc xe thực tế.
 
 ## Câu hỏi thường gặp
