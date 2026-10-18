@@ -4,6 +4,8 @@ Nguyễn Văn Duy · MSSV 2311553949 · Lớp 23DTH2A · GVHD theo phiếu: ThS.
 
 Sản phẩm dùng **Python 3.12, pandas, scipy, scikit-learn, matplotlib và Streamlit**. Code dùng hàm, vòng lặp và mô hình có sẵn của thư viện; có tài liệu giải thích để sinh viên chạy lại và bảo vệ.
 
+**Để học và chuẩn bị bảo vệ:** đọc [Sổ tay hiểu code, mô hình và kết quả](docs/so-tay-hoc-va-bao-ve.md), hoặc tải [bản Word](docs/so-tay-hoc-va-bao-ve.docx?raw=true). Sổ tay có quy trình từng bước, giải thích các đoạn code, ưu/nhược điểm của năm cấu hình, số liệu thật, lỗi Windows và kịch bản trả lời hội đồng. Chạy `python scripts/build_study_guide.py` để tạo lại các bảng của sổ tay từ kết quả mới.
+
 ## Tải về
 
 - [Code, mô hình, dữ liệu xả, notebook, báo cáo Word và slide](delivery/KhoaLuan_NguyenVanDuy.zip?raw=true).
