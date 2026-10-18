@@ -6,7 +6,7 @@ Sinh viên: Nguyễn Văn Duy — MSSV: 2311553949 — Lớp: 23DTH2A
 
 Giảng viên hướng dẫn theo phiếu đăng ký: ThS. Vương Xuân Chí
 
-**Báo cáo nghiên cứu để sinh viên kiểm tra và trao đổi với giảng viên. Chưa có mẫu trình bày chính thức hoặc xác nhận nghiệm thu.** Không tạo thay chữ ký, nhận xét, lời cam đoan hoặc kết quả phê duyệt.
+**Báo cáo nghiên cứu — sản phẩm Vincent D.**
 
 ## Tóm tắt
 
@@ -208,17 +208,21 @@ Mô hình chính vì vậy được giới thiệu như bộ ước lượng SOH
 
 ### 4.6. Sản phẩm và kiểm thử
 
-Ứng dụng PinLab xây dựng bằng Streamlit có năm mục: Tổng quan, Tra cứu pin, Đánh giá mô hình, Dự đoán SOH và Hồ sơ đề tài. Giao diện có thanh điều hướng, các bảng và biểu đồ tương tác với nhãn tiếng Việt. Thông tin người thực hiện là Nguyễn Văn Duy, MSSV 2311553949, chuyên ngành Khoa Học Dữ Liệu. Đầu vào yêu cầu time, terminal_voltage, terminal_current và temperature; cycle nhập riêng hoặc phải nhất quán với CSV. Dữ liệu không đủ cửa sổ hoặc sai cấu trúc được báo lỗi bằng thông điệp cụ thể.
+Ứng dụng Vincent D xây dựng bằng Streamlit có sáu mục: Tổng quan, Tra cứu pin, Đánh giá mô hình, Dự đoán SOH, Lịch sử dự đoán và Thông tin. Giao diện sử dụng Arial, thanh điều hướng, các bảng và biểu đồ tiếng Việt. Có so sánh hai chu kỳ, dự đoán theo lô tối đa 100 chu kỳ, lịch sử phiên tối đa 500 chu kỳ và phiếu kết quả HTML tự chứa có thể in thành PDF bằng trình duyệt. Nhóm dữ liệu lỗi được báo riêng; không tự tạo điểm tin cậy dự đoán. Thông tin người thực hiện là Nguyễn Văn Duy, MSSV 2311553949, chuyên ngành Khoa Học Dữ Liệu. Đầu vào yêu cầu time, terminal_voltage, terminal_current và temperature; cycle nhập riêng hoặc phải nhất quán với CSV. Dữ liệu không đủ cửa sổ hoặc sai cấu trúc được báo lỗi bằng thông điệp cụ thể.
 
 Trang tra cứu cho chọn nhiều pin, lọc khoảng chu kỳ và xem điện áp, dòng, nhiệt độ của một chu kỳ. Trang đánh giá cho chọn mô hình và pin kiểm thử, đối chiếu SOH thực tế–dự đoán và tải bảng tiếng Việt. Trang dự đoán nhận cả tên cột gốc hoặc tên tiếng Việt, từ chối file trộn nhiều pin/chu kỳ, giữ kết quả khi tải và ẩn kết quả cũ khi thay đầu vào. Ứng dụng cảnh báo khi đặc trưng ngoài miền huấn luyện, cho tải mẫu và kết quả dự đoán. Dự đoán chỉ lưu từ mô hình cục bộ do pipeline tạo; không nhận file mô hình joblib từ người dùng. Đây là phần mềm nghiên cứu, không đưa ra quyết định thay pin hoặc chứng nhận an toàn.
 
-![Tổng quan PinLab và thông tin sinh viên](images/00-tong-quan.png)
+![Tổng quan Vincent D và thông tin sinh viên](images/00-tong-quan.png)
 
 ![Giao diện đánh giá mô hình](images/03-danh-gia.png)
 
 ![Giao diện xem dữ liệu chạy thực tế](images/01-du-lieu.png)
 
 ![Giao diện nhận CSV và dự đoán chạy thực tế](images/02-du-doan.png)
+
+![Xử lý theo lô và báo nhóm dữ liệu không hợp lệ](images/04-theo-lo.png)
+
+![Lịch sử kết quả trong phiên](images/05-lich-su.png)
 
 Kiểm thử gồm kiểm tra hai triệu bản ghi theo khối và so với từng mảng MATLAB, chống rò rỉ đặc trưng, xác minh nhãn và khóa chu kỳ, kiểm tra số dự đoán test, tính lại MAE/RMSE/R² từ dự đoán đã lưu, kiểm tra thứ tự thời gian và chạy luồng demo. Kết quả thực tế nằm trong verification.json và pytest-results.xml; không dùng kiểm thử bỏ qua hoặc số test bằng 0 để xác nhận sản phẩm.
 
@@ -244,9 +248,9 @@ Thực nghiệm chính hỗ trợ nhận định RF hữu ích hơn baseline s�
 
 Về phương pháp, có thể kiểm tra nhiều cửa sổ đầu, thêm đặc trưng vật lý có sẵn tại thời điểm dự đoán và đánh giá lựa chọn tham số trong validation phù hợp. Nếu làm RUL cần định nghĩa ngưỡng kết thúc tuổi thọ, nhãn số chu kỳ còn lại và cơ chế xử lý dữ liệu chưa đạt ngưỡng.
 
-### 5.3. Điều kiện trước khi nộp chính thức
+### 5.3. Phạm vi xác nhận
 
-Sinh viên cần hiểu, chạy lại và giải thích mã; đối chiếu yêu cầu giảng viên về nguồn dữ liệu, tổng quan chuyên ngành, số trang, mẫu trình bày và trích dẫn. Báo cáo hiện tại không có xác nhận nghiệm thu. Các đề xuất phương pháp và thư viện không được thay thế cho việc sinh viên kiểm chứng nội dung và tuân thủ quy định học thuật của trường.
+Kết quả được xác nhận trong phạm vi bộ dữ liệu và thiết kế thực nghiệm đã mô tả. Chưa có kiểm thử vận hành trên xe thực tế, dữ liệu Việt Nam hoặc xác nhận nghiệm thu học thuật.
 
 ## Tài liệu tham khảo và trạng thái sử dụng
 
@@ -280,4 +284,4 @@ Dữ liệu lớn được đọc theo khối khi kiểm tra và ghi theo từng
 
 Manifest xác định nguồn; dataset_summary.json xác định số dòng; dataset_check.json xác nhận kiểm tra mảng; removed_measurements.csv ghi hai dòng loại; cycle_features.csv là bảng mô hình; metrics_by_battery.csv và predictions.csv chứa kết quả test; ablation_summary.csv và temporal_metrics.csv chứa phân tích bổ sung; run_metadata.json ghi tham số; verification.json ghi kiểm thử.
 
-Xem docs/giai-thich-code.md để đi theo luồng mã và docs/huong-dan-bao-ve.md để thực hành trình bày. Dự đoán trên CSV mẫu của demo không được dùng thay điểm test độc lập.
+Dự đoán trên CSV mẫu của demo không được dùng thay điểm test độc lập.

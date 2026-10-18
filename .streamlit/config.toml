@@ -4,7 +4,7 @@ primaryColor = "#087f70"
 backgroundColor = "#f5f6f2"
 secondaryBackgroundColor = "#ffffff"
 textColor = "#193431"
-font = "sans serif"
+font = "Arial"
 
 [server]
 maxUploadSize = 5

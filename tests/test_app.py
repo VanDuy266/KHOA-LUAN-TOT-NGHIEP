@@ -11,7 +11,7 @@ def open_page(name):
     return app
 
 
-@pytest.mark.parametrize("name", ["Tổng quan", "Tra cứu pin", "Đánh giá mô hình", "Dự đoán SOH", "Hồ sơ đề tài"])
+@pytest.mark.parametrize("name", ["Tổng quan", "Tra cứu pin", "Đánh giá mô hình", "Dự đoán SOH", "Thông tin", "Lịch sử dự đoán"])
 def test_each_page_renders(name):
     app = open_page(name)
     assert not app.exception
@@ -59,3 +59,24 @@ def test_old_forecast_hidden_after_input_changes():
     assert app.metric
     app.number_input[0].set_value(2).run()
     assert not app.metric
+
+
+def test_batch_sample_and_session_history():
+    app = open_page("Dự đoán SOH")
+    app.radio(key="forecast_mode").set_value("Theo lô").run()
+    app.checkbox[0].check().run()
+    app.button[0].click().run()
+    assert not app.exception and not app.error
+    assert len(app.session_state["prediction_history"]) == 3
+    app.radio(key="navigation").set_value("Lịch sử dự đoán").run()
+    assert not app.exception
+    assert any(metric.label == "Thành công" and str(metric.value) == "3" for metric in app.metric)
+    app.button[0].click().run()
+    assert any("Chưa có lịch sử" in info.value for info in app.info)
+
+
+def test_product_has_new_name_without_coaching_copy():
+    app = open_page("Tổng quan")
+    text = " ".join(item.value for item in app.markdown)
+    assert "Vincent D" in text and "PinLab" not in text
+    assert "Trước khi nộp" not in text

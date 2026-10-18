@@ -40,3 +40,36 @@ def test_rejects_mismatched_cycle():
 def test_rejects_duplicate_alias_columns():
     with pytest.raises(ValueError, match="Tên cột bị trùng"):
         read_csv("time,Thời gian (giây)\n0,0\n".encode("utf-8"))
+
+
+def test_batch_keeps_valid_cycles_and_reports_invalid_ones():
+    from prediction import predict_batch
+    artifact = joblib.load(ROOT / "artifacts/random_forest.joblib")
+    good = pd.read_csv(ROOT / "examples/chu_ky_mau_B0005.csv").assign(battery="B0005", cycle=1)
+    bad = good.head(2).assign(cycle=2)
+    result = predict_batch(pd.concat([good, bad], ignore_index=True), artifact)
+    assert result.status.tolist() == ["Thành công", "Không hợp lệ"]
+    assert pd.notna(result.predicted_soh_pct.iloc[0])
+    assert pd.isna(result.predicted_soh_pct.iloc[1])
+    assert result.error.iloc[1]
+
+
+def test_batch_requires_cycle_and_enforces_limit():
+    from prediction import predict_batch
+    sample = pd.read_csv(ROOT / "examples/chu_ky_mau_B0005.csv")
+    with pytest.raises(ValueError, match="cần cột cycle"):
+        predict_batch(sample, {})
+    many = pd.concat([sample.assign(cycle=i) for i in range(1, 102)], ignore_index=True)
+    with pytest.raises(ValueError, match="100 chu kỳ"):
+        predict_batch(many, {})
+
+
+def test_html_report_escapes_user_data_and_history_deduplicates():
+    from result_report import html_report, add_history
+    rows = pd.DataFrame([{"battery": "<script>alert(1)</script>", "cycle": 1, "predicted_soh_pct": 90., "status": "Thành công"}])
+    html = html_report(rows, "19/10/2026", "<img src=x>")
+    assert "<script>" not in html and "<img src=x>" not in html
+    assert "&lt;script&gt;" in html and "Vincent D" in html
+    history = add_history([], rows, "request-1", "file.csv", "t1")
+    again = add_history(history, rows, "request-1", "file.csv", "t2")
+    assert len(again) == 1 and again[0]["created_at"] == "t2"

@@ -55,7 +55,7 @@ Nguồn thực tế: file MATLAB trong psanabriaUC/BatteryDatasetImplementation,
 
 ## 4. Quy trình làm: từ dữ liệu đến sản phẩm
 
-MATLAB → kiểm checksum → đọc từng operation → làm sạch → tách xả → tạo nhãn và đặc trưng → chia theo pin → học trên train → dự đoán test → tính sai số → fit lại mô hình demo → PinLab.
+MATLAB → kiểm checksum → đọc từng operation → làm sạch → tách xả → tạo nhãn và đặc trưng → chia theo pin → học trên train → dự đoán test → tính sai số → fit lại mô hình demo → Vincent D.
 
 ### 4.1. Tải và xác minh nguồn
 
@@ -262,7 +262,7 @@ notebooks/01_eda.ipynb gồm ô văn bản, ô code và kết quả như bảng/
 
 Mở cả thư mục gốc trong VS Code, cài tiện ích Jupyter, chọn kernel Python của .venv rồi Run All khi đã có reports. Không tự chọn Python toàn cục 3.14 nếu dự án đang dùng 3.12. Notebook cần chạy với thư mục làm việc gốc có reports; nếu báo không thấy features.csv, kiểm tra working directory trước khi đổi đường dẫn tùy tiện.
 
-Tương quan chỉ mô tả quan hệ trong dữ liệu quan sát, không chứng minh nguyên nhân và không đủ chọn đặc trưng dựa trên toàn bộ test. Colab có thể dùng đọc notebook nếu đã upload đúng cấu trúc dữ liệu, nhưng sản phẩm PinLab nên demo bằng VS Code và trình duyệt trên máy chuẩn bị sẵn.
+Tương quan chỉ mô tả quan hệ trong dữ liệu quan sát, không chứng minh nguyên nhân và không đủ chọn đặc trưng dựa trên toàn bộ test. Colab có thể dùng đọc notebook nếu đã upload đúng cấu trúc dữ liệu, nhưng sản phẩm Vincent D nên demo bằng VS Code và trình duyệt trên máy chuẩn bị sẵn.
 
 ## 12. Từng file code làm gì?
 
@@ -274,7 +274,7 @@ Tương quan chỉ mô tả quan hệ trong dữ liệu quan sát, không chứn
 | src/battery_soh/features.py | Nhãn và 11 đặc trưng đầu chu kỳ | Hàm dùng chung train/demo |
 | scripts/run_experiment.py | Năm cấu hình, kiểm thử theo pin | metrics, predictions, model joblib |
 | scripts/analyze_results.py | Bỏ nhóm đặc trưng, chia thời gian | ablation, temporal_metrics, hình lỗi |
-| app/streamlit_app.py | Điểm vào, kiểm file, chọn màn hình | Ứng dụng PinLab |
+| app/streamlit_app.py | Điểm vào, kiểm file, chọn màn hình | Ứng dụng Vincent D |
 | app/app_data.py | Đọc file có cache theo thời điểm sửa | Bảng và model cho giao diện |
 | app/prediction.py | Đọc CSV, kiểm một pin/chu kỳ, dự đoán | SOH, đặc trưng, cảnh báo ngoài miền |
 | app/labels.py | Dịch tên hiển thị trên bản sao | Bảng tiếng Việt |
@@ -286,7 +286,7 @@ Tương quan chỉ mô tả quan hệ trong dữ liệu quan sát, không chứn
 
 pandas giúp chọn cột/nhóm chu kỳ, NumPy tính thống kê, scipy đọc .mat, scikit-learn học và đánh giá, joblib lưu mô hình, matplotlib tạo hình báo cáo, Altair vẽ tương tác, Streamlit dựng giao diện. Không có API LLM dùng để suy ra SOH. Các thuật toán thư viện cần được ghi nhận; việc biết gọi fit không thay cho hiểu thiết kế dữ liệu.
 
-## 13. Chạy PinLab đúng cách trên máy Windows
+## 13. Chạy Vincent D đúng cách trên máy Windows
 
 Lỗi gần nhất “không tìm thấy .venv\Scripts\python.exe” nghĩa là môi trường chưa tạo thành công hoặc không nằm ở vị trí đang gọi. ZIP không kèm môi trường Python của máy khác. Không giải quyết bằng việc liên tục chạy lại cùng một đường dẫn chưa tồn tại.
 
@@ -351,7 +351,7 @@ Mở docs/slide-bao-ve.pptx. Thời lượng đề xuất khoảng 10–15 phút
 | 2 phút | Phương pháp | 11 đặc trưng đầu 120 giây, không dùng nhãn làm đầu vào |
 | 2 phút | Cách đánh giá | Bốn vòng giữ riêng pin, năm cấu hình, tham số cố định |
 | 2 phút | Kết quả | MAE/RMSE/R², RF tốt ở macro nhưng không mọi trường hợp |
-| 2–3 phút | Demo PinLab | Tra cứu, đánh giá, upload CSV, tải kết quả |
+| 2–3 phút | Demo Vincent D | Tra cứu, đánh giá, upload CSV, tải kết quả |
 | 1 phút | Hạn chế và hướng phát triển | Chỉ bốn pin, chưa thực địa, cần thêm dữ liệu |
 
 ### 14.2. Lời nói mẫu khi đọc bảng kết quả

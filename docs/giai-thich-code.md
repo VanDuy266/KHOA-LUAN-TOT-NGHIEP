@@ -50,7 +50,8 @@ File chính chỉ kiểm tra dữ liệu, nạp CSS, tạo thanh điều hướn
 - `explorer.py`: lọc pin/chu kỳ, tra cứu tín hiệu thật, xuất CSV.
 - `evaluation.py`: chọn mô hình, xem MAE/RMSE/R² và dự đoán trên pin giữ riêng.
 - `forecast.py`: nhập CSV, nhận kết quả, lưu tạm trong phiên để tải file không làm mất kết quả.
-- `profile.py`: nguồn dữ liệu, thuật ngữ và tài liệu.
+- `history.py`: lịch sử phiên, lọc, tải và xóa kết quả.
+- `profile.py`: nguồn dữ liệu và hồ sơ thực nghiệm.
 
 `app/charts.py` gọi Altair để tạo biểu đồ. `app/labels.py` ánh xạ tên cột sang tiếng Việt trên một bản sao; không đổi tên cột trong pipeline tính toán. `app/app_data.py` dùng cache theo thời điểm sửa file để tránh đọc lại 185.721 dòng mỗi khi bấm bộ lọc. Dữ liệu upload không nằm trong cache dùng chung và không được thêm vào dữ liệu huấn luyện.
 
@@ -78,3 +79,5 @@ File chính chỉ kiểm tra dữ liệu, nạp CSS, tạo thanh điều hướn
 ## Điều cần tự giải thích khi bảo vệ
 
 Định nghĩa SOH; lý do dùng 120 giây; khác nhau giữa dòng đo và mẫu nhãn; lý do giữ riêng pin; tại sao không dùng capacity làm đầu vào; MAE có đơn vị gì; tại sao RF chưa dự đoán được tuổi thọ còn lại; giới hạn bốn pin và dữ liệu không phải Việt Nam. Nguồn hỗ trợ và mã thư viện cần được ghi nhận theo quy định của trường, không dùng cách trình bày để che giấu quá trình thực hiện.
+
+Bản Vincent D bổ sung `predict_batch` để xử lý riêng nhóm pin/chu kỳ, `result_report.py` tạo phiếu HTML có escape dữ liệu người dùng và quản lý lịch sử tối đa 500 dòng. Lịch sử chỉ nằm trong phiên, không lưu thành dataset huấn luyện.

@@ -10,8 +10,8 @@ def render():
     metrics = table("reports/metrics_summary.csv")
     by_battery = table("reports/metrics_by_battery.csv")
     predictions = table("reports/predictions.csv")
-    heading("THỰC NGHIỆM / 02", "Đánh giá bằng kết quả kiểm thử.",
-            "Bốn vòng đánh giá: mỗi vòng huấn luyện trên ba pin, giữ toàn bộ pin còn lại để kiểm thử. Tham số mô hình được cố định.")
+    heading("THỰC NGHIỆM / 02", "Đánh giá mô hình",
+            "Kiểm thử giữ riêng pin · 4 vòng · 5 cấu hình")
     names = metrics.model.tolist()
     model = st.selectbox("Mô hình cần xem", names, index=names.index("Random Forest"), format_func=lambda name: MODEL_NAMES[name])
     score = metrics[metrics.model == model].iloc[0]
@@ -20,14 +20,14 @@ def render():
         [f"{score.mae:.3f}", f"{score.rmse:.3f}", f"{score.r2:.3f}"],
         ["Điểm phần trăm SOH · nhỏ hơn là tốt hơn", "Điểm phần trăm SOH · nhạy với lỗi lớn", "Trung bình theo pin · có thể mang giá trị âm"]):
         with column: stat(label, value, detail)
-    section("01", "So sánh năm mô hình", "Chỉ số tổng hợp là trung bình không trọng số giữa bốn pin, không phải độ chính xác phân loại.")
+    section("01", "So sánh cấu hình", "Trung bình không trọng số giữa bốn pin")
     left, right = st.columns([1.3, 1], gap="large")
     with left:
         with st.container(border=True):
             metric = st.selectbox("Chỉ số trên biểu đồ", ["mae", "rmse", "r2"], format_func=lambda key: {"mae": "MAE — sai số tuyệt đối", "rmse": "RMSE — sai số bình phương", "r2": "R² — hệ số xác định"}[key])
-            st.altair_chart(model_comparison(metrics, metric), use_container_width=True, theme=None)
+            st.altair_chart(model_comparison(metrics, metric), width="stretch", theme=None)
     with right:
-        st.dataframe(vietnamese_table(metrics).round(3), hide_index=True, use_container_width=True,
+        st.dataframe(vietnamese_table(metrics).round(3), hide_index=True, width="stretch",
             column_config={
                 "Mô hình": st.column_config.TextColumn("Mô hình", width="medium"),
                 "MAE (điểm % SOH)": st.column_config.NumberColumn("MAE", width="small", format="%.3f", help="Sai số tuyệt đối, đơn vị điểm phần trăm SOH"),
@@ -35,23 +35,21 @@ def render():
                 "R²": st.column_config.NumberColumn("R²", width="small", format="%.3f"),
             })
         csv_download("Tải bảng so sánh tiếng Việt", vietnamese_table(metrics), "so_sanh_mo_hinh.csv")
-        st.caption("Màu cam nhận diện Random Forest — mô hình dùng trong demo. Không có nghĩa mô hình tốt nhất ở mọi pin.")
-    section("02", "Thực tế và dự đoán", "Các đường dự đoán dưới đây được tạo khi pin đang xem chưa xuất hiện trong tập huấn luyện.")
+        st.caption("MAE/RMSE: điểm phần trăm SOH · Màu cam: Random Forest")
+    section("02", "Thực tế và dự đoán", "Dự đoán từ pin giữ riêng trong kiểm thử")
     battery = st.selectbox("Pin kiểm thử", sorted(predictions.battery.unique()))
     part = predictions[(predictions.model == model) & (predictions.battery == battery)]
-    with st.container(border=True): st.altair_chart(held_out(part), use_container_width=True, theme=None)
-    st.dataframe(vietnamese_table(by_battery[by_battery.model == model]).round(3), hide_index=True, use_container_width=True)
+    with st.container(border=True): st.altair_chart(held_out(part), width="stretch", theme=None)
+    st.dataframe(vietnamese_table(by_battery[by_battery.model == model]).round(3), hide_index=True, width="stretch")
     section("03", "Sai số ở từng chu kỳ", "Sai số dương: dự đoán cao hơn thực tế. Sai số âm: dự đoán thấp hơn thực tế.")
-    with st.container(border=True): st.altair_chart(residuals(predictions[predictions.model == model]), use_container_width=True, theme=None)
+    with st.container(border=True): st.altair_chart(residuals(predictions[predictions.model == model]), width="stretch", theme=None)
     csv_download("Tải dự đoán kiểm thử của mô hình", vietnamese_table(predictions[predictions.model == model]), "du_doan_kiem_thu.csv")
     if (ROOT / "reports/ablation_summary.csv").exists():
-        section("04", "Các kiểm tra bổ sung", "Tách riêng câu hỏi về nhóm đặc trưng và dự đoán chu kỳ tương lai.")
+        section("04", "Các kiểm tra bổ sung", "Đặc trưng và phân hoạch thời gian")
         ablation, temporal = st.tabs(["Bỏ nhóm đặc trưng", "Kiểm thử theo thời gian"])
         with ablation:
-            st.dataframe(vietnamese_table(table("reports/ablation_summary.csv")).round(3), hide_index=True, use_container_width=True)
-            st.caption("So sánh RF đầy đủ với cấu hình bỏ số chu kỳ hoặc bỏ nhiệt độ. Không dùng bảng này để chọn lại mô hình trên tập kiểm thử.")
+            st.dataframe(vietnamese_table(table("reports/ablation_summary.csv")).round(3), hide_index=True, width="stretch")
+            st.caption("Random Forest · tham số cố định")
         with temporal:
-            st.dataframe(vietnamese_table(table("reports/temporal_metrics.csv")).round(3), hide_index=True, use_container_width=True)
-            note("Kết quả cần lưu ý", "Trong thiết kế 70% chu kỳ đầu / 30% chu kỳ sau, Random Forest có MAE cao hơn cách giữ SOH cuối đã biết. Đây là bài toán khác với giữ riêng pin; chưa có cơ sở tuyên bố dự đoán tuổi thọ còn lại.", "soft")
-    with st.expander("Cách đọc các chỉ số"):
-        st.markdown("**MAE:** trung bình độ lệch tuyệt đối giữa SOH dự đoán và SOH thực tế.\n\n**RMSE:** phạt mạnh hơn các dự đoán sai nhiều.\n\n**R²:** so với độ biến thiên nhãn của pin kiểm thử; có thể âm.\n\nKhông lấy `100 − MAE` để gọi là độ chính xác. Các bảng ở đây đánh giá ước lượng SOH, không đánh giá SOC hoặc RUL.")
+            st.dataframe(vietnamese_table(table("reports/temporal_metrics.csv")).round(3), hide_index=True, width="stretch")
+            st.caption("Phân hoạch 70/30 theo thời gian: RF có MAE cao hơn baseline SOH cuối đã biết ở cả bốn pin.")

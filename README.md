@@ -43,23 +43,24 @@ Linux: `bash scripts/setup.sh`. Windows: cài `requirements.txt` thay cho `requi
 
 Cần khoảng 2 GB ổ đĩa cho môi trường và CSV. Không cần GPU hoặc API key. `requirements-app.txt` chỉ cài phần chạy sản phẩm; `requirements.txt` thêm kiểm thử và xuất Word/PowerPoint/notebook; `requirements.lock.txt` ghim môi trường Linux đã kiểm thử. Script Windows đã được kiểm tra nội dung nhưng chưa được thực thi trực tiếp trên Windows trong môi trường Linux này.
 
-## Giao diện PinLab
+## Giao diện Vincent D
 
 Thông tin hiển thị: **Nguyễn Văn Duy · MSSV 2311553949 · Chuyên ngành Khoa Học Dữ Liệu**.
 
 | Mục | Chức năng |
 | --- | --- |
 | Tổng quan | Hồ sơ sinh viên, số liệu nghiên cứu, đường SOH của bốn pin |
-| Tra cứu pin | Chọn nhiều pin, lọc khoảng chu kỳ, xem tín hiệu từng chu kỳ, tải CSV |
+| Tra cứu pin | Lọc pin/chu kỳ, xem tín hiệu và so sánh hai chu kỳ A/B, tải CSV |
 | Đánh giá mô hình | So sánh MAE/RMSE/R², chọn mô hình và pin kiểm thử, xem sai số, phân tích bổ sung |
-| Dự đoán SOH | Upload CSV hoặc dùng mẫu, kiểm tra đầu vào, giữ kết quả khi tải, xuất CSV |
-| Hồ sơ đề tài | Nguồn, quy trình làm sạch, thuật ngữ và tải báo cáo/slide |
+| Dự đoán SOH | Một chu kỳ hoặc theo lô tối đa 100 chu kỳ; lỗi theo nhóm; xuất CSV và phiếu HTML |
+| Lịch sử dự đoán | Lưu tạm tối đa 500 chu kỳ trong phiên, lọc trạng thái, tải hoặc xóa |
+| Thông tin | Nguồn, quy trình làm sạch, thuật ngữ và tải báo cáo/slide |
 
-Biểu đồ tương tác và bảng trình bày dùng tiếng Việt; CSV xuất cho Excel có BOM để đọc đúng dấu. Trang dự đoán nhận cả tên cột gốc lẫn tên tiếng Việt đã xuất từ ứng dụng. File phải thuộc đúng một pin và một chu kỳ. Hiệu ứng CSS có chế độ giảm chuyển động theo thiết lập trình duyệt.
+Biểu đồ tương tác và bảng trình bày dùng tiếng Việt; CSV xuất cho Excel có BOM để đọc đúng dấu. Trang dự đoán nhận cả tên cột gốc lẫn tên tiếng Việt đã xuất từ ứng dụng. File phải thuộc đúng một pin và một chu kỳ. Giao diện dùng Arial, hiệu ứng nhẹ và hỗ trợ giảm chuyển động. Không hiển thị các đoạn hướng dẫn học/bảo vệ; tài liệu học được giữ riêng trong docs. Phiếu HTML có thể mở bằng trình duyệt và in/lưu PDF, không cần mạng ngoài.
 
-Code giao diện tách theo nhiệm vụ: `app/screens/` chứa năm màn hình; `app/charts.py` tạo biểu đồ; `app/labels.py` dịch cột; `app/prediction.py` kiểm tra CSV; `app/styles.css` phụ trách màu sắc/bố cục. Giao diện không huấn luyện lại mô hình khi người khác xem.
+Code giao diện tách theo nhiệm vụ: `app/screens/` chứa sáu màn hình; `app/charts.py` tạo biểu đồ; `app/labels.py` dịch cột; `app/prediction.py` kiểm tra CSV; `app/styles.css` phụ trách màu sắc/bố cục. Giao diện không huấn luyện lại mô hình khi người khác xem.
 
-![Tổng quan PinLab](docs/images/00-tong-quan.png)
+![Tổng quan Vincent D](docs/images/00-tong-quan.png)
 
 ## Dataset đã kiểm tra
 

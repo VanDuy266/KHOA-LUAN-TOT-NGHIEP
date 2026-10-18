@@ -66,3 +66,13 @@ def residuals(data):
         color=alt.Color("battery:N", scale=alt.Scale(range=PALETTE)),
         tooltip=[alt.Tooltip("battery:N", title="Pin"), alt.Tooltip("cycle:Q", title="Chu kỳ"), alt.Tooltip("error:Q", title="Sai số", format=".3f")])
     return finish(dots, 260)
+
+
+def compare_signal(data, column, title):
+    chart = alt.Chart(data).mark_line(strokeWidth=2.4).encode(
+        x=alt.X("time:Q", title="Thời gian (giây)"),
+        y=alt.Y(f"{column}:Q", title=title, scale=alt.Scale(zero=False)),
+        color=alt.Color("comparison:N", title=None, scale=alt.Scale(range=["#087f70", "#eb8c5e"])),
+        tooltip=[alt.Tooltip("comparison:N", title="Chu kỳ"), alt.Tooltip("time:Q", title="Giây", format=".2f"),
+                 alt.Tooltip(f"{column}:Q", title=title, format=".3f")])
+    return finish(chart, 260)

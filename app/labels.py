@@ -7,6 +7,8 @@ MODEL_NAMES = {
     "HistGradientBoosting": "Tăng cường cây — Histogram Boosting",
 }
 COLUMNS = {
+    "status": "Trạng thái", "error": "Lỗi dữ liệu", "outside_count": "Đặc trưng ngoài miền",
+    "measurement_count": "Số điểm đo", "created_at": "Thời điểm (UTC+7)", "source": "Nguồn đầu vào",
     "battery": "Mã pin", "cycle": "Chu kỳ xả", "soh_pct": "SOH (%)",
     "model": "Mô hình", "mae": "MAE (điểm % SOH)",
     "rmse": "RMSE (điểm % SOH)", "r2": "R²",

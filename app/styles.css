@@ -4,11 +4,11 @@
 [data-testid="stHeader"] { background:rgba(245,246,242,.94); }
 [data-testid="stAppDeployButton"] { display:none; }
 .block-container { max-width:1480px; padding:4.5rem 3rem 2rem; }
-h1,h2,h3,h4,p { font-family:"Segoe UI",Arial,sans-serif; }
-h1 { letter-spacing:-1.8px !important; }
+h1,h2,h3,h4,p { font-family:Arial,Helvetica,sans-serif; }
+h1 { letter-spacing:normal !important; }
 .page-heading { animation:reveal .45s ease both; padding:0 0 1.4rem; }
 .eyebrow { color:var(--teal); font-size:10px; letter-spacing:1.8px; font-weight:700; margin-bottom:12px; }
-.page-heading h1 { font-size:42px; line-height:1.18; font-weight:650; margin:0 0 14px; color:var(--ink); }
+.page-heading h1 { font-size:36px; line-height:1.18; font-weight:650; margin:0 0 14px; color:var(--ink); }
 .page-heading p { font-size:14px; line-height:1.8; color:var(--muted); max-width:850px; margin:0; }
 .hero-panel { background:#113e37; color:white; padding:30px 32px; border-radius:18px; min-height:291px; position:relative; overflow:hidden; }
 .hero-panel::after { content:""; width:230px; height:230px; border:35px solid rgba(255,255,255,.035); border-radius:50%; position:absolute; right:-100px; bottom:-120px; pointer-events:none; }
@@ -75,3 +75,10 @@ dt { color:#7a877e; font-weight:400; } dd { margin:0; font-weight:550; }
 @keyframes reveal { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
 @media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
 @media (max-width:900px) { .block-container { padding:4.5rem 1.2rem 1.5rem; } .page-heading h1 { font-size:31px; } .hero-panel { padding:25px; } .stat-value { font-size:27px; } .stat-card { padding:15px; } .app-footer { flex-direction:column; gap:6px; } }
+
+/* Arial dùng xuyên suốt; giữ font biểu tượng Material của các nút. */
+.stApp,.stApp p,.stApp h1,.stApp h2,.stApp h3,.stApp h4,.stApp input,.stApp textarea,.stApp button,.stApp label,[data-testid="stMetricValue"] { font-family:Arial,Helvetica,sans-serif !important; }
+.brand-mark { border:0;background:#386152;border-radius:10px;width:40px;height:40px;color:white;font-size:16px; }
+.brand-mark::before { display:none; }
+.hero-panel h2,.page-heading h1,.author-card h2,.profile-card h2 { letter-spacing:normal; }
+.stButton button[kind="primary"] { min-height:43px; }

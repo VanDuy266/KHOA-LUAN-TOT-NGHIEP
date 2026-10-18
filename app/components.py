@@ -1,4 +1,4 @@
-"""Các thành phần trình bày nhỏ dùng chung cho năm màn hình."""
+"""Các thành phần trình bày nhỏ dùng chung cho các màn hình."""
 from html import escape
 import streamlit as st
 

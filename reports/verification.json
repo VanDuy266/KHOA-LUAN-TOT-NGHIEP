@@ -1,7 +1,7 @@
 {
-  "utc": "2026-10-18T22:42:29.656873+00:00",
+  "utc": "2026-10-18T23:09:05.854432+00:00",
   "pytest": {
-    "tests": 35,
+    "tests": 41,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -16,13 +16,22 @@
   "dataset_array_check": "passed; reports/dataset_check.json",
   "windows_launcher": "reviewed only; not executed on Windows",
   "interface": {
-    "name": "PinLab",
-    "pages": 5,
-    "browser_pages": "passed",
-    "uploaded_csv_soh_pct": 91.47,
-    "download_retains_result": true,
-    "mobile_viewport_width": 390,
+    "name": "Vincent D",
+    "font": "Arial",
+    "pages": 6,
+    "single_upload_soh_pct": 91.47,
+    "partial_batch": {
+      "cycles": 3,
+      "valid": 2,
+      "invalid": 1
+    },
+    "session_history": true,
+    "clear_history": true,
+    "html_report_download": true,
+    "html_render_pdf_test": true,
+    "mobile_viewport": 390,
     "mobile_document_width": 390,
-    "reduced_motion_css": true
+    "two_cycle_comparison": true,
+    "coaching_copy_removed": true
   }
 }
