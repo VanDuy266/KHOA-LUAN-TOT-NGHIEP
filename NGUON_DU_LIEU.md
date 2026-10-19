@@ -29,10 +29,10 @@ Theo tác giả, dữ liệu thu từ 86 cell Lishen LR1865SZ, điện cực NMC
 
 1. Đọc và kiểm tra 145.112.317 dòng, 89.677 chu kỳ ghi nhận từ 172 CSV nguồn.
 2. Chọn các đoạn xả ở điều kiện tham chiếu khoảng 0,2C: dòng -0,48 A, đầu xả ít nhất 4 V, cuối xả gần 3 V, cùng các kiểm tra tín hiệu và dung lượng. Kết quả: 30.929.675 dòng thuộc 20.823 chu kỳ của 86 pin. Đây là nhận diện điều kiện xả từ tín hiệu, không phải khẳng định mọi chu kỳ đều có nhãn chẩn đoán do tác giả cấp.
-3. Bản 10.000.000 dòng giữ đủ 20.823 chu kỳ và 86 pin. Giữ toàn bộ mẫu 120 giây đầu xả và điểm cuối mỗi chu kỳ; giảm mật độ mẫu ở đoạn sau theo thứ tự thời gian. Đây là lấy thưa, không phải tuyên bố mọi điểm bị bỏ là nhiễu.
+3. Bản 10.505.065 dòng giữ đủ 20.823 chu kỳ và 86 pin. Giữ toàn bộ mẫu 120 giây đầu xả và điểm cuối mỗi chu kỳ; giảm mật độ mẫu ở đoạn sau theo thứ tự thời gian bằng cách giữ một trong ba điểm còn lại của từng chu kỳ. Đây là lấy thưa, không phải tuyên bố mọi điểm bị bỏ là nhiễu.
 4. Dòng CSV được chọn giữ nguyên văn: tên cột, số đo, mã pin, số chu kỳ và thứ tự nguồn. Không nội suy, điền giá trị thiếu, nhân bản hoặc sửa số đo. Đây là tập con do dự án tạo, không phải nguyên gói tác giả phát hành.
 5. Bảng đặc trưng và nhãn được tạo riêng. SOH (%) = dung lượng xả tham chiếu / 2,4 × 100. Nhãn lấy từ chu kỳ đầy đủ; không tính lại bằng đường đã lấy thưa. Các file bảng mô hình được đối chiếu với bộ đầy đủ.
 
-Trong báo cáo có thể ghi: “Tôi sử dụng bộ dữ liệu SDU công bố năm 2025 của Wang, Gao và Tian. Tập con gồm 10 triệu dòng đo xả, giữ đủ 20.823 chu kỳ ở điều kiện tham chiếu của 86 pin. Mọi điểm đo trong 120 giây đầu được giữ để tính đặc trưng; phần sau được lấy thưa để giảm dung lượng lưu trữ.”
+Trong báo cáo có thể ghi: “Tôi sử dụng bộ dữ liệu SDU công bố năm 2025 của Wang, Gao và Tian. Tập con gồm 10.505.065 dòng đo xả, giữ đủ 20.823 chu kỳ ở điều kiện tham chiếu của 86 pin. Mọi điểm đo trong 120 giây đầu được giữ để tính đặc trưng; phần sau được lấy thưa để giảm dung lượng lưu trữ.”
 
 Chất lượng của bản được phát kèm nằm trong KET_QUA_KIEM_TRA.md và verification/. Tính toàn vẹn file không chứng minh mọi tín hiệu đều không có nhiễu.

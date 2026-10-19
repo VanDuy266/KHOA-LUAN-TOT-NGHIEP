@@ -87,7 +87,7 @@ def main():
     result.update(files=len(audit),physical_batteries=int(audit.battery.nunique()),all_source_hashes_match=bool(audit.source_hash_verified.all()),
         structural_validation_passed=bool(not any(result[key] for key in fatal)),
         status='Structurally checked; suspected spikes retained for review; no claim of zero noise',source_data_modified=False)
-    if result['rows']!=10000000 or result['cycles']!=20823 or result['physical_batteries']!=86:raise ValueError('Sai quy mô')
+    if result['rows']!=10505065 or result['cycles']!=20823 or result['physical_batteries']!=86:raise ValueError('Sai quy mô')
     (OUT/'summary.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n')
     print(json.dumps(result,ensure_ascii=False,indent=2),flush=True)
 

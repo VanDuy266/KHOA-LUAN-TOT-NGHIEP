@@ -1,6 +1,6 @@
 {
   "dataset": "SDU 2025 — 10 million rows, all selected reference cycles",
-  "measurement_rows": 10000000,
+  "measurement_rows": 10505065,
   "parent_measurement_rows": 30929675,
   "cycles": 20823,
   "batteries": 86,
@@ -30,5 +30,6 @@
     "temperature_max",
     "temperature_slope"
   ],
-  "nominal_capacity_ah": 2.4
+  "nominal_capacity_ah": 2.4,
+  "sampling_method": "Keep every first-120s and final point; retain every third remaining point in time order within each cycle"
 }
