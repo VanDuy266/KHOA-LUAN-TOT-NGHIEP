@@ -1,0 +1,144 @@
+{
+  "created": "2025-05-06T08:29:54.218946+00:00",
+  "modified": "2025-06-25T06:20:35.020730+00:00",
+  "id": 14859405,
+  "conceptrecid": "14859404",
+  "doi": "10.5281/zenodo.14859405",
+  "conceptdoi": "10.5281/zenodo.14859404",
+  "doi_url": "https://doi.org/10.5281/zenodo.14859405",
+  "metadata": {
+    "title": "Data for: Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions",
+    "doi": "10.5281/zenodo.14859405",
+    "publication_date": "2025-02-12",
+    "description": "<p>This dataset supports the study titled <strong>Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions</strong>, published in <em><strong>Cell Reports Physical Science</strong></em>. The study focuses on enhancing the sorting and grouping of retired lithium-ion batteries for second-life applications. It is based on a 30-month aging campaign conducted on 86 NMC(532)/graphite batteries (Lishen LR1865SZ, 2.4 Ah nominal capacity). The batteries underwent two-phase cyclic aging tests, designed to simulate real-world usage and second-life applications, generating over 88,000 charge-discharge cycles and approximately 145 million recorded data points.</p>\n<p><strong>Primary_use_phase Dataset</strong><br>The <em>Primary_use_phase</em> dataset contains data from the initial aging phase, during which the 86 batteries were subjected to 16 distinct charge-discharge protocols. Each battery was cycled until its state of health (SOH) declined from 100% to approximately 80%. Key parameters including voltage, current, internal resistance, and surface temperature were recorded during regular cycling and diagnostic cycles, the latter being conducted every four operational cycles to assess capacity and resistance.</p>\n<p><strong>Second_life_phase Dataset</strong><br>The <em>Second_life_phase</em> dataset captures the batteries' behavior during the second-life phase, where all 86 batteries, now aged to 80% SOH, were cycled under a standardized charge-discharge protocol until their capacity decayed to 50%. The same set of parameters&mdash;voltage, current, IR, and temperature&mdash;was systematically monitored throughout this phase.</p>\n<p><strong>File Naming and Identification</strong><br>The file names correspond to the initial identifiers assigned during the aging experiments and differ from the Battery_ID used in the associated manuscript. For clarity, each data file includes a &ldquo;Battery_ID&rdquo; column, aligning with the manuscript&rsquo;s references, and a &ldquo;Protocol_ID&rdquo; column indicating the cycling protocol applied during the primary-use phase. Data for batteries originally labeled 61 and 62 are unavailable due to damage during testing and are therefore excluded from both datasets.</p>\n<p><strong>Significance</strong><br>This dataset provides a unique and comprehensive view of lithium-ion battery degradation under realistic second-life conditions. It serves as a key resource for developing and benchmarking battery sorting, prediction, and second-life deployment strategies, offering a foundation for improving the efficiency, reliability, and sustainability of battery reuse practices.</p>",
+    "access_right": "open",
+    "creators": [
+      {
+        "name": "Wang, Shuquan",
+        "affiliation": "Shandong University",
+        "orcid": "0000-0003-0317-1430"
+      },
+      {
+        "name": "Gao, Feng",
+        "affiliation": "Shandong University",
+        "orcid": "0000-0002-4969-5195"
+      },
+      {
+        "name": "Tian, Hao",
+        "affiliation": "Shandong University",
+        "orcid": "0000-0002-4810-5798"
+      }
+    ],
+    "keywords": [
+      "lithium-ion batteries",
+      "second-life applications",
+      "battery aging",
+      "cycling aging dataset",
+      "battery reuse",
+      "battery sorting",
+      "degradation analysis"
+    ],
+    "related_identifiers": [
+      {
+        "identifier": "10.1016/j.xcrp.2025.102657",
+        "relation": "isSupplementTo",
+        "scheme": "doi"
+      }
+    ],
+    "language": "eng",
+    "resource_type": {
+      "title": "Dataset",
+      "type": "dataset"
+    },
+    "license": {
+      "id": "cc-by-4.0"
+    },
+    "relations": {
+      "version": [
+        {
+          "index": 0,
+          "is_last": true,
+          "parent": {
+            "pid_type": "recid",
+            "pid_value": "14859404"
+          }
+        }
+      ]
+    }
+  },
+  "title": "Data for: Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions",
+  "links": {
+    "self": "https://zenodo.org/api/records/14859405",
+    "self_html": "https://zenodo.org/records/14859405",
+    "preview_html": "https://zenodo.org/records/14859405?preview=1",
+    "doi": "https://doi.org/10.5281/zenodo.14859405",
+    "self_doi": "https://doi.org/10.5281/zenodo.14859405",
+    "self_doi_html": "https://zenodo.org/doi/10.5281/zenodo.14859405",
+    "reserve_doi": "https://zenodo.org/api/records/14859405/draft/pids/doi",
+    "parent": "https://zenodo.org/api/records/14859404",
+    "parent_html": "https://zenodo.org/records/14859404",
+    "parent_doi": "https://doi.org/10.5281/zenodo.14859404",
+    "parent_doi_html": "https://zenodo.org/doi/10.5281/zenodo.14859404",
+    "self_iiif_manifest": "https://zenodo.org/api/iiif/record:14859405/manifest",
+    "self_iiif_sequence": "https://zenodo.org/api/iiif/record:14859405/sequence/default",
+    "files": "https://zenodo.org/api/records/14859405/files",
+    "media_files": "https://zenodo.org/api/records/14859405/media-files",
+    "latest": "https://zenodo.org/api/records/14859405/versions/latest",
+    "latest_html": "https://zenodo.org/records/14859405/latest",
+    "versions": "https://zenodo.org/api/records/14859405/versions",
+    "draft": "https://zenodo.org/api/records/14859405/draft",
+    "access_links": "https://zenodo.org/api/records/14859405/access/links",
+    "access_grants": "https://zenodo.org/api/records/14859405/access/grants",
+    "access_users": "https://zenodo.org/api/records/14859405/access/users",
+    "access_request": "https://zenodo.org/api/records/14859405/access/request",
+    "access": "https://zenodo.org/api/records/14859405/access",
+    "communities": "https://zenodo.org/api/records/14859405/communities",
+    "communities-suggestions": "https://zenodo.org/api/records/14859405/communities-suggestions",
+    "request_deletion": "https://zenodo.org/api/records/14859405/request-deletion",
+    "file_modification": "https://zenodo.org/api/records/14859405/file-modification",
+    "quota_increase": "https://zenodo.org/api/records/14859405/quota-increase",
+    "requests": "https://zenodo.org/api/records/14859405/requests"
+  },
+  "updated": "2025-06-25T06:20:35.020730+00:00",
+  "recid": "14859405",
+  "revision": 12,
+  "files": [
+    {
+      "id": "030e4dcc-a628-4da0-b94c-bceb12ab9ff7",
+      "key": "Primary_use_phase.zip",
+      "size": 2694002794,
+      "checksum": "md5:15d94a62d47dd9036899889b3f36992d",
+      "links": {
+        "self": "https://zenodo.org/api/records/14859405/files/Primary_use_phase.zip/content"
+      }
+    },
+    {
+      "id": "e4f45972-bbe6-4146-90ee-433c27b526f2",
+      "key": "Second_life_phase.zip",
+      "size": 1794732202,
+      "checksum": "md5:0ba11864d2c1017c84d96dfe578956fc",
+      "links": {
+        "self": "https://zenodo.org/api/records/14859405/files/Second_life_phase.zip/content"
+      }
+    }
+  ],
+  "swh": {},
+  "owners": [
+    {
+      "id": "1194108"
+    }
+  ],
+  "status": "published",
+  "stats": {
+    "downloads": 4145,
+    "unique_downloads": 1360,
+    "views": 2175,
+    "unique_views": 1946,
+    "version_downloads": 4145,
+    "version_unique_downloads": 1360,
+    "version_unique_views": 1946,
+    "version_views": 2175
+  },
+  "state": "done",
+  "submitted": true
+}

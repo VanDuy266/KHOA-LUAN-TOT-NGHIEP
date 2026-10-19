@@ -1,0 +1,83 @@
+# Cấu trúc mã nguồn và phương pháp xử lý
+
+Tôi chia chương trình thành bốn phần: dữ liệu, mô hình, đánh giá và giao diện. Mỗi phần có đầu vào và đầu ra riêng để kiểm tra được kết quả.
+
+## 1. Dữ liệu và khóa chu kỳ
+
+Nguồn SDU công bố năm 2025 có 86 pin qua hai giai đoạn. Bản chọn dùng trong sản phẩm có 10 triệu dòng đo và 20.823 mẫu chu kỳ. Một mẫu được xác định bởi `battery + phase + cycle`; số chu kỳ có thể lặp khi đổi giai đoạn nên không bỏ cột `phase` khỏi khóa.
+
+`download_data.py` nhận gói ZIP tải về hoặc lấy nhánh dữ liệu riêng bằng Git. `prepare_data.py` kiểm SHA-256 của nội dung nguồn, đọc từng file, sắp bản sao theo chu kỳ/thời gian rồi tạo Parquet. CSV nguồn không bị ghi đè. Mỗi file Parquet ứng với một pin trong một giai đoạn; mỗi nhóm dòng Parquet ứng với một chu kỳ để đọc nhanh.
+
+Bảng `cycle_features.csv` chứa cả thông tin kiểm tra và nhãn. Chỉ các tên trong hằng `FEATURES` được dùng làm đầu vào mô hình. Không đưa mọi cột của bảng vào `fit()`.
+
+## 2. Hàm tính đặc trưng
+
+`src/battery_soh/features.py` có hai hàm chính:
+
+| Hàm | Mục đích |
+| --- | --- |
+| `extract_window(frame, cycle)` | Kiểm tín hiệu, lấy 0–120 giây, chọn phần đang xả và tính 12 đặc trưng |
+| `validate_target(frame)` | Kiểm dung lượng/SOH hữu hạn, nhất quán và đúng mẫu số 2,4 Ah |
+
+`voltage_mean` là điện áp trung bình, `voltage_std` là độ lệch chuẩn. `voltage_slope` tính bằng tổng tích thời gian đã trừ trung bình với điện áp đã trừ trung bình, chia cho tổng bình phương thời gian đã trừ trung bình. Nhiệt độ cũng có độ dốc tương tự.
+
+`phase_code` bằng 0 cho sử dụng ban đầu và 1 cho tái sử dụng. `cycle` và `phase_code` là thông tin giả định có sẵn khi dự đoán. Dung lượng xả toàn chu kỳ chỉ tạo nhãn `soh_pct = capacity_ah / 2.4 * 100`.
+
+## 3. Huấn luyện mô hình bảng
+
+`scripts/run_experiment.py` định nghĩa mốc trung bình, Ridge, Random Forest và LightGBM. Mỗi cấu hình được fit lại trong từng vòng GroupKFold. Bộ chuẩn hóa của Ridge nằm trong Pipeline nên chỉ học từ phần train.
+
+Ví dụ luồng chính:
+
+```python
+for train, test in splits:
+    model.fit(data.iloc[train][columns], data.iloc[train].soh_pct)
+    predicted = model.predict(data.iloc[test][columns])
+```
+
+`train` và `test` là vị trí mẫu; `columns` là đúng danh sách đầu vào. Nhóm chia tập là mã pin vật lý, không phải từng dòng cảm biến. Hai giai đoạn của pin kiểm thử không xuất hiện trong train.
+
+`save_models.py` học lại các mô hình bảng trên toàn bộ dữ liệu để bàn giao. Bản học lại không tạo chỉ số kiểm thử. Random Forest được ứng dụng sử dụng tại `artifacts/random_forest.joblib`.
+
+## 4. GRU
+
+`train_gru.py` đọc cửa sổ đầu xả, tạo chuỗi 25 vị trí của V/I/T. Nội suy chỉ tạo biểu diễn dẫn xuất trong bộ nhớ; không sửa dữ liệu gốc. Mỗi mẫu gồm chuỗi `[25, 3]` và hai biến ngữ cảnh `[phase_code, cycle]`.
+
+Lớp `HealthGRU` có GRU 24 đơn vị ẩn. Trạng thái cuối được ghép ngữ cảnh rồi đưa qua lớp Linear/ReLU/Linear. Vòng học tối ưu MSE bằng Adam, 20 epoch và batch 256. Tất cả thang chuẩn hóa lấy từ train trong từng vòng. Trọng số học lại toàn bộ nằm ở `artifacts/gru.pt`, tham số chuẩn hóa ở `artifacts/gru.json`.
+
+## 5. Đánh giá
+
+`reports/predictions.csv` chứa dự đoán ngoài tập học của từng mẫu và tên mô hình, vòng, pin, giai đoạn, chu kỳ. `metrics_by_battery.csv` tính MAE/RMSE/R² theo từng pin. `metrics_summary.csv` lấy trung bình 86 pin; không phải R² tính gộp tất cả mẫu.
+
+| Chỉ số | Ý nghĩa |
+| --- | --- |
+| MAE | Độ lớn sai số trung bình; thấp hơn tốt hơn |
+| RMSE | Sai số nhạy với trường hợp lệch lớn; thấp hơn tốt hơn |
+| R² | Mức cải thiện so với dự đoán trung bình trong nhóm đánh giá; có thể âm |
+
+MAE 1,619 nghĩa là sai số trung bình 1,619 điểm phần trăm SOH trong thiết kế đã chạy. Không diễn giải thành độ chính xác 98,381%.
+
+`analyze_results.py` làm hai thí nghiệm riêng. Bỏ đặc trưng kiểm tính hữu ích của số chu kỳ, giai đoạn và nhóm điện áp. Kiểm thử thời gian học 70% chu kỳ đầu của từng pin/giai đoạn, kiểm tra 30% cuối, so với SOH cuối đã biết. Bài toán này khác kiểm thử pin mới.
+
+## 6. Ứng dụng
+
+| File | Vai trò |
+| --- | --- |
+| `streamlit_app.py` | Tạo trang, thanh điều hướng và kiểm file cần thiết |
+| `app_data.py` | Bộ nhớ đệm, nạp mô hình và đọc đúng chu kỳ Parquet |
+| `screens/overview.py` | Tổng quan dữ liệu và SOH theo giai đoạn |
+| `screens/explorer.py` | Lọc, xem tín hiệu, so sánh hai chu kỳ và xuất CSV |
+| `screens/evaluation.py` | Đọc kết quả kiểm thử, không tự huấn luyện |
+| `screens/forecast.py` | Nhận CSV, dự đoán một chu kỳ hoặc theo lô |
+| `screens/history.py` | Lịch sử trong phiên, xuất và xóa lịch sử |
+| `screens/quality.py` | Nguồn, tiến trình chọn và điểm nghi vấn |
+| `screens/profile.py` | Thông tin tác giả, phạm vi và tài liệu |
+| `prediction.py` | Chuẩn hóa tên cột, kiểm CSV, tách nhóm và gọi mô hình |
+| `result_report.py` | Tạo phiếu HTML, thoát ký tự đầu vào và quản lý lịch sử |
+| `labels.py` | Tên tiếng Việt trên bản sao hiển thị |
+
+## 7. Kiểm tra và tái lập
+
+`check_dataset.py` đọc toàn bộ 10 triệu dòng theo từng lô để kiểm số dòng, tín hiệu, nhãn và khóa. Các bài pytest kiểm rò rỉ đặc trưng tương lai, phân hoạch pin, đối chiếu chỉ số từ dự đoán đã lưu, CSV và các màn hình.
+
+`reproduce.py` điều phối lần lượt các bước và dừng khi có lỗi. `build_notebook.py` thực thi notebook trước khi lưu. `build_documents.py` lấy số liệu thực từ CSV để tạo báo cáo và slide, không ghi cứng kết quả trong nội dung báo cáo.

@@ -1,0 +1,41 @@
+{
+  "dataset": "SDU",
+  "source": "https://zenodo.org/records/14859405",
+  "source_doi": "10.5281/zenodo.14859405",
+  "original_year": 2025,
+  "battery_count": 86,
+  "all_measurement_rows": 10000000,
+  "measurement_rows": 10000000,
+  "feature_rows": 20823,
+  "discharge_cycles": 20823,
+  "nominal_capacity_ah": 2.4,
+  "window_seconds": 120,
+  "features": [
+    "phase_code",
+    "cycle",
+    "voltage_mean",
+    "voltage_min",
+    "voltage_max",
+    "voltage_std",
+    "voltage_slope",
+    "current_mean",
+    "current_std",
+    "temperature_mean",
+    "temperature_max",
+    "temperature_slope"
+  ],
+  "missing_values": 0,
+  "duplicates_removed": 0,
+  "invalid_rows_removed": 0,
+  "excluded_cycles": 0,
+  "source_parent_rows": 30929675,
+  "source_original_rows": 145112317,
+  "suspected_points": 25,
+  "suspected_points_in_window": 0,
+  "source_backward_steps": 23,
+  "phases": {
+    "primary": "Sử dụng ban đầu",
+    "second_life": "Tái sử dụng"
+  },
+  "country": "China; laboratory cells, not Vietnam vehicle packs"
+}

@@ -1,0 +1,84 @@
+/* Giao diện sáng, xanh trầm. CSS chỉ trình bày, không thay đổi dữ liệu. */
+:root { --ink:#193431; --muted:#6f8078; --teal:#087f70; --line:#e1e7df; --orange:#ed956e; }
+.stApp { background:#f5f6f2; color:var(--ink); }
+[data-testid="stHeader"] { background:rgba(245,246,242,.94); }
+[data-testid="stAppDeployButton"] { display:none; }
+.block-container { max-width:1480px; padding:4.5rem 3rem 2rem; }
+h1,h2,h3,h4,p { font-family:Arial,Helvetica,sans-serif; }
+h1 { letter-spacing:normal !important; }
+.page-heading { animation:reveal .45s ease both; padding:0 0 1.4rem; }
+.eyebrow { color:var(--teal); font-size:10px; letter-spacing:1.8px; font-weight:700; margin-bottom:12px; }
+.page-heading h1 { font-size:36px; line-height:1.18; font-weight:650; margin:0 0 14px; color:var(--ink); }
+.page-heading p { font-size:14px; line-height:1.8; color:var(--muted); max-width:850px; margin:0; }
+.hero-panel { background:#113e37; color:white; padding:30px 32px; border-radius:18px; min-height:291px; position:relative; overflow:hidden; }
+.hero-panel::after { content:""; width:230px; height:230px; border:35px solid rgba(255,255,255,.035); border-radius:50%; position:absolute; right:-100px; bottom:-120px; pointer-events:none; }
+.hero-panel h2 { color:#f3f7ee; font-weight:550; font-size:27px; line-height:1.4; margin:18px 0 12px; max-width:520px; letter-spacing:-.5px; }
+.hero-panel p { color:#b9cec2; line-height:1.7; font-size:13px; max-width:520px; }
+.status-pill { display:inline-flex; align-items:center; gap:7px; font-size:9px; font-weight:650; letter-spacing:1.3px; color:#d6ead8; }
+.status-pill i { width:6px; height:6px; background:#a9d8a3; border-radius:50%; box-shadow:0 0 0 4px #ffffff0c; }
+.hero-tags { display:flex; gap:8px; margin-top:21px; }
+.hero-tags span { border:1px solid #ffffff26; padding:5px 10px; border-radius:30px; color:#e0e9de; font-size:10px; }
+.author-card,.profile-card { border:1px solid var(--line); border-radius:18px; padding:26px 28px; background:#fff; min-height:291px; position:relative; }
+.author-card,.hero-panel { min-height:320px; }
+.author-monogram { display:flex; align-items:center; justify-content:center; background:#eff3eb; color:#38624d; font-size:18px; font-weight:600; height:45px; width:45px; border-radius:13px; margin-bottom:18px; }
+.author-monogram span { position:absolute; right:25px; top:24px; color:#b4bdb4; font-size:11px; letter-spacing:1px; }
+.author-card h2,.profile-card h2 { font-size:23px; letter-spacing:-.5px; margin:0 0 16px; padding:0; }
+dl { margin:0; display:grid; grid-template-columns:1fr 1.25fr; gap:10px; font-size:12px; }
+dt { color:#7a877e; font-weight:400; } dd { margin:0; font-weight:550; }
+.stat-card { border:1px solid var(--line); border-radius:14px; background:#fff; padding:20px; min-height:142px; transition:transform .2s,box-shadow .2s; animation:reveal .45s ease both; }
+.stat-card:hover { transform:translateY(-3px); box-shadow:0 10px 25px #19343109; }
+.stat-label { font-size:10px; letter-spacing:1px; color:#66796e; font-weight:650; min-height:22px; }
+.stat-value { font-size:33px; font-weight:600; line-height:1.5; letter-spacing:-1.2px; }
+.stat-detail { font-size:11px; color:#728176; line-height:1.6; }
+.stat-accent { background:#fcece2; border-color:#f4d4bd; }
+.stat-accent .stat-value { color:#995431; }
+.section-heading { display:flex; align-items:flex-start; gap:12px; margin:30px 0 14px; }
+.section-heading>span { font-size:10px; padding:5px 8px; background:#e8eee6; border-radius:6px; color:#68816d; margin-top:3px; font-weight:650; }
+.section-heading h3 { font-size:20px; letter-spacing:-.45px; margin:0 0 5px; padding:0; line-height:1.5; font-weight:600; }
+.section-heading p { color:var(--muted); font-size:12px; line-height:1.7; margin:0; }
+.note { padding:20px; border:1px solid var(--line); background:#fff; border-radius:12px; min-height:105px; margin-bottom:12px; }
+.note strong { color:var(--ink); font-size:13px; font-weight:600; }
+.note p { font-size:12px; color:var(--muted); line-height:1.8; margin:8px 0 0; }
+.note-soft { background:#eaf0e8; border-color:#dce6d8; }
+[data-testid="stVerticalBlockBorderWrapper"] { border-radius:14px; }
+[data-testid="stVerticalBlockBorderWrapper"]>div { border-color:var(--line) !important; }
+[data-testid="stMetric"] { padding:12px 8px; }
+[data-testid="stMetricValue"] { color:var(--teal); font-weight:600; font-size:50px; letter-spacing:-1.7px; }
+[data-testid="stDataFrame"] { border-radius:10px; overflow:hidden; }
+.stButton button,.stDownloadButton button,.stLinkButton a { border-radius:9px !important; font-size:12px !important; font-weight:500; transition:transform .18s,box-shadow .18s; }
+.stButton button:hover,.stDownloadButton button:hover,.stLinkButton a:hover { transform:translateY(-1px); box-shadow:0 4px 12px #1934310c; }
+[data-testid="stWidgetLabel"] p { font-size:12px; color:#52665b; }
+[data-testid="stCaptionContainer"] p { font-size:11px; line-height:1.7; color:#7c8b80; }
+[data-testid="stTabs"] [data-baseweb="tab-list"] { gap:26px; border-bottom:1px solid var(--line); }
+[data-testid="stTabs"] button { font-size:12px; }
+[data-testid="stFileUploader"] { background:#f7f9f4; border-radius:12px; }
+/* Thanh điều hướng riêng, dùng radio gốc để vẫn hỗ trợ bàn phím. */
+[data-testid="stSidebar"] { background:#142f2d; border-right:0; }
+[data-testid="stSidebar"]>div:first-child { padding-top:1.5rem; }
+[data-testid="stSidebar"] button { color:#dce7dd; }
+[data-testid="stSidebar"] .brand { display:flex; align-items:center; gap:12px; color:#edf5e9; margin:7px 0 24px; }
+.brand-mark { width:34px; height:42px; border:1.5px solid #78a891; border-radius:7px; display:flex; align-items:center; justify-content:center; font-weight:600; color:#c0d6b1; font-size:18px; position:relative; }
+.brand-mark::before { content:""; width:12px; height:4px; position:absolute; top:-5px; background:#78a891; border-radius:2px 2px 0 0; }
+.brand-name { font-size:18px; font-weight:600; letter-spacing:-.4px; } .brand-sub { font-size:9px; letter-spacing:1.6px; color:#85a59b; margin-top:3px; }
+.sidebar-heading { color:#6d9287; font-size:9px; font-weight:600; letter-spacing:2px; margin:23px 0 12px; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label { color:#c4d4cb; padding:11px 12px; border-radius:9px; transition:background .2s; width:100%; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label:hover { background:#ffffff09; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) { background:#294c41; color:#eff5e9; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label p { font-size:13px; color:inherit; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label [data-testid="stMarkdownContainer"] p { color:#c4d4cb !important; }
+[data-testid="stSidebar"] [data-testid="stRadio"] label:has(input:checked) [data-testid="stMarkdownContainer"] p { color:#f1f6ed !important; }
+[data-testid="stSidebar"] [data-testid="stRadio"] [role="radiogroup"] { gap:4px; }
+.sidebar-note { margin-top:35px; border-top:1px solid #ffffff12; padding-top:18px; color:#7f9d90; font-size:11px; line-height:1.9; }
+.sidebar-person { margin-top:24px; padding:15px; border:1px solid #ffffff13; border-radius:10px; color:#dde8da; font-size:12px; }
+.sidebar-person small { color:#88a898; display:block; font-size:10px; margin-top:5px; line-height:1.7; }
+.app-footer { border-top:1px solid var(--line); padding:20px 0 0; margin-top:35px; display:flex; justify-content:space-between; color:#94a095; font-size:10px; gap:20px; }
+@keyframes reveal { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
+@media (prefers-reduced-motion:reduce) { *,*::before,*::after { animation:none !important; transition:none !important; } }
+@media (max-width:900px) { .block-container { padding:4.5rem 1.2rem 1.5rem; } .page-heading h1 { font-size:31px; } .hero-panel { padding:25px; } .stat-value { font-size:27px; } .stat-card { padding:15px; } .app-footer { flex-direction:column; gap:6px; } }
+
+/* Arial dùng xuyên suốt; giữ font biểu tượng Material của các nút. */
+.stApp,.stApp p,.stApp h1,.stApp h2,.stApp h3,.stApp h4,.stApp input,.stApp textarea,.stApp button,.stApp label,[data-testid="stMetricValue"] { font-family:Arial,Helvetica,sans-serif !important; }
+.brand-mark { border:0;background:#386152;border-radius:10px;width:40px;height:40px;color:white;font-size:16px; }
+.brand-mark::before { display:none; }
+.hero-panel h2,.page-heading h1,.author-card h2,.profile-card h2 { letter-spacing:normal; }
+.stButton button[kind="primary"] { min-height:43px; }
