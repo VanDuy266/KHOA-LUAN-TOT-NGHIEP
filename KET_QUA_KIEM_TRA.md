@@ -38,4 +38,4 @@ Tính lại 12 đặc trưng theo từng chu kỳ từ dữ liệu CSV 10 triệ
 
 Nguồn và trích dẫn nằm trong NGUON_DU_LIEU.md. SOH (%) = dung lượng tham chiếu / 2,4 × 100. Dùng training_table.csv, đúng danh sách feature_columns trong dataset_summary.json. Chia theo Battery_ID vật lý qua cả hai giai đoạn để tránh rò rỉ dữ liệu. Không dùng dung lượng toàn chu kỳ hoặc thông tin cuối chu kỳ làm đầu vào dự đoán từ 120 giây đầu.
 
-Các kiểm tra này chưa đánh giá chất lượng dự đoán; cần huấn luyện và kiểm thử bốn cấu hình đã chọn. Chưa cập nhật dataset này vào ứng dụng.
+Kiểm tra dữ liệu tách biệt với đánh giá mô hình. Kết quả Ridge, Random Forest, LightGBM và GRU đã được đưa vào sản phẩm Vincent D trên nhánh san-pham-sdu.

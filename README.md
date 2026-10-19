@@ -1,29 +1,18 @@
-# SDU — bản 10 triệu dòng giữ đủ chu kỳ
+# SDU — bộ chọn 10 triệu dòng
 
-10.000.000 dòng đo xả; 20.823 chu kỳ tham chiếu; 86 pin vật lý; 172 CSV gzip.
+10.000.000 dòng đo xả, 20.823 chu kỳ, 86 pin vật lý, 172 CSV gzip qua hai giai đoạn. Giữ toàn bộ 120 giây đầu và điểm cuối chu kỳ; lấy thưa phần sau. Các dòng được chọn giữ nguyên giá trị và văn bản từ nguồn. Đây là tập con của bộ tác giả, không phải nguyên bộ 145 triệu dòng.
 
-## Giữ và giảm những gì
+Nguồn: Wang, Gao và Tian (2025), DOI 10.5281/zenodo.14859405, CC BY 4.0. Chi tiết tại NGUON_DU_LIEU.md và KET_QUA_KIEM_TRA.md. Có 25 điểm nghi vấn còn giữ, không nằm trong cửa sổ mô hình; không tự sửa hoặc xóa.
 
-Giữ đủ các chu kỳ trong bộ đã chọn 30.929.675 dòng. Giữ mọi điểm đo trong 120 giây đầu xả và điểm cuối mỗi chu kỳ. Ở phần sau, lấy thưa theo thứ tự thời gian; số điểm được phân bổ theo độ dài chu kỳ. Không bỏ pin hoặc chu kỳ để đạt số dòng.
+## Tải và sử dụng
 
-Từng dòng CSV được chọn giữ nguyên văn, gồm tên cột, cách viết số và thứ tự nguồn. Không sửa giá trị, điền thiếu, nội suy hoặc nhân bản. Hai ZIP nguồn và bộ 30,9 triệu dòng vẫn giữ riêng. Tập con này do dự án tạo, không phải gói gốc của tác giả.
+Tải cả nhánh bằng Code → Download ZIP. Chỉ giải nén ZIP bên ngoài, giữ nguyên các file .csv.gz trong source_rows/Primary_use_phase và source_rows/Second_life_phase. Python đọc trực tiếp gzip.
 
-Bảng training_table.csv và cycle_features.csv giữ nguyên file từ bộ đầy đủ. Dung lượng tham chiếu/SOH được tính từ chu kỳ đầy đủ; không tính lại dung lượng bằng tích phân trên đường đã lấy thưa. Đặc trưng chỉ dùng 120 giây đầu, được giữ đủ điểm. Giảm mật độ sau 120 giây làm mất chi tiết ở đoạn đó; không phù hợp nếu nghiên cứu khác cần nguyên chuỗi toàn chu kỳ.
+Bảng training_table.csv và cycle_features.csv giữ nhãn/đặc trưng từ chu kỳ đầy đủ. Khóa gồm pin, giai đoạn và chu kỳ; chỉ dùng danh sách feature_columns trong dataset_summary.json làm đầu vào. Không tính lại dung lượng bằng đường đã lấy thưa.
 
-## Kiểm tra chất lượng
+## Sản phẩm sử dụng dữ liệu
 
-Đã kiểm tra 30.929.675 dòng: không thiếu/vô hạn ở các tín hiệu chính, không có dòng trùng hoàn toàn, không có khóa thời gian trùng và không có giá trị ngoài các giới hạn kiểm tra đã công bố. Có 28 bước thời gian đi lùi trong thứ tự nguồn; khi tính đặc trưng đã sắp xếp bản sao trong chu kỳ, không sửa thứ tự file nguồn.
+Vincent D đã tích hợp bộ chọn này, có Ridge, Random Forest, LightGBM, GRU và mốc trung bình, kiểm thử theo pin. Bản sản phẩm có sẵn Parquet và mô hình tại nhánh san-pham-sdu:
+https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/archive/refs/heads/san-pham-sdu.zip
 
-Bộ kiểm tra tìm được 65 nghi vấn xung đơn điện áp và 14 nghi vấn nhiệt độ, theo quy tắc so sánh hai điểm lân cận khi dòng ổn định. Đây là cờ xem xét, chưa xác nhận lỗi cảm biến; không tự sửa hay loại những điểm này chỉ dựa trên quy tắc. Danh sách nằm trong quality_spike_candidates.csv. Bản 10 triệu dòng giảm mật độ đoạn sau cửa sổ mô hình; không tuyên bố đã loại hết nhiễu.
-
-## Sử dụng
-
-Huấn luyện bằng training_table.csv (20.823 hàng), lấy đúng feature_columns trong dataset_summary.json. Không dùng dung lượng toàn chu kỳ, số điểm đo hoặc thông tin cuối chu kỳ làm đầu vào. Chia tập theo Battery_ID vật lý qua cả hai giai đoạn. Đọc file đo từng pin hoặc từng khối; không nạp tất cả vào RAM.
-
-Nguồn: https://zenodo.org/records/14859405 — DOI 10.5281/zenodo.14859405, công bố 2025, CC BY 4.0. Wang, Gao và Tian: Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions. Pin NMC(532)/graphite Lishen LR1865SZ, danh định 2,4 Ah.
-
-Chưa áp dụng vào ứng dụng và chưa chạy mô hình mới. Script tái tạo cần thư mục selection (bộ lớn) và quality_review ở thư mục cha.
-
-## Hồ sơ kiểm tra và trích dẫn
-
-Xem KET_QUA_KIEM_TRA.md để biết kết quả kiểm tra thực tế trên bộ 10 triệu dòng và 25 điểm nghi vấn còn giữ. Trích dẫn đầy đủ tại NGUON_DU_LIEU.md. File CSV nguồn không bị sửa.
+Bộ dữ liệu nguồn này nộp riêng cùng hồ sơ nguồn, nhật ký chọn và verification/. Script build_10m.py là bước tạo bộ chọn, cần các thư mục selection và quality_review của quy trình nguồn; không cần chạy script đó để đọc bộ đã tải.
