@@ -1,0 +1,15 @@
+{
+  "rows": 30929675,
+  "nonfinite_rows": 0,
+  "outside_limits_rows": 0,
+  "exact_duplicate_rows": 0,
+  "conflicting_time_keys": 0,
+  "backward_time_steps": 28,
+  "voltage_spike_candidates": 65,
+  "temperature_spike_candidates": 14,
+  "files": 172,
+  "batteries": 86,
+  "source_files_modified": false,
+  "spike_policy": "Heuristic candidates for review only; not automatically removed. Similar consecutive values are not classified as errors.",
+  "input_features": "Use only feature_columns in selection/dataset_summary.json. Energy, internal resistance, export index, source identifiers and whole-cycle target checks are not model inputs."
+}
