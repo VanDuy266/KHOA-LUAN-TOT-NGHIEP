@@ -7,3 +7,5 @@ data/mat/
 data/clean/
 artifacts/
 *.log
+
+data/hust/
