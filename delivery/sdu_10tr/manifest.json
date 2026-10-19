@@ -1,0 +1,26 @@
+[
+  {
+    "file": "Dataset_SDU_10tr_phan_01.zip",
+    "bytes": 88703213,
+    "measurement_files": 8,
+    "sha256": "2f17ebd9080851a1a5c16d858af01f035dc2c78dde3e37bb29a3ccd9a25fddb1"
+  },
+  {
+    "file": "Dataset_SDU_10tr_phan_02.zip",
+    "bytes": 88752062,
+    "measurement_files": 22,
+    "sha256": "c7fdb4670952bf5ad6b56a889004be9e92a6323f179a1419acc57365df31c2e8"
+  },
+  {
+    "file": "Dataset_SDU_10tr_phan_03.zip",
+    "bytes": 88758807,
+    "measurement_files": 46,
+    "sha256": "0d2b246dea7d0f2ce76b243e206052463f7d662cc13e125ae1c6d08c6774a27c"
+  },
+  {
+    "file": "Dataset_SDU_10tr_phan_04.zip",
+    "bytes": 82003954,
+    "measurement_files": 96,
+    "sha256": "9691f5feb421d509789ae72f5605af4c53b84e990265aa30ffc44b44a3412b3d"
+  }
+]
