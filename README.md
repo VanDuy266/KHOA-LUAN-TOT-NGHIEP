@@ -8,8 +8,8 @@ Ngôn ngữ và thư viện: **Python 3.12, pandas, SciPy, scikit-learn, Matplot
 
 ## Tải về
 
-- [Code, mô hình, dữ liệu xả, notebook, báo cáo Word và slide](delivery/KhoaLuan_NguyenVanDuy.zip?raw=true).
-- [Dataset sạch đầy đủ 2.089.048 dòng](delivery/Dataset_Pin_NASA_2tr_dong.zip?raw=true).
+- [Code, mô hình, dữ liệu xả, notebook, báo cáo Word và slide](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/raw/refs/heads/main/delivery/KhoaLuan_NguyenVanDuy.zip).
+- [Dataset sạch đầy đủ 2.089.048 dòng](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/raw/refs/heads/main/delivery/Dataset_Pin_NASA_2tr_dong.zip).
 
 Dữ liệu đầy đủ nằm trong gói riêng. Mỗi file ZIP có mã SHA-256 để kiểm tra khi tải. Gói mã nguồn không kèm môi trường `.venv`.
 
