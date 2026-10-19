@@ -37,9 +37,9 @@ def test_demo_sample_prediction_and_result_persistence():
     app.button[0].click().run()
     assert not app.exception
     assert not app.error
-    assert any(metric.label == "SOH ước lượng" for metric in app.metric)
+    assert any(metric.label == "SOH dự đoán" for metric in app.metric)
     app.run()
-    assert any(metric.label == "SOH ước lượng" for metric in app.metric)
+    assert any(metric.label == "SOH dự đoán" for metric in app.metric)
 
 
 def test_demo_requires_input():

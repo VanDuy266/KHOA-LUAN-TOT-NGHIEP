@@ -5,7 +5,7 @@
   "numpy": "2.3.5",
   "pandas": "2.2.3",
   "sklearn": "1.8.0",
-  "dataset_commit": "zenodo-14859405-sdu-10m",
+  "dataset_commit": "zenodo-14859405-sdu-stride3",
   "data_sha256": "9dd1c7c85323d8d8d802ff7c1af999dab1bcfb23397ae43a96b9201083548790",
   "n_cycles": 20823,
   "dataset": "SDU",
@@ -89,5 +89,11 @@
       "subsample_freq": 0,
       "verbosity": -1
     }
+  },
+  "sampling_revision": {
+    "measurement_rows": 10505065,
+    "first120s_and_labels_unchanged": true,
+    "feature_file_sha256": "9dd1c7c85323d8d8d802ff7c1af999dab1bcfb23397ae43a96b9201083548790",
+    "evaluation_reused": "Feature/label CSV is byte-identical; sampling only changes later signal points, outside every model input window."
   }
 }

@@ -82,3 +82,12 @@ dt { color:#7a877e; font-weight:400; } dd { margin:0; font-weight:550; }
 .brand-mark::before { display:none; }
 .hero-panel h2,.page-heading h1,.author-card h2,.profile-card h2 { letter-spacing:normal; }
 .stButton button[kind="primary"] { min-height:43px; }
+
+/* Chữ Arial, trình bày thông thường, không giãn chữ trang trí. */
+.eyebrow,.brand-sub,.sidebar-heading,.status-pill,.stat-label { letter-spacing:normal; }
+.page-heading h1 { font-size:30px;font-weight:600;line-height:1.4;max-width:1050px; }
+.page-heading .eyebrow:empty,.page-heading p:empty { display:none; }
+@media(max-width:900px) { .page-heading h1 { font-size:25px; } }
+
+.page-heading .eyebrow { display:none; }
+.stat-label { font-size:12px;font-weight:600; }

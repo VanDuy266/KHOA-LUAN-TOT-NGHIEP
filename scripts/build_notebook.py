@@ -45,7 +45,7 @@ def main():
     md, code = nbformat.v4.new_markdown_cell, nbformat.v4.new_code_cell
     cells = [
         md(
-            "# Phân tích và dự đoán SOH — SDU 2025\nNguyễn Văn Duy · 2311553949\n\nNguồn: https://doi.org/10.5281/zenodo.14859405 · CC BY 4.0. Bộ chọn 10 triệu điểm đo, 86 pin, 20.823 chu kỳ. Mỗi mẫu huấn luyện là một chu kỳ, không phải một điểm cảm biến."
+            "# Phân tích và dự đoán SOH — SDU 2025\nNguyễn Văn Duy · 2311553949\n\nNguồn: https://doi.org/10.5281/zenodo.14859405 · CC BY 4.0. Bộ chọn 10.505.065 điểm đo, 86 pin, 20.823 chu kỳ. Mỗi mẫu huấn luyện là một chu kỳ, không phải một điểm cảm biến."
         ),
         code(
             "from pathlib import Path\nimport json\nimport sys\nimport numpy as np\nimport pandas as pd\nimport matplotlib.pyplot as plt\nROOT = Path.cwd()\nif ROOT.name == 'notebooks': ROOT = ROOT.parent\nsys.path.insert(0, str(ROOT/'src'))\nfrom battery_soh.features import FEATURES\ndata = pd.read_csv(ROOT/'reports/features.csv')\njson.loads((ROOT/'reports/dataset_summary.json').read_text())"
@@ -91,7 +91,7 @@ def main():
             "display(pd.read_csv(ROOT/'reports/ablation_summary.csv'))\ntemporal = pd.read_csv(ROOT/'reports/temporal_metrics.csv')\nassert (temporal.last_train_cycle < temporal.first_test_cycle).all()\ntemporal.groupby('model')[['mae','rmse']].mean()"
         ),
         md(
-            "## 7. Chất lượng và giới hạn\n25 điểm nghi vấn được giữ để xem xét, không nằm trong cửa sổ 120 giây đầu. Bộ chọn giữ đủ các chu kỳ xả tham chiếu, không gồm mọi trạng thái trong nguồn. Dữ liệu phòng thí nghiệm chưa đại diện cho bộ pin xe thực tế tại Việt Nam."
+            "## 7. Chất lượng và giới hạn\n26 điểm nghi vấn được giữ để xem xét, không nằm trong cửa sổ 120 giây đầu. Bộ chọn giữ đủ các chu kỳ xả tham chiếu, không gồm mọi trạng thái trong nguồn. Dữ liệu phòng thí nghiệm chưa đại diện cho bộ pin xe thực tế tại Việt Nam."
         ),
         code("json.loads((ROOT/'reports/dataset_check.json').read_text())"),
     ]

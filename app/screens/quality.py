@@ -23,7 +23,11 @@ def render():
             ),
             ("MẪU CHU KỲ", number(summary["feature_rows"]), "86 pin vật lý"),
             ("THIẾU TÍN HIỆU BẮT BUỘC", "0", "Thời gian, điện áp, dòng điện, nhiệt độ"),
-            ("ĐIỂM CẦN XEM XÉT", "25", "Không có điểm nào trong 120 giây đầu"),
+            (
+                "ĐIỂM CẦN XEM XÉT",
+                str(summary["suspected_points"]),
+                "Không có điểm nào trong 120 giây đầu",
+            ),
         ],
     ):
         with col:
@@ -37,7 +41,7 @@ def render():
             "20.823 chu kỳ có điều kiện xả tương đồng.",
         ),
         (
-            "10.000.000",
+            "10.505.065",
             "Dòng được giữ",
             "Giữ toàn bộ cửa sổ đầu, điểm cuối; lấy thưa phần giữa.",
         ),

@@ -27,7 +27,7 @@ st.markdown(
 with st.sidebar:
     st.markdown(
         '<div class="brand"><div class="brand-mark">VD</div><div><div class="brand-name">Vincent D</div>'
-        '<div class="brand-sub">DỮ LIỆU & SỨC KHỎE PIN</div></div></div><div class="sidebar-heading">PHÂN TÍCH PIN</div>',
+        '<div class="brand-sub">Dữ liệu sức khỏe pin</div></div></div><div class="sidebar-heading">Chức năng</div>',
         unsafe_allow_html=True,
     )
     page = st.radio(
@@ -45,10 +45,10 @@ with st.sidebar:
         key="navigation",
     )
     st.markdown(
-        '<div class="sidebar-note">Cell lithium-ion · Dữ liệu SDU · 86 pin<br>Ước lượng SOH từ 120 giây đầu xả</div>'
-        '<div class="sidebar-person">Nguyễn Văn Duy<small>MSSV 2311553949<br>Chuyên ngành: Khoa Học Dữ Liệu</small></div>',
+        '<div class="sidebar-person">Nguyễn Văn Duy<small>MSSV 2311553949<br>Khoa Học Dữ Liệu</small></div>',
         unsafe_allow_html=True,
     )
+
 
 required = [
     "reports/features.csv",
@@ -69,7 +69,7 @@ if missing:
     st.stop()
 
 dataset = json.loads((ROOT / "reports/dataset_summary.json").read_text())
-if dataset.get("dataset") != "SDU" or dataset.get("all_measurement_rows") != 10000000:
+if dataset.get("dataset") != "SDU":
     st.error("Dữ liệu không khớp phiên bản SDU của ứng dụng.")
     st.stop()
 
@@ -83,8 +83,3 @@ screens = {
     "Lịch sử dự đoán": history.render,
 }
 screens[page]()
-st.markdown(
-    '<div class="app-footer"><span>Vincent D · Nguyễn Văn Duy</span>'
-    "<span>Khoa Học Dữ Liệu · Nghiên cứu trên cell thử nghiệm</span></div>",
-    unsafe_allow_html=True,
-)

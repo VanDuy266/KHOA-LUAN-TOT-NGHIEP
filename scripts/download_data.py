@@ -28,7 +28,7 @@ def main():
             (p.parent for p in matches if (p.parent / "source_rows").exists()), None
         )
         if location is None:
-            raise ValueError("ZIP không chứa bộ SDU 10 triệu dòng")
+            raise ValueError("ZIP không chứa bộ SDU 10.505.065 dòng")
     elif (folder / "location.txt").exists():
         location = Path((folder / "location.txt").read_text().strip())
         if not (location / "source_rows").exists():

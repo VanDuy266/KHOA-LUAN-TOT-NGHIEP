@@ -1,4 +1,4 @@
-"""Đối chiếu toàn bộ 10 triệu dòng Parquet với nhãn và nhật ký nguồn."""
+"""Đối chiếu toàn bộ 10.505.065 dòng Parquet với nhãn và nhật ký nguồn."""
 
 import json
 from pathlib import Path
@@ -43,7 +43,7 @@ def main():
             previous = (data.cycle.iloc[-1], data.time.iloc[-1])
             assert np.allclose(data.SOH, data.capacity / 2.4, atol=1e-12)
             total += len(data)
-    assert total == summary["all_measurement_rows"] == 10000000
+    assert total == summary["all_measurement_rows"] == 10505065
     assert missing == duplicates == 0
     result = dict(
         status="passed",
@@ -55,8 +55,8 @@ def main():
         duplicate_measurement_keys=duplicates,
         nominal_capacity_ah=2.4,
         source_doi=summary["source_doi"],
-        suspected_points=25,
-        suspected_points_in_window=0,
+        suspected_points=summary["suspected_points"],
+        suspected_points_in_window=summary["suspected_points_in_window"],
         scope="All prepared Parquet batches checked; source-byte hashes and all window features checked during preparation. Suspect points retained.",
     )
     (ROOT / "reports/dataset_check.json").write_text(

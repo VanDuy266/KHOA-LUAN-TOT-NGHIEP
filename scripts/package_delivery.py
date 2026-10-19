@@ -79,7 +79,7 @@ def main():
             )
         )
     manifest = dict(
-        dataset="SDU", rows=10000000, cycles=20823, batteries=86, files=files
+        dataset="SDU", rows=10505065, cycles=20823, batteries=86, files=files
     )
     (staging / "MANIFEST_SHA256.json").write_text(json.dumps(manifest, indent=2) + "\n")
     output = destination / "VincentD_SDU.zip"

@@ -7,7 +7,7 @@ Tôi nghiên cứu ước lượng SOH từ 120 giây đầu chu kỳ xả. SOH 
 | Phần | Nội dung | Minh chứng |
 | --- | --- | --- |
 | Bài toán | Nhu cầu ước lượng dung lượng bằng đoạn tín hiệu ngắn | Slide 1–2 |
-| Dữ liệu | SDU 2025, 86 pin, hai giai đoạn; từ 145 triệu xuống 10 triệu điểm giữ đủ các chu kỳ đã chọn | Slide 3–6, trang chất lượng |
+| Dữ liệu | SDU 2025, 86 pin, hai giai đoạn; từ 145 triệu xuống 10.505.065 điểm giữ đủ các chu kỳ đã chọn | Slide 3–6, trang chất lượng |
 | Phương pháp | 12 đặc trưng hoặc chuỗi V/I/T; không dùng dung lượng cuối làm đầu vào | Slide 7–8, mã features.py |
 | Đánh giá | Giữ riêng pin qua cả hai giai đoạn, 5 vòng | Slide 9, split_assignments.csv |
 | Kết quả | MAE, RMSE, R²; sai số theo pin và giai đoạn | Slide 10–14, reports/ |
@@ -24,6 +24,6 @@ Tôi mở Vincent D, chọn một giai đoạn ở Tổng quan và xem SOH theo 
 
 ## Các kết luận cần giữ đúng phạm vi
 
-10 triệu dòng là số điểm đo; mô hình bảng có 20.823 mẫu chu kỳ và 86 pin độc lập theo mã vật lý. Hai giai đoạn không tạo thành 172 pin độc lập. Giảm mật độ điểm sau 120 giây là lấy thưa, không phải kết luận tất cả điểm bị bỏ là nhiễu.
+10.505.065 dòng là số điểm đo; mô hình bảng có 20.823 mẫu chu kỳ và 86 pin độc lập theo mã vật lý. Hai giai đoạn không tạo thành 172 pin độc lập. Giảm mật độ điểm sau 120 giây là lấy thưa, không phải kết luận tất cả điểm bị bỏ là nhiễu.
 
 Random Forest đạt MAE 1,619 điểm phần trăm SOH trong cấu hình đã thử. GRU phức tạp hơn nhưng chưa tốt hơn trên bộ chọn này. Nguồn là thí nghiệm pin tại Trung Quốc, không phải xe đang vận hành tại Việt Nam. Bài hiện tại chưa dự báo RUL và chưa chứng nhận an toàn pin.

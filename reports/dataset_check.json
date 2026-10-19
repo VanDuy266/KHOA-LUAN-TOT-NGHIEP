@@ -1,14 +1,14 @@
 {
   "status": "passed",
   "dataset": "SDU",
-  "measurement_rows": 10000000,
+  "measurement_rows": 10505065,
   "independent_batteries": 86,
   "feature_samples": 20823,
   "missing_values": 0,
   "duplicate_measurement_keys": 0,
   "nominal_capacity_ah": 2.4,
   "source_doi": "10.5281/zenodo.14859405",
-  "suspected_points": 25,
+  "suspected_points": 26,
   "suspected_points_in_window": 0,
   "scope": "All prepared Parquet batches checked; source-byte hashes and all window features checked during preparation. Suspect points retained."
 }

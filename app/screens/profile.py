@@ -51,7 +51,7 @@ def render():
             "SOH khác mức sạc SOC. Kết quả chưa phải chứng nhận an toàn, chưa dự báo tuổi thọ còn lại RUL và chưa được kiểm chứng trên bộ pin xe điện thực tế."
         )
         st.write(
-            "Bộ 10 triệu dòng giữ đủ các chu kỳ đã chọn, nhưng giảm mật độ điểm đo sau cửa sổ đầu xả. Những chu kỳ sạc, nghỉ hoặc điều kiện xả khác không thuộc bộ chọn này."
+            "Bộ 10.505.065 dòng giữ đủ các chu kỳ đã chọn, nhưng giảm mật độ điểm đo sau cửa sổ đầu xả. Những chu kỳ sạc, nghỉ hoặc điều kiện xả khác không thuộc bộ chọn này."
         )
     section("02", "Tài liệu nghiên cứu")
     for column, (label, relative, mime) in zip(

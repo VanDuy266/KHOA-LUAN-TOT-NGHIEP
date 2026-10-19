@@ -100,6 +100,7 @@ def main():
         folder / "cycle_labels.csv", index=False
     )
     verification = json.loads((source / "verification/summary.json").read_text())
+    source_info = json.loads((source / "dataset_summary.json").read_text())
     summary = dict(
         dataset="SDU",
         source="https://zenodo.org/records/14859405",
@@ -118,6 +119,7 @@ def main():
         invalid_rows_removed=0,
         excluded_cycles=0,
         source_parent_rows=30929675,
+        sampling_method=source_info["sampling_method"],
         source_original_rows=145112317,
         suspected_points=verification["retained_parent_spike_candidates"],
         suspected_points_in_window=verification["spike_candidates_first120s"],
@@ -125,7 +127,10 @@ def main():
         phases={"primary": "Sử dụng ban đầu", "second_life": "Tái sử dụng"},
         country="China; laboratory cells, not Vietnam vehicle packs",
     )
-    if summary["all_measurement_rows"] != 10_000_000 or len(original) != 20823:
+    if (
+        summary["all_measurement_rows"] != source_info["measurement_rows"]
+        or len(original) != 20823
+    ):
         raise ValueError("Sai quy mô SDU")
     (reports / "dataset_summary.json").write_text(
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n"

@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 def test_full_sdu_dataset_verified():
     check = json.loads((ROOT / "reports/dataset_check.json").read_text())
     assert check["status"] == "passed" and check["dataset"] == "SDU"
-    assert check["measurement_rows"] == 10_000_000
+    assert check["measurement_rows"] == 10_505_065
     assert check["independent_batteries"] == 86
     assert check["missing_values"] == check["duplicate_measurement_keys"] == 0
     assert check["nominal_capacity_ah"] == 2.4

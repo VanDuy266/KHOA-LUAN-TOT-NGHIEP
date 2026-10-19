@@ -1,5 +1,5 @@
 {
-  "rows": 10000000,
+  "rows": 10505065,
   "cycles": 20823,
   "missing_or_nonfinite_rows": 0,
   "outside_limits_rows": 0,
@@ -10,7 +10,7 @@
   "sample_count_mismatch_cycles": 0,
   "first120s_rows": 261516,
   "backward_time_steps": 23,
-  "retained_parent_spike_candidates": 25,
+  "retained_parent_spike_candidates": 26,
   "spike_candidates_first120s": 0,
   "files": 172,
   "physical_batteries": 86,

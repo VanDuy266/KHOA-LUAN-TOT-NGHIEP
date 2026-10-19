@@ -4,7 +4,7 @@ Tôi chia chương trình thành bốn phần: dữ liệu, mô hình, đánh gi
 
 ## 1. Dữ liệu và khóa chu kỳ
 
-Nguồn SDU công bố năm 2025 có 86 pin qua hai giai đoạn. Bản chọn dùng trong sản phẩm có 10 triệu dòng đo và 20.823 mẫu chu kỳ. Một mẫu được xác định bởi `battery + phase + cycle`; số chu kỳ có thể lặp khi đổi giai đoạn nên không bỏ cột `phase` khỏi khóa.
+Nguồn SDU công bố năm 2025 có 86 pin qua hai giai đoạn. Bản chọn dùng trong sản phẩm có 10.505.065 dòng đo và 20.823 mẫu chu kỳ. Một mẫu được xác định bởi `battery + phase + cycle`; số chu kỳ có thể lặp khi đổi giai đoạn nên không bỏ cột `phase` khỏi khóa.
 
 `download_data.py` nhận gói ZIP tải về hoặc lấy nhánh dữ liệu riêng bằng Git. `prepare_data.py` kiểm SHA-256 của nội dung nguồn, đọc từng file, sắp bản sao theo chu kỳ/thời gian rồi tạo Parquet. CSV nguồn không bị ghi đè. Mỗi file Parquet ứng với một pin trong một giai đoạn; mỗi nhóm dòng Parquet ứng với một chu kỳ để đọc nhanh.
 
@@ -78,6 +78,6 @@ MAE 1,619 nghĩa là sai số trung bình 1,619 điểm phần trăm SOH trong t
 
 ## 7. Kiểm tra và tái lập
 
-`check_dataset.py` đọc toàn bộ 10 triệu dòng theo từng lô để kiểm số dòng, tín hiệu, nhãn và khóa. Các bài pytest kiểm rò rỉ đặc trưng tương lai, phân hoạch pin, đối chiếu chỉ số từ dự đoán đã lưu, CSV và các màn hình.
+`check_dataset.py` đọc toàn bộ 10.505.065 dòng theo từng lô để kiểm số dòng, tín hiệu, nhãn và khóa. Các bài pytest kiểm rò rỉ đặc trưng tương lai, phân hoạch pin, đối chiếu chỉ số từ dự đoán đã lưu, CSV và các màn hình.
 
 `reproduce.py` điều phối lần lượt các bước và dừng khi có lỗi. `build_notebook.py` thực thi notebook trước khi lưu. `build_documents.py` lấy số liệu thực từ CSV để tạo báo cáo và slide, không ghi cứng kết quả trong nội dung báo cáo.
