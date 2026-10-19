@@ -16,3 +16,12 @@ Bảng training_table.csv vẫn giữ đủ 20.823 hàng như bộ 30,9 triệu 
 Có 79 điểm nghi vấn tín hiệu trong bộ lớn chưa xác nhận là lỗi; danh sách kèm theo để kiểm tra, không tự sửa hoặc gọi là đã loại hết nhiễu. Chưa áp dụng dataset này vào ứng dụng hoặc chạy mô hình mới.
 
 Nguồn: https://zenodo.org/records/14859405 — DOI 10.5281/zenodo.14859405, CC BY 4.0.
+
+## Kết quả kiểm tra thực tế
+
+- 10 triệu dòng, 20.823 chu kỳ và 86 pin; không thiếu/vô hạn ở tín hiệu chính, không có bản ghi trùng hoặc khóa thời gian trùng.
+- Đặc trưng và dung lượng tham chiếu khớp bộ đầy đủ cho tất cả chu kỳ.
+- Còn 25 điểm từ danh sách nghi vấn xung đơn, tất cả sau 120 giây. Chưa tự sửa/xóa hoặc gọi là hết nhiễu.
+- Giữ nguyên thứ tự nguồn; có 23 bước thời gian đi lùi, được sắp xếp trên bản sao khi tính đặc trưng.
+
+Xem [kết quả kiểm tra](KET_QUA_KIEM_TRA.md) và [nguồn/trích dẫn](NGUON_DU_LIEU.md). Các hồ sơ này có trong cả bốn gói ZIP.
