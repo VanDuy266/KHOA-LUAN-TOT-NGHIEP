@@ -11,7 +11,7 @@ TP. Hồ Chí Minh, năm 2026
 
 # Tóm tắt
 Tình trạng sức khỏe pin (State of Health — SOH) phản ánh dung lượng còn lại so với dung lượng danh định. Việc đo dung lượng đầy đủ cần cả một chu kỳ xả, trong khi ứng dụng theo dõi cần ước lượng từ một đoạn tín hiệu ngắn. Khóa luận xây dựng quy trình phân tích và ước lượng SOH từ 120 giây đầu chu kỳ xả bằng điện áp, dòng điện, nhiệt độ, số chu kỳ và giai đoạn sử dụng.
-Tôi sử dụng dữ liệu SDU do Wang, Gao và Tian công bố trên Zenodo năm 2025 [1]. Tập nguồn có 145.112.317 dòng đo của 86 tế bào pin, gồm sử dụng ban đầu và tái sử dụng. Sau nhận diện điều kiện xả tham chiếu, bộ được chọn có 30.929.675 dòng và 20.823 chu kỳ. Bản dùng trong sản phẩm giữ 10.000.000 dòng, đủ 86 pin và đủ các chu kỳ đã chọn; mọi điểm trong cửa sổ đầu xả được giữ nguyên. Giảm mật độ sau 120 giây giúp giảm dung lượng lưu trữ, không được coi là loại bỏ nhiễu.
+Tôi sử dụng dữ liệu SDU do Wang, Gao và Tian công bố trên Zenodo năm 2025 [1]. Tập nguồn có 145.112.317 dòng đo của 86 tế bào pin, gồm sử dụng ban đầu và tái sử dụng. Sau nhận diện điều kiện xả tham chiếu, bộ được chọn có 30.929.675 dòng và 20.823 chu kỳ. Bản dùng trong sản phẩm giữ 10.505.065 dòng, đủ 86 pin và đủ các chu kỳ đã chọn; mọi điểm trong cửa sổ đầu xả được giữ nguyên. Giảm mật độ sau 120 giây giúp giảm dung lượng lưu trữ, không được coi là loại bỏ nhiễu.
 Bốn mô hình nghiên cứu gồm Ridge, Random Forest, LightGBM và GRU; mô hình dự đoán bằng trung bình SOH là mốc đối chứng. Kiểm thử 5 vòng chia theo mã pin vật lý, giữ hai giai đoạn của cùng pin ở cùng phía. Chỉ số chính lấy trung bình theo pin. Random Forest đạt MAE {{RF_MAE}}, RMSE {{RF_RMSE}} điểm phần trăm SOH và R² {{RF_R2}}. Kết quả này thuộc dữ liệu thí nghiệm đã chọn, chưa chứng minh hiệu quả trên bộ pin xe vận hành thực tế.
 Sản phẩm Vincent D cung cấp tra cứu tín hiệu, so sánh chu kỳ, đánh giá mô hình, dự đoán một chu kỳ hoặc theo lô, lịch sử phiên và hồ sơ nguồn dữ liệu. Báo cáo, notebook, bảng thực nghiệm và mã xử lý được lưu cùng dự án để đối chiếu và tái lập.
 Từ khóa: SOH, pin lithium-ion, trích xuất đặc trưng, học máy, GRU, SDU.
@@ -37,7 +37,7 @@ Sản phẩm gồm bộ chọn có hồ sơ nguồn, bảng đặc trưng 20.823
 Nhãn được định nghĩa: SOH (%) = 100 × Q_xả / Q_danh_định, với Q_danh_định = 2,4 Ah. Q_xả lấy từ dung lượng tham chiếu toàn chu kỳ trước khi giảm mật độ điểm đo. Không tính lại nhãn bằng tích phân trên bản đã lấy thưa vì sai số lấy mẫu có thể làm lệch dung lượng.
 Giá trị SOH trên 100% được giữ nguyên khi dung lượng đo lớn hơn danh định. Không cắt giá trị về 100% để làm đường cong đẹp hơn. Sự thay đổi SOH giữa các chu kỳ có thể gồm cả thay đổi dung lượng và ảnh hưởng điều kiện đo; không ép đường SOH phải giảm đơn điệu.
 ## 2.2. Dữ liệu đo và mẫu huấn luyện
-Một dòng cảm biến chứa các số đo tại một thời điểm; một mẫu huấn luyện trong mô hình bảng đại diện cho một chu kỳ. Do đó, 10 triệu dòng không tương đương 10 triệu mẫu độc lập. Các điểm cùng chu kỳ có liên hệ theo thời gian, và các chu kỳ cùng pin cũng có liên hệ.
+Một dòng cảm biến chứa các số đo tại một thời điểm; một mẫu huấn luyện trong mô hình bảng đại diện cho một chu kỳ. Do đó, 10.505.065 dòng không tương đương 10.505.065 mẫu độc lập. Các điểm cùng chu kỳ có liên hệ theo thời gian, và các chu kỳ cùng pin cũng có liên hệ.
 Mỗi mẫu có khóa gồm mã pin, giai đoạn và số chu kỳ. Số chu kỳ có thể bắt đầu lại khi chuyển giai đoạn; chỉ dùng mã pin và số chu kỳ sẽ làm lẫn hai quá trình. Mã pin dùng để phân nhóm kiểm thử, không dùng làm đầu vào mô hình.
 ## 2.3. Trích xuất đặc trưng
 Từ tín hiệu trong 0–120 giây, chương trình giữ các mẫu đang xả và tính trung bình, cực trị, độ lệch chuẩn và độ dốc. Độ lệch chuẩn dùng định nghĩa tổng thể, cùng quy ước trong huấn luyện và dự đoán. Độ dốc là hệ số hồi quy tuyến tính theo thời gian đã trừ trung bình, không lấy hiệu giữa hai mẫu tùy ý.
@@ -68,13 +68,13 @@ Tên file không được dùng thay mã pin. Cột Battery_ID của nguồn đ�
 Từ 145.112.317 dòng nguồn, quy trình nhận diện các đoạn xả gần dòng tham chiếu −0,48 A. Trung vị dòng phải nằm trong khoảng tham chiếu với dung sai 0,03 A và ít nhất 95% mẫu nằm trong dải đó. Điện áp đầu ít nhất 4 V; điện áp cuối từ 2,95 đến 3,05 V. Các tín hiệu thời gian, điện áp, dòng điện và nhiệt độ phải hữu hạn, khóa thời gian không trùng trong chu kỳ.
 Các kiểm tra dung lượng gồm dung lượng đầu không vượt 0,01 Ah, không giảm quá dung sai 0,0001 Ah và giới hạn dung lượng theo 1,2 lần danh định. Dung lượng ghi nhận được đối chiếu tích phân dòng điện với sai số cho phép lớn hơn giữa 0,02 Ah và 2%. Cửa sổ đầu xả cần ít nhất 5 điểm và độ phủ đến ít nhất 90 giây.
 Kết quả chọn là 30.929.675 dòng của 20.823 chu kỳ. Không gọi mọi đoạn này là chu kỳ chẩn đoán do tác giả gán nhãn; tiêu chí đang nhận diện điều kiện từ tín hiệu. Chọn điều kiện tương đồng giúp giảm khác biệt chế độ đo, đồng thời thu hẹp phạm vi áp dụng của mô hình.
-## 3.3. Tạo bản 10 triệu dòng
-Bản gọn giữ tất cả các chu kỳ đã chọn, mọi mẫu trong 120 giây đầu và điểm cuối mỗi chu kỳ. Ngân sách điểm còn lại được phân bổ theo số điểm của từng chu kỳ; các điểm phần giữa được chọn đều theo thứ tự thời gian. Từng dòng được giữ nguyên văn từ nguồn, không nhân bản, điền thiếu hay sửa số đo.
-Sau giảm mật độ, nguồn lưu 10.000.000 dòng trong 172 file CSV nén gzip. Dung lượng tham chiếu, nhãn và bảng đặc trưng được giữ từ bộ đủ điểm và được đối chiếu lại. Phần sau 120 giây mất chi tiết, nên bản này không thay thế dữ liệu đầy đủ cho nghiên cứu cần phân tích nguyên chuỗi hoặc tính ICA chính xác ở toàn bộ miền điện áp.
-Việc chọn đúng 10 triệu dòng phục vụ lưu trữ theo yêu cầu triển khai; đây không phải ngưỡng đảm bảo chất lượng học máy. Số pin độc lập và số chu kỳ hữu ích mới là thông tin cần báo cáo cùng số điểm cảm biến.
+## 3.3. Tạo bản 10.505.065 dòng
+Bản gọn giữ tất cả các chu kỳ đã chọn, mọi mẫu trong 120 giây đầu và điểm cuối mỗi chu kỳ. Sau khi giữ các điểm bắt buộc, phần còn lại trong từng chu kỳ được sắp theo thời gian và giữ một trong ba điểm liên tiếp, bắt đầu từ điểm đầu của phần này. Không đặt trước tổng số dòng. Từng dòng được giữ nguyên văn từ nguồn, không nhân bản, điền thiếu hay sửa số đo.
+Sau giảm mật độ, nguồn lưu 10.505.065 dòng trong 172 file CSV nén gzip. Dung lượng tham chiếu, nhãn và bảng đặc trưng được giữ từ bộ đủ điểm và được đối chiếu lại. Phần sau 120 giây mất chi tiết, nên bản này không thay thế dữ liệu đầy đủ cho nghiên cứu cần phân tích nguyên chuỗi hoặc tính ICA chính xác ở toàn bộ miền điện áp.
+Số 10.505.065 là kết quả đếm sau khi áp dụng quy tắc lấy thưa, không phải số dòng được đặt trước. Đây không phải ngưỡng đảm bảo chất lượng học máy. Số pin độc lập và số chu kỳ hữu ích mới là thông tin cần báo cáo cùng số điểm cảm biến.
 ## 3.4. Kiểm tra chất lượng
-Bản xử lý được quét toàn bộ 10 triệu dòng. Không phát hiện giá trị thiếu/vô hạn ở tín hiệu bắt buộc hoặc khóa thời gian trùng. Nội dung dòng giải nén được kiểm SHA-256 theo file, đặc trưng được tính lại và nhãn được nối theo khóa pin/giai đoạn/chu kỳ.
-Có 25 điểm nghi vấn biến thiên đột ngột còn nằm trong bộ chọn, không điểm nào thuộc 120 giây đầu. Đây là cờ kiểm tra theo quy tắc, chưa phải xác nhận lỗi cảm biến; các điểm không bị tự xóa hoặc sửa. Có 23 bước thời gian đi lùi trong thứ tự ghi nguồn. Bản sao phục vụ xử lý được sắp theo thời gian trong từng chu kỳ, còn file nguồn giữ nguyên.
+Bản xử lý được quét toàn bộ 10.505.065 dòng. Không phát hiện giá trị thiếu/vô hạn ở tín hiệu bắt buộc hoặc khóa thời gian trùng. Nội dung dòng giải nén được kiểm SHA-256 theo file, đặc trưng được tính lại và nhãn được nối theo khóa pin/giai đoạn/chu kỳ.
+Có 26 điểm nghi vấn biến thiên đột ngột còn nằm trong bộ chọn, không điểm nào thuộc 120 giây đầu. Đây là cờ kiểm tra theo quy tắc, chưa phải xác nhận lỗi cảm biến; các điểm không bị tự xóa hoặc sửa. Có 23 bước thời gian đi lùi trong thứ tự ghi nguồn. Bản sao phục vụ xử lý được sắp theo thời gian trong từng chu kỳ, còn file nguồn giữ nguyên.
 Không có lỗi được phát hiện theo các kiểm tra trên không có nghĩa dữ liệu hoàn toàn không có nhiễu hoặc không có sai lệch đo. Những giới hạn kiểm tra và danh sách điểm nghi vấn được phát kèm để có thể xem xét lại.
 ## 3.5. Tạo bảng đặc trưng
 Thời gian đầu xả của mỗi chu kỳ được quy về 0 trên bản xử lý. Cửa sổ lấy mẫu từ 0 đến 120 giây, ít nhất 5 điểm, thời gian bắt đầu không quá 20 giây và điểm cuối ít nhất 90 giây. Phần đang xả cần ít nhất 3 mẫu có dòng dưới −0,1 A và trải ít nhất 30 giây. Các thống kê được tính trên phần xả trong cửa sổ.
@@ -93,7 +93,7 @@ Dữ liệu thô được đọc lần lượt theo pin/giai đoạn. Bản ứn
 
 # Chương 4. Kết quả và thảo luận
 ## 4.1. Quy mô bộ dữ liệu
-Tập dùng trong sản phẩm có 10.000.000 dòng đo, 20.823 mẫu chu kỳ của 86 pin, gồm cả sử dụng ban đầu và tái sử dụng. Bảng dưới tổng hợp theo giai đoạn từ dữ liệu thực tế, không suy ra số chu kỳ bằng số dòng cảm biến.
+Tập dùng trong sản phẩm có 10.505.065 dòng đo, 20.823 mẫu chu kỳ của 86 pin, gồm cả sử dụng ban đầu và tái sử dụng. Bảng dưới tổng hợp theo giai đoạn từ dữ liệu thực tế, không suy ra số chu kỳ bằng số dòng cảm biến.
 {{PHASE_TABLE}}
 ![Hình 4.1. SOH của các pin theo từng giai đoạn](../reports/soh_by_phase.png)
 Hai giai đoạn được vẽ riêng vì số chu kỳ có thể bắt đầu lại. Đường cong của một pin không được nối trực tiếp qua điểm chuyển giai đoạn nếu chưa có thang thời gian thống nhất.
@@ -133,7 +133,7 @@ Quy trình gồm tầng nguồn CSV gzip, tầng chuyển đổi Parquet, tầng
 Giao diện đọc bảng nhỏ cho thống kê và chỉ đọc dữ liệu chu kỳ khi cần. Mô hình được nạp một lần trong bộ nhớ đệm. Trình duyệt nhận dữ liệu biểu đồ đã giới hạn điểm hiển thị, trong khi file xuất vẫn giữ các mẫu theo bộ lọc. Cách này tránh gửi hàng triệu điểm lên trình duyệt.
 ## 5.2. Các chức năng
 Tổng quan trình bày quy mô dữ liệu, sai số và đường SOH theo giai đoạn. Tra cứu cho phép lọc pin, giai đoạn, khoảng chu kỳ, xem tín hiệu và so sánh hai chu kỳ. Đánh giá mô hình hiển thị chỉ số, dự đoán giữ riêng, sai số, thời gian và thử nghiệm bỏ đặc trưng.
-Dự đoán nhận CSV cho một chu kỳ hoặc tối đa 100 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
+Dự đoán nhận CSV hoặc CSV.GZ tới 512 MiB cho một chu kỳ hoặc tối đa 2.000 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
 Lịch sử chỉ lưu trong phiên làm việc, không phải cơ sở dữ liệu người dùng. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu.
 ## 5.3. Mô hình ứng dụng
 Random Forest là mô hình triển khai được quy định trước cho bản ứng dụng. Mô hình này được học lại trên toàn bộ 20.823 mẫu để phục vụ ước lượng; không lấy sai số trên chính dữ liệu học lại để báo cáo chất lượng. Điểm thực nghiệm luôn đọc từ các dự đoán giữ riêng đã lưu.

@@ -12,9 +12,7 @@ from result_report import add_history, current_time, html_report
 
 
 def render():
-    heading(
-        "DỰ ĐOÁN", "Ước lượng sức khỏe pin", "Random Forest · 120 giây đầu chu kỳ xả"
-    )
+    heading("", "Dự đoán tình trạng sức khỏe pin", "")
     mode = st.radio(
         "Chế độ dự đoán",
         ["Một chu kỳ", "Theo lô"],
@@ -45,7 +43,15 @@ def render():
     with st.container(border=True):
         left, right = st.columns([1.4, 1], gap="large")
         with left:
-            uploaded = st.file_uploader("CSV đầu vào · tối đa 5 MB", type=["csv"])
+            uploaded = st.file_uploader(
+                "File CSV hoặc CSV.GZ · tối đa 512 MiB", type=["csv", "gz"]
+            )
+            phase_code = st.selectbox(
+                "Giai đoạn của dữ liệu",
+                [0, 1],
+                format_func=lambda x: "Sử dụng ban đầu" if x == 0 else "Tái sử dụng",
+                key="upload_phase",
+            )
             use_example = st.checkbox("Dùng dữ liệu mẫu SDU_01")
         with right:
             cycle = st.number_input(
@@ -62,7 +68,7 @@ def render():
                 "mau_mot_chu_ky.csv" if mode == "Một chu kỳ" else "mau_theo_lo.csv",
             )
         run = st.button(
-            "Ước lượng SOH", type="primary", icon=":material/bolt:", width="stretch"
+            "Dự đoán SOH", type="primary", icon=":material/bolt:", width="stretch"
         )
     with st.expander("Thông số đầu vào"):
         st.dataframe(
@@ -101,10 +107,11 @@ def render():
             width="stretch",
         )
         st.caption(
-            "Cửa sổ 0–120 giây: ít nhất 5 mẫu, bắt đầu ≤20 giây, kết thúc ≥90 giây; ít nhất 3 mẫu xả trải dài ≥30 giây. Tối đa 100 chu kỳ/lô."
+            "Cửa sổ 0–120 giây: ít nhất 5 mẫu, bắt đầu ≤20 giây, kết thúc ≥90 giây; ít nhất 3 mẫu xả trải dài ≥30 giây. Tối đa 2.000 chu kỳ/lô. CSV gốc SDU được đọc theo khối, chỉ giữ cửa sổ đầu xả."
         )
     content = uploaded.getvalue() if uploaded is not None else None
     input_key = (
+        phase_code,
         content,
         use_example,
         cycle,
@@ -118,7 +125,18 @@ def render():
                 raise ValueError("Hãy tải CSV hoặc chọn dữ liệu mẫu.")
             if content is None and mode == "Một chu kỳ" and cycle != 1:
                 raise ValueError("CSV mẫu thuộc chu kỳ 1.")
-            frame = read_csv(content) if content is not None else sample.copy()
+            with st.spinner("Đang đọc dữ liệu..."):
+                frame = (
+                    read_csv(content, phase_code=phase_code)
+                    if content is not None
+                    else sample.copy()
+                )
+            if mode == "Một chu kỳ" and frame.attrs.get("source_format") == "sdu_raw":
+                frame = frame[frame.cycle == cycle].copy()
+                if frame.empty:
+                    raise ValueError(
+                        "File không có chu kỳ xả đã chọn. Kiểm tra số chu kỳ hoặc chọn Theo lô."
+                    )
             artifact = model()
             features, outside = None, []
             if mode == "Một chu kỳ":
@@ -156,7 +174,7 @@ def render():
                     if content is not None
                     else sample.to_csv(index=False).encode()
                 )
-                + str((cycle, mode, source)).encode()
+                + str((cycle, phase_code, mode, source)).encode()
             ).hexdigest()
             st.session_state["prediction_history"] = add_history(
                 st.session_state.get("prediction_history", []),
@@ -180,6 +198,8 @@ def render():
             KeyError,
             UnicodeDecodeError,
             pd.errors.ParserError,
+            OSError,
+            EOFError,
         ) as error:
             st.error(str(error))
     result = st.session_state.get("forecast_result")
@@ -231,7 +251,7 @@ def single_result(rows, features, outside, frame, source):
     left, right = st.columns([1, 1.5], gap="large")
     with left:
         with st.container(border=True):
-            st.metric("SOH ước lượng", f"{rows.predicted_soh_pct.iloc[0]:.2f}%")
+            st.metric("SOH dự đoán", f"{rows.predicted_soh_pct.iloc[0]:.2f}%")
             st.caption("SDU · NMC/graphite · dung lượng danh định 2,4 Ah")
     with right:
         st.text(source)

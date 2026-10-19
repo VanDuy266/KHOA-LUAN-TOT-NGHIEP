@@ -7,7 +7,7 @@ textColor = "#193431"
 font = "Arial"
 
 [server]
-maxUploadSize = 5
+maxUploadSize = 512
 
 [browser]
 gatherUsageStats = false

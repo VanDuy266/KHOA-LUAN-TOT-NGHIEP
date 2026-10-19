@@ -210,7 +210,7 @@ def slides(summary, temporal):
             "Từ nguồn đến dữ liệu mô hình",
             [
                 "145.112.317 dòng nguồn → 30.929.675 dòng xả tham chiếu",
-                "Bản chọn: 10.000.000 dòng, đủ 20.823 chu kỳ",
+                "Bản chọn: 10.505.065 dòng, đủ 20.823 chu kỳ",
                 "Giữ nguyên cửa sổ đầu xả; lấy thưa đoạn sau",
             ],
             None,
@@ -221,7 +221,7 @@ def slides(summary, temporal):
             [
                 "Đối chiếu MD5 gói gốc và SHA-256 file được chọn",
                 "Không thiếu tín hiệu bắt buộc, không trùng khóa thời gian",
-                "25 điểm nghi vấn được giữ; không nằm trong 120 giây đầu",
+                "26 điểm nghi vấn được giữ; không nằm trong 120 giây đầu",
             ],
             None,
         ),
@@ -492,7 +492,7 @@ def main():
     if xml.exists():
         suite = ET.parse(xml).getroot().find("testsuite")
         replacements["TEST_DISCUSSION"] = (
-            f'Lần kiểm thử lưu trong reports/pytest-results.xml gồm {suite.get("tests")} trường hợp, {suite.get("failures")} thất bại, {suite.get("errors")} lỗi và {suite.get("skipped")} bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10 triệu dòng.'
+            f'Lần kiểm thử lưu trong reports/pytest-results.xml gồm {suite.get("tests")} trường hợp, {suite.get("failures")} thất bại, {suite.get("errors")} lỗi và {suite.get("skipped")} bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.'
         )
     else:
         raise ValueError("Chưa có kết quả kiểm thử")

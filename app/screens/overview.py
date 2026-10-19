@@ -11,40 +11,40 @@ def render():
     dataset = metadata("reports/dataset_summary.json")
     rf = table("reports/metrics_summary.csv").query("model == 'Random Forest'").iloc[0]
     heading(
-        "VINCENT D / PHÂN TÍCH PIN",
-        "Tổng quan sức khỏe pin",
-        "Dữ liệu lithium-ion · Tra cứu chu kỳ · Ước lượng SOH",
+        "",
+        "Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy",
+        "",
     )
     left, right = st.columns([1.55, 1], gap="large")
     with left:
         st.markdown(
-            '<div class="hero-panel"><span class="status-pill"><i></i> BỘ DỮ LIỆU NGHIÊN CỨU</span>'
-            "<h2>Phân tích sức khỏe pin lithium-ion</h2><p>Theo dõi dung lượng theo chu kỳ và đối chiếu kết quả của các mô hình học máy.</p>"
+            '<div class="hero-panel"><span class="status-pill"><i></i> Dữ liệu nghiên cứu</span>'
+            "<h2>Phân tích dữ liệu và dự đoán SOH</h2><p>Dữ liệu SDU · 86 tế bào pin lithium-ion · Hai giai đoạn sử dụng.</p>"
             '<div class="hero-tags"><span>86 pin SDU</span><span>12 đặc trưng</span><span>120 giây đầu</span></div></div>',
             unsafe_allow_html=True,
         )
     with right:
         st.markdown(
             '<div class="author-card"><div class="author-monogram">VD</div>'
-            '<div class="eyebrow">NGƯỜI THỰC HIỆN</div><h2>Nguyễn Văn Duy</h2>'
+            '<div class="eyebrow">Người thực hiện</div><h2>Nguyễn Văn Duy</h2>'
             "<dl><dt>MSSV</dt><dd>2311553949</dd><dt>Chuyên ngành</dt><dd>Khoa Học Dữ Liệu</dd></dl></div>",
             unsafe_allow_html=True,
         )
     st.write("")
     values = [
         (
-            "DÒNG ĐO ĐƯỢC CHỌN",
+            "Dòng đo được chọn",
             number(dataset["all_measurement_rows"]),
             "Xả tham chiếu · hai giai đoạn",
         ),
         (
-            "PIN THỬ NGHIỆM",
+            "Pin thử nghiệm",
             str(data.battery.nunique()),
             "Cell NMC(532)/graphite · 2,4 Ah",
         ),
-        ("CHU KỲ XẢ", number(len(data)), "Mẫu SOH của mô hình"),
+        ("Chu kỳ xả", number(len(data)), "Mẫu SOH của mô hình"),
         (
-            "MAE · RANDOM FOREST",
+            "MAE · Random Forest",
             f"{rf.mae:.3f}",
             "Điểm phần trăm SOH · kiểm thử theo pin",
         ),

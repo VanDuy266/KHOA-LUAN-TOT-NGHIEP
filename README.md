@@ -9,9 +9,9 @@ Tôi sử dụng dữ liệu SDU công bố năm 2025 để phân tích dung lư
 ## Tải sản phẩm và dữ liệu
 
 - [Bản sản phẩm đầy đủ, có dữ liệu tra cứu và mô hình](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/archive/refs/heads/san-pham-sdu.zip).
-- [Bộ dữ liệu nguồn đã chọn — 10 triệu dòng, một file ZIP](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/archive/refs/heads/dataset-sdu-10tr.zip).
+- [Bộ dữ liệu nguồn đã chọn — 10.505.065 dòng, một file ZIP](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/archive/refs/heads/dataset-sdu-10tr.zip).
 
-Kho riêng tư yêu cầu đăng nhập tài khoản GitHub có quyền truy cập. Gói sản phẩm có sẵn Parquet, mô hình và kết quả; không cần tải nguồn hoặc huấn luyện lại để mở ứng dụng. Gói dữ liệu riêng dùng để đối chiếu nguồn hoặc tạo lại Parquet. Chỉ giải nén ZIP ngoài; Python đọc trực tiếp các file `.csv.gz` bên trong.
+Kho riêng tư yêu cầu đăng nhập tài khoản GitHub có quyền truy cập. Gói sản phẩm có sẵn Parquet, mô hình và kết quả; không cần tải nguồn hoặc huấn luyện lại để mở ứng dụng. Gói dữ liệu riêng dùng để đối chiếu nguồn hoặc tạo lại Parquet. Quy tắc lấy thưa: sau khi giữ cửa sổ đầu và điểm cuối, giữ mỗi ba điểm còn lại một điểm trong từng chu kỳ. Số dòng là kết quả đếm thực tế. Chỉ giải nén ZIP ngoài; Python đọc trực tiếp các file `.csv.gz` bên trong.
 
 ## Chạy trên Windows / VS Code
 
@@ -42,7 +42,7 @@ Trình duyệt mở địa chỉ Streamlit hiển thị trong terminal. Đổi t
 | File đo trong bộ chọn | 172 CSV gzip |
 | Dòng đo nguồn gốc | 145.112.317 |
 | Dòng xả tham chiếu trước lấy thưa | 30.929.675 |
-| Dòng đo được giữ trong bản sản phẩm | 10.000.000 |
+| Dòng đo được giữ trong bản sản phẩm | 10.505.065 |
 | Mẫu chu kỳ dùng huấn luyện | 20.823 |
 | Đặc trưng mô hình bảng | 12 |
 
@@ -52,7 +52,7 @@ Nguồn: Wang, S., Gao, F., & Tian, H. (2025). *Data for: Deep sorting of reused
 
 Bản chọn giữ đủ các chu kỳ xả tham chiếu, mọi điểm 120 giây đầu và điểm cuối; lấy thưa đoạn sau. Không sửa giá trị các dòng nguồn. Bộ chọn không bao gồm mọi chế độ sạc, nghỉ và xả trong gói gốc. Nhãn dung lượng lấy từ chu kỳ đầy đủ, không tính lại trên bản đã lấy thưa.
 
-Kiểm tra toàn bộ 10 triệu dòng không phát hiện thiếu tín hiệu bắt buộc hoặc khóa thời gian trùng. Có **25 điểm nghi vấn**, không điểm nào trong cửa sổ mô hình; các điểm được giữ để xem xét. Có 23 bước thời gian đi lùi trong thứ tự nguồn; bản sao xử lý được sắp trong từng chu kỳ. Chi tiết tại [nguồn dữ liệu](data/README.md), [kết quả kiểm tra](data/KIEM_TRA_DU_LIEU.md) và `reports/dataset_check.json`.
+Kiểm tra toàn bộ 10.505.065 dòng không phát hiện thiếu tín hiệu bắt buộc hoặc khóa thời gian trùng. Có **26 điểm nghi vấn**, không điểm nào trong cửa sổ mô hình; các điểm được giữ để xem xét. Có 23 bước thời gian đi lùi trong thứ tự nguồn; bản sao xử lý được sắp trong từng chu kỳ. Chi tiết tại [nguồn dữ liệu](data/README.md), [kết quả kiểm tra](data/KIEM_TRA_DU_LIEU.md) và `reports/dataset_check.json`.
 
 ## Mô hình và kết quả
 
@@ -112,3 +112,5 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 [Giải thích mã nguồn](docs/giai-thich-code.md) · [Nội dung trình bày](docs/noi-dung-trinh-bay.md) · [Danh mục bàn giao](docs/danh-muc-ban-giao.md)
 
 Bản báo cáo dùng thông tin trường và GVHD theo phiếu đăng ký. Mẫu trình bày, số trang và thủ tục nộp cuối cùng phụ thuộc quy định khoa và xác nhận của giảng viên.
+
+CSV đầu vào: tối đa 512 MiB, hỗ trợ `.csv` và `.csv.gz`, gồm tên cột gốc SDU. Chọn đúng giai đoạn sử dụng; chế độ Theo lô xử lý tới 2.000 chu kỳ. File lớn nhất của bộ hiện tại khoảng 82,8 MiB sau giải nén.

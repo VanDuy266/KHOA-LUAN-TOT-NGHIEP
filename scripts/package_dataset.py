@@ -12,7 +12,7 @@ def main():
     assert (source / "source_rows").exists() and (
         source / "verification/summary.json"
     ).exists()
-    output = ROOT.parent / "deliverables/Dataset_SDU_10tr_dong.zip"
+    output = ROOT.parent / "deliverables/Dataset_SDU_10505065_dong.zip"
     output.parent.mkdir(exist_ok=True)
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED) as archive:
         for path in sorted(source.rglob("*")):

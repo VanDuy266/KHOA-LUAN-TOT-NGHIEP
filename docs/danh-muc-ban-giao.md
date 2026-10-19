@@ -16,7 +16,7 @@
 
 ## Bộ dữ liệu nộp riêng
 
-Bộ dữ liệu ZIP gồm `source_rows/Primary_use_phase/` và `source_rows/Second_life_phase/`: tổng 172 file CSV gzip của cùng 86 pin. Kèm `training_table.csv`, `cycle_features.csv`, nguồn, nhật ký chọn và thư mục `verification/`. Giữ nguyên `.csv.gz`, không cần giải nén từng file. Gói này là tập con 10 triệu dòng do dự án chọn từ nguồn SDU; không gọi là toàn bộ bộ nguồn 145 triệu dòng.
+Bộ dữ liệu ZIP gồm `source_rows/Primary_use_phase/` và `source_rows/Second_life_phase/`: tổng 172 file CSV gzip của cùng 86 pin. Kèm `training_table.csv`, `cycle_features.csv`, nguồn, nhật ký chọn và thư mục `verification/`. Giữ nguyên `.csv.gz`, không cần giải nén từng file. Gói này là tập con 10.505.065 dòng do dự án chọn từ nguồn SDU; không gọi là toàn bộ bộ nguồn 145 triệu dòng.
 
 Nguồn gốc đầy đủ, giấy phép CC BY 4.0 và checksum được ghi trong hồ sơ. Gói sản phẩm chứa bản Parquet dẫn xuất để chạy nhanh, không thay thế việc lưu trữ nguồn và trích dẫn.
 

@@ -70,8 +70,10 @@ def test_batch_requires_cycle_and_enforces_limit():
     sample = pd.read_csv(ROOT / "examples/chu_ky_mau_SDU.csv")
     with pytest.raises(ValueError, match="cần cột cycle"):
         predict_batch(sample.drop(columns=["cycle"], errors="ignore"), {})
-    many = pd.concat([sample.assign(cycle=i) for i in range(1, 102)], ignore_index=True)
-    with pytest.raises(ValueError, match="100 chu kỳ"):
+    many = pd.concat(
+        [sample.assign(cycle=i) for i in range(1, 2002)], ignore_index=True
+    )
+    with pytest.raises(ValueError, match="2000 chu kỳ"):
         predict_batch(many, {})
 
 
@@ -106,3 +108,51 @@ def test_batch_does_not_mix_same_cycle_across_phases():
     )
     assert len(rows) == 2 and set(rows.phase_code) == {0, 1}
     assert rows.status.eq("Thành công").all()
+
+
+def test_upload_accepts_csv_larger_than_old_decimal_5mb_limit():
+    sample = pd.read_csv(ROOT / "examples/chu_ky_mau_SDU.csv")
+    sample["note"] = ["x" * 5_010_000] + [""] * (len(sample) - 1)
+    content = sample.to_csv(index=False).encode()
+    assert len(content) > 5_000_000
+    assert len(read_csv(content)) == len(sample)
+
+
+def test_upload_limit_matches_binary_streamlit_setting(monkeypatch):
+    import prediction
+
+    assert prediction.MAX_UPLOAD_BYTES == 512 * 1024 * 1024
+    monkeypatch.setattr(prediction, "MAX_UPLOAD_BYTES", 10)
+    with pytest.raises(ValueError, match="512 MiB"):
+        prediction.read_csv(b"a" * 11)
+
+
+def test_raw_sdu_csv_and_gzip_use_relative_discharge_time():
+    import gzip
+
+    source = pd.read_csv(ROOT / "examples/chu_ky_mau_SDU.csv")
+    expected = source.copy()
+    source = source.rename(
+        columns={
+            "time": "Test_Time(s)",
+            "cycle": "Cycle_Index",
+            "battery": "Battery_ID",
+            "terminal_voltage": "Voltage(V)",
+            "terminal_current": "Current(A)",
+            "temperature": "Aux_Temperature_1(C)",
+        }
+    )
+    source["Test_Time(s)"] += 10000
+    source["Battery_ID"] = 1
+    source = source.drop(columns=["phase_code", "phase"], errors="ignore")
+    content = source.to_csv(index=False).encode()
+    artifact = joblib.load(ROOT / "artifacts/random_forest.joblib")
+    for payload in [content, gzip.compress(content)]:
+        actual = read_csv(payload, phase_code=0)
+        assert actual.time.min() == pytest.approx(0)
+        assert set(actual.battery) == {"SDU_01"}
+        assert predict(actual, 1, artifact)[0] == pytest.approx(
+            predict(expected, 1, artifact)[0]
+        )
+    with pytest.raises(ValueError, match="chọn giai đoạn"):
+        read_csv(content)

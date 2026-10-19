@@ -1,6 +1,6 @@
 {
   "dataset": "SDU",
-  "measurement_rows": 10000000,
+  "measurement_rows": 10505065,
   "parent_measurement_rows": 30929675,
   "cycles": 20823,
   "batteries": 86,
@@ -31,7 +31,7 @@
     "temperature_slope"
   ],
   "nominal_capacity_ah": 2.4,
-  "commit": "zenodo-14859405-sdu-10m",
+  "commit": "zenodo-14859405-sdu-stride3",
   "primary_batteries": [
     "SDU_01",
     "SDU_02",
@@ -123,5 +123,6 @@
   "source_page": "https://zenodo.org/records/14859405",
   "doi": "10.5281/zenodo.14859405",
   "original_year": 2025,
-  "source_branch": "dataset-sdu-10tr"
+  "source_branch": "dataset-sdu-10tr",
+  "sampling_method": "All first 120s and final points; every third remaining point within each cycle"
 }
