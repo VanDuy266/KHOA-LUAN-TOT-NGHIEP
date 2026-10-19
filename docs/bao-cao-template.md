@@ -1,287 +1,173 @@
-# PHÂN TÍCH VÀ DỰ ĐOÁN TÌNH TRẠNG SỨC KHỎE PIN XE ĐIỆN BẰNG CÁC MÔ HÌNH HỌC MÁY
-
-Trường Đại học Nguyễn Tất Thành — Khoa Công nghệ thông tin
-
-Sinh viên: Nguyễn Văn Duy — MSSV: 2311553949 — Lớp: 23DTH2A
-
-Giảng viên hướng dẫn theo phiếu đăng ký: ThS. Vương Xuân Chí
-
-**Báo cáo nghiên cứu — sản phẩm Vincent D.**
-
-## Tóm tắt
-
-Khóa luận xây dựng một sản phẩm ước lượng trạng thái sức khỏe (State of Health — SOH) của cell lithium-ion từ dữ liệu đo đầu chu kỳ xả. Dữ liệu được đọc trực tiếp từ bốn file MATLAB công khai dẫn nguồn NASA. Tổng số bản ghi sạc/xả ban đầu là 2.089.050; sau khi loại hai bản ghi sạc thiếu tín hiệu, còn 2.089.048 bản ghi sạch. Bảng đặc trưng cho mô hình gồm 636 chu kỳ xả thuộc bốn pin, không phải hai triệu mẫu SOH độc lập. Đặc trưng sử dụng điện áp, dòng điện, nhiệt độ trong 120 giây đầu và chỉ số chu kỳ. Năm mô hình được đánh giá bằng cách giữ riêng từng pin làm kiểm thử. Random Forest đạt MAE trung bình {{RF_MAE}} và RMSE {{RF_RMSE}} điểm phần trăm SOH. Các phân tích bổ sung gồm bỏ nhóm đặc trưng và chia theo thời gian. Sản phẩm gồm quy trình dữ liệu, mô hình, ứng dụng Streamlit, notebook, kiểm thử, báo cáo và tài liệu tái lập. Kết quả giới hạn ở các cell thử nghiệm; chưa chứng minh hiệu quả trên bộ pin xe điện thực tế hoặc dữ liệu Việt Nam.
-
-Từ khóa: pin lithium-ion, SOH, học máy, Random Forest, chất lượng dữ liệu, kiểm thử theo nhóm.
-
-## Abstract
-
-This thesis implements a reproducible lithium-ion cell state-of-health estimation workflow. Four publicly mirrored MATLAB files attributed to the NASA PCoE battery dataset yield 2,089,048 valid charge and discharge measurements after removing two incomplete charging records. The supervised SOH table contains 636 discharge-cycle samples from four cells. Features are extracted from the first 120 seconds of discharge, without using full-cycle capacity as an input. Five fixed-parameter models are evaluated using leave-one-battery-out validation. Random Forest obtains a macro MAE of {{RF_MAE}} SOH percentage points. Additional analyses examine feature removal and forward chronological evaluation. The deliverables include a data pipeline, a Streamlit demonstration, executed notebooks, tests, and reproducibility documentation. These results do not establish field performance on electric-vehicle battery packs.
-
-## Danh mục từ viết tắt
-
-| Từ viết tắt | Ý nghĩa | Vai trò trong khóa luận |
-| --- | --- | --- |
-| SOH | State of Health | Sức khỏe theo dung lượng so với 2 Ah |
-| SOC | State of Charge | Trạng thái sạc; không phải biến đích |
-| RUL | Remaining Useful Life | Tuổi thọ còn lại; ngoài phạm vi thực nghiệm |
-| CC/CV | Constant Current / Constant Voltage | Chế độ sạc trong mô tả dữ liệu |
-| MAE | Mean Absolute Error | Sai số tuyệt đối trung bình |
-| RMSE | Root Mean Squared Error | Căn sai số bình phương trung bình |
-| RF | Random Forest | Mô hình cây dùng cho demo |
-| LOBO | Leave-One-Battery-Out | Giữ riêng toàn bộ từng pin để kiểm thử |
-
-## Chương 1. Giới thiệu
-
-### 1.1. Bối cảnh
-
-Dung lượng sử dụng được của pin lithium-ion thay đổi theo quá trình sử dụng. Việc mô tả tình trạng sức khỏe pin là một bài toán liên quan quản lý năng lượng, bảo trì và đánh giá khả năng vận hành. Khi nghiên cứu bằng dữ liệu, cần phân biệt mức sạc tại một thời điểm với dung lượng tối đa mà cell có thể cung cấp. Hai cell đều ở trạng thái sạc đầy vẫn có thể có dung lượng thực tế khác nhau.
-
-Trong điều kiện thử nghiệm, dung lượng xả của một chu kỳ được dùng làm giá trị tham chiếu để tính SOH. Tuy nhiên, quan sát hết chu kỳ xả mới có được giá trị đó. Khóa luận đặt vấn đề sử dụng một phần ngắn của tín hiệu đầu chu kỳ để ước lượng sức khỏe. Cách tiếp cận phù hợp một sản phẩm minh họa khoa học dữ liệu vì có thể thiết kế rõ đầu vào, nhãn, quy trình đánh giá và giới hạn.
-
-### 1.2. Vấn đề nghiên cứu
-
-Câu hỏi chính là: tín hiệu trong 120 giây đầu chu kỳ xả có giúp mô hình ước lượng SOH của một pin chưa xuất hiện trong huấn luyện tốt hơn mô hình chỉ sử dụng chỉ số chu kỳ không? Thời điểm đưa ra dự đoán là sau cửa sổ quan sát đó, không phải trước khi xả.
-
-Hai câu hỏi bổ sung là vai trò của số chu kỳ và nhiệt độ trong mô hình cây, và khả năng dự đoán các chu kỳ về sau khi đã có nhãn những chu kỳ đầu của cùng một pin. Câu hỏi sau có thiết kế khác với kiểm thử trên pin mới, vì vậy kết quả phải được báo cáo riêng.
-
-### 1.3. Mục tiêu
-
-Mục tiêu kỹ thuật là xây dựng một quy trình dễ đọc bằng Python và các thư viện thông dụng: scipy để đọc MATLAB; pandas/NumPy để xử lý bảng; scikit-learn để huấn luyện; matplotlib để vẽ hình; Streamlit để làm giao diện. Không triển khai mạng học sâu hoặc thuật toán tối ưu tự viết vì phạm vi dữ liệu nhãn nhỏ và mục tiêu là một quy trình sinh viên có thể giải thích.
-
-Mục tiêu nghiên cứu gồm kiểm tra nguồn, làm sạch minh bạch, chống rò rỉ dữ liệu, so sánh nhiều mô hình với baseline, phân tích lỗi theo từng pin và trình bày được điều mà kết quả chứng minh cũng như điều chưa được chứng minh.
-
-### 1.4. Phạm vi và sản phẩm
-
-Nguồn dữ liệu gồm bốn cell B0005, B0006, B0007 và B0018 theo README thí nghiệm. Khóa luận không có số đo vận hành trên xe ở Việt Nam. Phần sạc được xuất để tạo bộ dữ liệu đầy đủ và phục vụ khám phá; mô hình SOH chính chỉ sử dụng cửa sổ xả có dung lượng tham chiếu.
-
-Sản phẩm bàn giao gồm CSV sạch trên hai triệu dòng, bảng 636 mẫu học máy, mã nguồn, mô hình demo, nhật ký kiểm tra, kết quả theo từng pin, ứng dụng, notebook đã chạy, báo cáo Word và slide. Việc đóng gói đủ các thành phần này không thay thế xác nhận nghiệm thu hoặc yêu cầu hình thức của trường.
-
-### 1.5. Đóng góp trong phạm vi khóa luận
-
-Đóng góp thực hiện là quy trình đọc trực tiếp cấu trúc MATLAB, kiểm chứng từng mảng sau khi xuất CSV, tách rõ dòng đo và mẫu nhãn, kiểm thử theo pin và một ứng dụng dùng đúng mã đặc trưng đã đánh giá. Không tuyên bố phát minh Random Forest, đề xuất thuật toán mới hoặc đạt hiệu quả tốt nhất so với mọi công trình SOH.
-
-## Chương 2. Cơ sở lý thuyết và tài liệu liên quan
-
-### 2.1. Dữ liệu lão hóa pin NASA
-
-Danh mục NASA PCoE mô tả dữ liệu pin với thí nghiệm sạc, xả và trở kháng, và ghi trích dẫn Saha và Goebel (2007) [1]. Trang danh mục đã đọc được trong lần triển khai hiện tại. File tải trên S3 do trang đó chỉ dẫn chưa truy cập được; vì vậy file MATLAB thực tế được lấy từ một bản lưu công khai, cố định commit và checksum [2]. Cần phân biệt dữ liệu định dạng MATLAB của bản lưu với việc đã xác nhận byte từ máy chủ phát hành.
-
-README đi kèm bốn pin mô tả sạc CC 1,5 A tới 4,2 V, sau đó CV tới ngưỡng dòng 20 mA; xả CC khoảng 2 A với các ngưỡng điện áp cuối khác nhau giữa pin. Đây là thông tin giúp hiểu dữ liệu và cũng là giới hạn: điều kiện phòng thí nghiệm không thể tự động đại diện cho dòng tải, môi trường và quản lý nhiệt của xe thực tế.
-
-### 2.2. SOH, SOC và RUL
-
-SOH theo dung lượng được tính bằng tỷ số dung lượng tham chiếu đo được so với dung lượng danh định. Trong khóa luận: SOH (%) = 100 × Q / Q_nominal, với Q_nominal = 2 Ah theo README. SOC thể hiện lượng điện còn lại tương đối trong một chu kỳ; RUL là phần tuổi thọ còn lại tới một tiêu chí kết thúc. Ba đại lượng không được dùng thay thế nhau.
-
-Giá trị SOH có thể hơi lớn hơn 100% nếu dung lượng đo ban đầu vượt mức danh định. B0006 có giá trị tối đa khoảng 101,77%; quy trình giữ nguyên và giải thích theo định nghĩa, không cắt nhãn để đồ thị đẹp hơn. Chỉ loại nhãn không hợp lệ như thiếu, không hữu hạn hoặc không nhất quán trong cùng chu kỳ.
-
-### 2.3. Hồi quy Ridge
-
-Ridge mở rộng hồi quy tuyến tính bằng hạng phạt L2 trên hệ số. Hàm mục tiêu gồm tổng bình phương sai số cộng alpha nhân tổng bình phương hệ số. Khi đặc trưng có thang đo khác nhau, chuẩn hóa giúp việc điều chuẩn có ý nghĩa hơn. Tài liệu scikit-learn đã đọc giải thích dạng hàm mục tiêu và cách sử dụng Ridge [3].
-
-Khóa luận sử dụng Cycle Ridge với một đầu vào số chu kỳ như baseline có xu hướng; Signal Ridge dùng toàn bộ đặc trưng. Không giả định thêm nhiều đặc trưng luôn cải thiện mô hình tuyến tính. Hệ số chuẩn hóa chỉ được học từ tập huấn luyện, không từ pin kiểm thử.
-
-### 2.4. Random Forest và boosting
-
-Random Forest kết hợp dự đoán từ nhiều cây để mô tả quan hệ phi tuyến. Tài liệu ensemble của scikit-learn dẫn công trình Breiman (2001), Random Forests, Machine Learning 45(1), trang 5–32 [4]. Khóa luận sử dụng hiện thực thư viện, không tự viết lại thuật toán. Số cây và số mẫu tối thiểu tại lá được cố định nhằm giới hạn độ phức tạp và giữ tính tái lập.
-
-HistGradientBoosting là mô hình cây cộng dồn với cách chia giá trị đặc trưng theo histogram. Tài liệu thư viện dẫn Friedman (2001), Greedy Function Approximation: A Gradient Boosting Machine [5]. Mô hình được đưa vào để so sánh một phương pháp phi tuyến khác, không vì đã biết nó sẽ tốt nhất trên dữ liệu này.
-
-Các công trình [4], [5] được dùng ở đây như nền tảng thuật toán theo tài liệu thư viện; không trình bày chúng như công trình đã nghiên cứu trực tiếp bộ pin của khóa luận. Tổng quan SOH chuyên ngành rộng hơn vẫn cần được giảng viên xác định phạm vi và sinh viên đọc bổ sung trước bản nộp chính thức.
-
-### 2.5. Đánh giá theo nhóm và theo thời gian
-
-Tài liệu cross-validation của scikit-learn mô tả LeaveOneGroupOut để loại toàn bộ một nhóm khỏi phần huấn luyện [6]. Trong khóa luận, nhóm là mã pin. Việc chia ngẫu nhiên các dòng đo hoặc chu kỳ cùng pin làm train/test có nguy cơ đo khả năng nội suy trong cùng pin, không đo khả năng áp dụng cho pin mới.
-
-Đánh giá theo thời gian trả lời một câu hỏi khác: mô hình biết các chu kỳ đầu của cùng pin và cần dự đoán chu kỳ sau. Khi đó, chỉ số chu kỳ kiểm thử có thể nằm ngoài khoảng huấn luyện; mô hình cây thường khó ngoại suy xu hướng. Baseline dùng SOH cuối cùng đã biết được đưa vào để kiểm tra xem học máy có cải thiện hơn một cách dự đoán đơn giản không.
-
-### 2.6. Chỉ số sai số
-
-Với sai số e_i = y_pred_i − y_i, MAE = trung bình |e_i| và RMSE = căn bậc hai của trung bình e_i². MAE dễ diễn giải, RMSE nhạy hơn với sai số lớn. R² = 1 − SSE/SST so sánh sai số với độ biến thiên của tập kiểm thử và có thể âm.
-
-Do y được tính trên thang SOH nhân 100, MAE/RMSE có đơn vị điểm phần trăm SOH. MAE 2,7 không được viết thành độ chính xác 97,3%. Kết quả chính lấy trung bình không trọng số giữa bốn pin, nên mỗi pin có vai trò bằng nhau dù số chu kỳ không bằng nhau.
-
-## Chương 3. Dữ liệu và phương pháp thực hiện
-
-### 3.1. Nguồn dữ liệu và phiên bản
-
-File MATLAB được tải từ repository psanabriaUC/BatteryDatasetImplementation, commit 0007aead10cb85aafdd11fb3de1d64186c7c6c05 [2]. Manifest lưu URL và SHA-256 của B0005.mat, B0006.mat, B0007.mat, B0018.mat cùng README. Checksum giúp xác nhận lại phiên bản bản lưu, không tự chứng minh danh tính nội dung từ S3 chính thức.
-
-Bản CSV cộng đồng từng dùng ở giai đoạn đầu cũng được đối chiếu với MATLAB của ba pin tương ứng. Có 468 chu kỳ khớp số mẫu, thời gian, điện áp và dung lượng. Hai nguồn đều có một số trục thời gian giống nhau giữa pin; vì vậy không đủ cơ sở coi đây là lỗi riêng của bước chuyển đổi CSV. Nhật ký đối chiếu được giữ trong reports/source_comparison.csv.
-
-### 3.2. Kiểm kê và làm sạch
-
-Tổng đầu vào sạc/xả là 2.089.050 bản ghi. Hai bản ghi sạc tại B0018, operation_index 115, thời gian 4528.156 và 4786.328 giây bị thiếu điện áp, dòng và nhiệt độ. Các bản ghi này không dùng được để phân tích tín hiệu nên bị loại và ghi nhật ký. Không có bản ghi được sinh thêm để bù; bộ sạch còn 2.089.048 dòng.
-
-{{AUDIT_TABLE}}
-
-Số liệu ở cột rows là dòng xả dùng xây dựng nhãn; all_rows gồm cả sạc và xả. Sau làm sạch, bảng toàn bộ phép đo không còn giá trị thiếu/vô hạn hoặc khóa trùng. Khóa được xác định bằng battery, operation_index và time; không thể chỉ dùng time vì thời gian bắt đầu lại ở mỗi operation.
-
-Không ghép trở kháng vào bảng tín hiệu vì cấu trúc đo khác. Không đồng nhất chỉ số sạc và xả: ở ba pin đầu có 170 lần sạc và 168 lần xả. Cột cycle được đếm riêng theo loại hoạt động; operation_index giữ vị trí thật trong cấu trúc gốc.
-
-### 3.3. Hai cấp độ dữ liệu
-
-Bảng measurements_all.csv gồm 2.089.048 dòng và chín cột: battery, operation_type, operation_index, cycle, time, terminal_voltage, terminal_current, temperature, ambient_temperature. Bảng này không tự gán SOH cho các dòng sạc. Bảng measurements.csv chỉ gồm 185.721 dòng xả, bổ sung capacity và SOH tỷ lệ.
-
-Bảng cycle_features.csv gồm 636 dòng và 13 cột: mã pin, nhãn soh_pct và 11 đặc trưng. Số mẫu của bài toán hồi quy là 636 chu kỳ; số nhóm độc lập là bốn pin. Không sử dụng con số hai triệu để tuyên bố số mẫu giám sát hoặc độ đa dạng pin tăng lên.
-
-### 3.4. Xây dựng nhãn và cửa sổ
-
-Mỗi chu kỳ xả có một dung lượng tham chiếu. Nhãn được kiểm tra hữu hạn, dương, nhất quán trong chu kỳ và SOH = capacity/2 trong sai số 10⁻⁶. Biến đích của mô hình là soh_pct, bằng SOH nhân 100.
-
-Cửa sổ đầu vào là 0–120 giây tính từ mốc đầu bản ghi, không dịch mốc tới lần xuất hiện dòng xả. Cần ít nhất năm mẫu; mốc đầu không muộn hơn 20 giây và mốc cuối trong cửa sổ không sớm hơn 90 giây. Cần ít nhất ba mẫu có dòng nhỏ hơn −0,1 A trải dài ít nhất 30 giây. Các điều kiện bảo đảm cửa sổ chứa thông tin xả tối thiểu, không khẳng định 120 giây là cửa sổ tối ưu.
-
-Có 636 chu kỳ xả vượt kiểm tra, không loại chu kỳ xả nào. Các bước này không loại hai bản ghi sạc bằng cách xóa cả chu kỳ xả hoặc chuyển chúng thành nhãn, nên số mẫu giám sát không bị giảm do hai bản ghi thiếu ở phần sạc.
-
-### 3.5. Đặc trưng
-
-| Nhóm | Các đặc trưng | Diễn giải |
-| --- | --- | --- |
-| Lịch sử | cycle | Chỉ số chu kỳ xả hiện tại |
-| Điện áp | mean, min, max, std, slope | Mức và thay đổi điện áp trong cửa sổ |
-| Dòng | mean, std | Mức tải xả và biến thiên đo được |
-| Nhiệt độ | mean, max, slope | Trạng thái nhiệt và xu hướng đầu chu kỳ |
-
-Độ lệch chuẩn dùng ddof=0. Độ dốc lấy hệ số đường thẳng fit theo thời gian. Tất cả thống kê tín hiệu được tính trên các mẫu xả đã chọn trong cửa sổ. Không dùng capacity, SOH, tích phân dòng toàn chu kỳ hoặc thời gian kết thúc xả làm đầu vào.
-
-Mã trích xuất được dùng chung giữa thực nghiệm và ứng dụng. Kiểm thử thay nhãn và tín hiệu sau 120 giây nhưng yêu cầu đặc trưng không đổi; kiểm thử khác xác nhận mẫu ở đúng 120 giây vẫn nằm trong cửa sổ.
-
-### 3.6. Thiết kế thực nghiệm chính
-
-Năm cấu hình cố định gồm Mean baseline, Cycle Ridge, Signal Ridge, Random Forest và HistGradientBoosting. Mỗi vòng giữ riêng một pin; phần còn lại dùng huấn luyện. Có bốn vòng, tổng cộng 20 lần fit phục vụ đánh giá chính. Không tìm kiếm siêu tham số trên các pin kiểm thử.
-
-| Mô hình | Cấu hình |
-| --- | --- |
-| Mean baseline | Trung bình nhãn huấn luyện |
-| Cycle Ridge | StandardScaler; alpha=1; đầu vào cycle |
-| Signal Ridge | StandardScaler; alpha=10; 11 đầu vào |
-| Random Forest | 200 cây; min_samples_leaf=5; seed=42; n_jobs=2 |
-| HistGradientBoosting | 150 vòng; 15 lá tối đa; L2=1; không early stopping; seed=42 |
-
-Mô hình demo được quy định là Random Forest từ trước; sau khi đánh giá, fit lại trên cả bốn pin để phục vụ ứng dụng. Không dùng dự đoán mẫu demo đã học để tính chỉ số kiểm thử. Việc lựa chọn tham số mới sau khi nhìn các kết quả này phải được coi là nghiên cứu tiếp nối và cần validation độc lập.
-
-### 3.7. Thực nghiệm bổ sung
-
-Phân tích bỏ đặc trưng dùng Random Forest với ba cấu hình: toàn bộ, bỏ cycle, bỏ nhiệt độ. Mục đích là tìm hiểu độ nhạy của kết quả với nhóm đầu vào, không chọn lại mô hình demo hoặc tuyên bố tối ưu sau khi biết điểm.
-
-Kiểm thử thời gian dùng 70% chu kỳ đầu của mỗi pin để học và 30% còn lại để đánh giá. Baseline Last known SOH dùng nhãn cuối cùng trong phần train để dự đoán cho các chu kỳ test; không dùng nhãn test hoặc SOH tương lai. Kết quả của bốn pin được trình bày riêng, không trộn vào bảng LOBO.
-
-## Chương 4. Kết quả và thảo luận
-
-### 4.1. Kết quả chính
-
+# TRƯỜNG ĐẠI HỌC NGUYỄN TẤT THÀNH
+## KHOA CÔNG NGHỆ THÔNG TIN
+# KHÓA LUẬN TỐT NGHIỆP
+## PHÂN TÍCH VÀ DỰ ĐOÁN TÌNH TRẠNG SỨC KHỎE PIN XE ĐIỆN BẰNG CÁC MÔ HÌNH HỌC MÁY
+Sinh viên: Nguyễn Văn Duy
+Mã số sinh viên: 2311553949
+Lớp: 23DTH2A
+Chuyên ngành: Khoa Học Dữ Liệu
+Giảng viên hướng dẫn: ThS. Vương Xuân Chí
+TP. Hồ Chí Minh, năm 2026
+
+# Tóm tắt
+Tình trạng sức khỏe pin (State of Health — SOH) phản ánh dung lượng còn lại so với dung lượng danh định. Việc đo dung lượng đầy đủ cần cả một chu kỳ xả, trong khi ứng dụng theo dõi cần ước lượng từ một đoạn tín hiệu ngắn. Khóa luận xây dựng quy trình phân tích và ước lượng SOH từ 120 giây đầu chu kỳ xả bằng điện áp, dòng điện, nhiệt độ, số chu kỳ và giai đoạn sử dụng.
+Tôi sử dụng dữ liệu SDU do Wang, Gao và Tian công bố trên Zenodo năm 2025 [1]. Tập nguồn có 145.112.317 dòng đo của 86 tế bào pin, gồm sử dụng ban đầu và tái sử dụng. Sau nhận diện điều kiện xả tham chiếu, bộ được chọn có 30.929.675 dòng và 20.823 chu kỳ. Bản dùng trong sản phẩm giữ 10.000.000 dòng, đủ 86 pin và đủ các chu kỳ đã chọn; mọi điểm trong cửa sổ đầu xả được giữ nguyên. Giảm mật độ sau 120 giây giúp giảm dung lượng lưu trữ, không được coi là loại bỏ nhiễu.
+Bốn mô hình nghiên cứu gồm Ridge, Random Forest, LightGBM và GRU; mô hình dự đoán bằng trung bình SOH là mốc đối chứng. Kiểm thử 5 vòng chia theo mã pin vật lý, giữ hai giai đoạn của cùng pin ở cùng phía. Chỉ số chính lấy trung bình theo pin. Random Forest đạt MAE {{RF_MAE}}, RMSE {{RF_RMSE}} điểm phần trăm SOH và R² {{RF_R2}}. Kết quả này thuộc dữ liệu thí nghiệm đã chọn, chưa chứng minh hiệu quả trên bộ pin xe vận hành thực tế.
+Sản phẩm Vincent D cung cấp tra cứu tín hiệu, so sánh chu kỳ, đánh giá mô hình, dự đoán một chu kỳ hoặc theo lô, lịch sử phiên và hồ sơ nguồn dữ liệu. Báo cáo, notebook, bảng thực nghiệm và mã xử lý được lưu cùng dự án để đối chiếu và tái lập.
+Từ khóa: SOH, pin lithium-ion, trích xuất đặc trưng, học máy, GRU, SDU.
+
+# Chương 1. Tổng quan đề tài
+## 1.1. Vấn đề nghiên cứu
+Pin lithium-ion suy giảm theo thời gian và quá trình sử dụng. Dung lượng có thể thay đổi theo điều kiện đo, nhiệt độ và chế độ dòng điện. SOH hỗ trợ mô tả mức suy giảm dung lượng nhưng không thể thay thế toàn bộ việc đánh giá an toàn hoặc công suất của pin. Một giá trị SOH đơn lẻ chưa đủ quyết định pin có phù hợp với một ứng dụng cụ thể hay không.
+Đo dung lượng xả toàn chu kỳ là cách tạo tham chiếu trực tiếp, nhưng thời gian đo dài. Bài toán trong khóa luận là dùng tín hiệu đầu xả để ước lượng giá trị tham chiếu này. Dự đoán được thực hiện sau khi đã quan sát cửa sổ 120 giây; đây không phải dự báo trước khi bắt đầu chu kỳ.
+## 1.2. Mục tiêu
+Tôi xây dựng một quy trình có thể kiểm tra từ nguồn dữ liệu đến kết quả dự đoán. Các mục tiêu gồm: kiểm tra tính toàn vẹn và chất lượng dữ liệu; tạo nhãn SOH và đặc trưng không dùng thông tin cuối chu kỳ; so sánh các mô hình dưới cùng phân hoạch pin; phân tích sai số theo giai đoạn; triển khai ứng dụng tra cứu và ước lượng.
+Khóa luận ưu tiên Python và các thư viện phổ biến. Mã nguồn chia thành xử lý dữ liệu, huấn luyện, đánh giá và giao diện. Cách chia này giúp thay đổi một thành phần mà vẫn kiểm tra được ảnh hưởng đến các thành phần còn lại.
+## 1.3. Câu hỏi nghiên cứu
+Câu hỏi thứ nhất là liệu tín hiệu 120 giây đầu xả có cung cấp thông tin hữu ích so với dự đoán một giá trị trung bình hay không. Câu hỏi thứ hai là mô hình phi tuyến có giảm sai số so với hồi quy tuyến tính điều chuẩn hay không. Câu hỏi thứ ba là sai số khác nhau thế nào giữa sử dụng ban đầu và tái sử dụng. Câu hỏi cuối là việc bỏ số chu kỳ, giai đoạn hoặc nhóm tín hiệu ảnh hưởng thế nào đến kết quả.
+Các câu hỏi được trả lời bằng số liệu thực nghiệm và thiết kế kiểm thử đã nêu. Khóa luận không đặt trước yêu cầu R² phải đạt một ngưỡng cụ thể và không điều chỉnh kết quả để đạt ngưỡng.
+## 1.4. Đối tượng và phạm vi
+Đối tượng là 86 tế bào Lishen LR1865SZ, điện cực NMC(532)/graphite, dung lượng danh định 2,4 Ah. Hai giai đoạn dữ liệu thuộc cùng những pin này, không phải hai nhóm độc lập. Phạm vi thực nghiệm là các đoạn xả có điều kiện tham chiếu gần 0,2C được nhận diện từ tín hiệu nguồn.
+Tên đề tài đề cập pin xe điện; dữ liệu thực nghiệm hiện tại ở cấp tế bào trong phòng thí nghiệm. Kết quả không được suy rộng trực tiếp đến bộ pin nhiều tế bào, hệ thống quản lý pin hoặc xe tại Việt Nam. SOC là mức sạc hiện tại, SOH là tình trạng sức khỏe tương đối; khóa luận không dự báo RUL là tuổi thọ còn lại.
+## 1.5. Sản phẩm và đóng góp
+Sản phẩm gồm bộ chọn có hồ sơ nguồn, bảng đặc trưng 20.823 mẫu, các mô hình và kết quả kiểm thử, notebook phân tích, ứng dụng Vincent D và tài liệu nghiên cứu. Đóng góp thực hành là quy trình giữ nguyên số đo nguồn, kiểm tra nhãn/đặc trưng và chia tập theo pin qua cả hai giai đoạn. Khóa luận không đề xuất một thuật toán học máy mới.
+
+# Chương 2. Cơ sở lý thuyết và mô hình
+## 2.1. SOH theo dung lượng
+Nhãn được định nghĩa: SOH (%) = 100 × Q_xả / Q_danh_định, với Q_danh_định = 2,4 Ah. Q_xả lấy từ dung lượng tham chiếu toàn chu kỳ trước khi giảm mật độ điểm đo. Không tính lại nhãn bằng tích phân trên bản đã lấy thưa vì sai số lấy mẫu có thể làm lệch dung lượng.
+Giá trị SOH trên 100% được giữ nguyên khi dung lượng đo lớn hơn danh định. Không cắt giá trị về 100% để làm đường cong đẹp hơn. Sự thay đổi SOH giữa các chu kỳ có thể gồm cả thay đổi dung lượng và ảnh hưởng điều kiện đo; không ép đường SOH phải giảm đơn điệu.
+## 2.2. Dữ liệu đo và mẫu huấn luyện
+Một dòng cảm biến chứa các số đo tại một thời điểm; một mẫu huấn luyện trong mô hình bảng đại diện cho một chu kỳ. Do đó, 10 triệu dòng không tương đương 10 triệu mẫu độc lập. Các điểm cùng chu kỳ có liên hệ theo thời gian, và các chu kỳ cùng pin cũng có liên hệ.
+Mỗi mẫu có khóa gồm mã pin, giai đoạn và số chu kỳ. Số chu kỳ có thể bắt đầu lại khi chuyển giai đoạn; chỉ dùng mã pin và số chu kỳ sẽ làm lẫn hai quá trình. Mã pin dùng để phân nhóm kiểm thử, không dùng làm đầu vào mô hình.
+## 2.3. Trích xuất đặc trưng
+Từ tín hiệu trong 0–120 giây, chương trình giữ các mẫu đang xả và tính trung bình, cực trị, độ lệch chuẩn và độ dốc. Độ lệch chuẩn dùng định nghĩa tổng thể, cùng quy ước trong huấn luyện và dự đoán. Độ dốc là hệ số hồi quy tuyến tính theo thời gian đã trừ trung bình, không lấy hiệu giữa hai mẫu tùy ý.
+Bảng đầu vào có 12 cột: giai đoạn, số chu kỳ, năm đặc trưng điện áp, hai đặc trưng dòng điện và ba đặc trưng nhiệt độ. Thông tin toàn chu kỳ như dung lượng, SOH, tổng số điểm, điện áp cuối và thời lượng xả không được đưa vào danh sách đầu vào.
+## 2.4. Mốc trung bình và Ridge
+Mốc trung bình dự đoán trung bình SOH của tập huấn luyện cho mọi mẫu kiểm thử. Đây là phép kiểm tra xem mô hình có học được thông tin tốt hơn một dự đoán hằng số hay không.
+Ridge là hồi quy tuyến tính với phạt L2 lên hệ số [3]. Chuẩn hóa giúp các biến có đơn vị khác nhau đóng góp vào quá trình tối ưu ở thang đo hợp lý. Bộ chuẩn hóa chỉ được học từ tập huấn luyện trong từng vòng. Ridge dễ giải thích và tính toán nhanh, nhưng khó mô tả quan hệ phi tuyến nếu chỉ dùng các biến gốc.
+## 2.5. Random Forest
+Random Forest kết hợp nhiều cây quyết định được huấn luyện có ngẫu nhiên [4]. Mô hình phù hợp dữ liệu bảng và có thể biểu diễn tương tác phi tuyến giữa số chu kỳ, điện áp và nhiệt độ mà không yêu cầu chuẩn hóa các biến.
+Cấu hình sử dụng 100 cây, độ sâu tối đa 16, tối thiểu 5 mẫu ở lá và tỷ lệ mẫu mỗi cây 0,7. Giới hạn độ sâu và kích thước lá giúp hạn chế học quá sát các mẫu. Chỉ số quan trọng đặc trưng từ cây chỉ mô tả cách mô hình sử dụng biến, không chứng minh quan hệ nhân quả. Các biến tương quan có thể chia sẻ hoặc thay thế mức quan trọng.
+## 2.6. LightGBM
+LightGBM là phương pháp tăng cường cây dùng cách biểu diễn histogram để tăng hiệu quả tính toán [5]. Các cây học lần lượt nhằm giảm phần sai số còn lại. Cấu hình trong khóa luận cố định 150 cây, tối đa 15 lá, tốc độ học 0,05 và phạt L2 bằng 1.
+LightGBM phù hợp quan hệ phi tuyến và dữ liệu bảng. Kết quả phụ thuộc cấu hình và dữ liệu; việc một cấu hình có sai số cao hơn Random Forest không chứng minh mọi cấu hình LightGBM đều kém hơn. Khóa luận không tối ưu siêu tham số trên các pin kiểm thử.
+## 2.7. GRU
+GRU là mạng hồi tiếp có cổng, dùng để biểu diễn thông tin theo thứ tự trong chuỗi [6]. Đầu vào chuỗi của nghiên cứu là điện áp, dòng điện và nhiệt độ ở 25 vị trí đều nhau trong 120 giây. Các vị trí được nội suy tuyến tính từ bản sao tín hiệu; ở biên dùng giá trị đầu/cuối gần nhất. Đây là biểu diễn dẫn xuất cho mô hình, không ghi đè hoặc sửa CSV nguồn.
+GRU có 24 đơn vị ẩn. Trạng thái cuối được ghép với số chu kỳ và giai đoạn rồi đi qua lớp kết nối để dự đoán SOH. Huấn luyện 20 epoch, batch 256, Adam với tốc độ học 0,002. Tín hiệu, biến ngữ cảnh và nhãn được chuẩn hóa theo tập huấn luyện của từng vòng. Chuỗi của một mẫu không nối qua chu kỳ khác hoặc qua pin khác.
+GRU giữ thông tin diễn biến mà các thống kê tổng hợp có thể bỏ qua, nhưng cần nhiều phép tính và khó giải thích hơn. Vì biểu diễn đầu vào khác mô hình bảng, phép so sánh đo hiệu quả của cả cách biểu diễn và mô hình, không tách riêng ảnh hưởng của thuật toán. Khóa luận chưa khảo sát đầy đủ cửa sổ khác, kiến trúc khác hoặc độ nhạy theo nhiều seed.
+## 2.8. Chỉ số đánh giá
+MAE là trung bình độ lớn sai số, cùng đơn vị với SOH được biểu diễn bằng phần trăm. RMSE là căn trung bình bình phương sai số, nhạy hơn với sai số lớn. R² so sánh sai số bình phương của mô hình với dự đoán trung bình trong tập được đánh giá; R² có thể âm.
+Nếu SOH thực tế là 90% và dự đoán là 92%, sai số là 2 điểm phần trăm SOH. MAE bằng 2 không có nghĩa mô hình có độ chính xác 98%. Chỉ số chính được tính riêng trên từng pin giữ riêng, sau đó lấy trung bình không trọng số giữa 86 pin, tránh để pin có nhiều chu kỳ chi phối toàn bộ kết quả.
+
+# Chương 3. Dữ liệu và phương pháp thực hiện
+## 3.1. Nguồn và giấy phép
+Nguồn dữ liệu: Wang, S., Gao, F. và Tian, H. (2025), Data for: Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions [1]. DOI: 10.5281/zenodo.14859405, giấy phép CC BY 4.0. Bài báo liên quan có DOI 10.1016/j.xcrp.2025.102657 [2]. Ngày công bố 12/02/2025 không đồng nghĩa mọi phép đo đều được thực hiện trong năm 2025.
+Hai gói gốc là Primary_use_phase.zip và Second_life_phase.zip. Kích thước lần lượt 2.694.002.794 byte và 1.794.732.202 byte. MD5 công bố lần lượt là 15d94a62d47dd9036899889b3f36992d và 0ba11864d2c1017c84d96dfe578956fc. Cả hai đã được đối chiếu sau tải. Tổng 172 CSV tương ứng 86 pin qua hai giai đoạn.
+Tên file không được dùng thay mã pin. Cột Battery_ID của nguồn được ánh xạ thành SDU_01 đến SDU_86 trong bảng xử lý. Ví dụ file mang số hiệu khác mã pin vẫn phải được gán theo Battery_ID. Việc thiếu một số số hiệu tên file không có nghĩa thiếu các pin có cùng số đó.
+## 3.2. Điều kiện chọn đoạn xả
+Từ 145.112.317 dòng nguồn, quy trình nhận diện các đoạn xả gần dòng tham chiếu −0,48 A. Trung vị dòng phải nằm trong khoảng tham chiếu với dung sai 0,03 A và ít nhất 95% mẫu nằm trong dải đó. Điện áp đầu ít nhất 4 V; điện áp cuối từ 2,95 đến 3,05 V. Các tín hiệu thời gian, điện áp, dòng điện và nhiệt độ phải hữu hạn, khóa thời gian không trùng trong chu kỳ.
+Các kiểm tra dung lượng gồm dung lượng đầu không vượt 0,01 Ah, không giảm quá dung sai 0,0001 Ah và giới hạn dung lượng theo 1,2 lần danh định. Dung lượng ghi nhận được đối chiếu tích phân dòng điện với sai số cho phép lớn hơn giữa 0,02 Ah và 2%. Cửa sổ đầu xả cần ít nhất 5 điểm và độ phủ đến ít nhất 90 giây.
+Kết quả chọn là 30.929.675 dòng của 20.823 chu kỳ. Không gọi mọi đoạn này là chu kỳ chẩn đoán do tác giả gán nhãn; tiêu chí đang nhận diện điều kiện từ tín hiệu. Chọn điều kiện tương đồng giúp giảm khác biệt chế độ đo, đồng thời thu hẹp phạm vi áp dụng của mô hình.
+## 3.3. Tạo bản 10 triệu dòng
+Bản gọn giữ tất cả các chu kỳ đã chọn, mọi mẫu trong 120 giây đầu và điểm cuối mỗi chu kỳ. Ngân sách điểm còn lại được phân bổ theo số điểm của từng chu kỳ; các điểm phần giữa được chọn đều theo thứ tự thời gian. Từng dòng được giữ nguyên văn từ nguồn, không nhân bản, điền thiếu hay sửa số đo.
+Sau giảm mật độ, nguồn lưu 10.000.000 dòng trong 172 file CSV nén gzip. Dung lượng tham chiếu, nhãn và bảng đặc trưng được giữ từ bộ đủ điểm và được đối chiếu lại. Phần sau 120 giây mất chi tiết, nên bản này không thay thế dữ liệu đầy đủ cho nghiên cứu cần phân tích nguyên chuỗi hoặc tính ICA chính xác ở toàn bộ miền điện áp.
+Việc chọn đúng 10 triệu dòng phục vụ lưu trữ theo yêu cầu triển khai; đây không phải ngưỡng đảm bảo chất lượng học máy. Số pin độc lập và số chu kỳ hữu ích mới là thông tin cần báo cáo cùng số điểm cảm biến.
+## 3.4. Kiểm tra chất lượng
+Bản xử lý được quét toàn bộ 10 triệu dòng. Không phát hiện giá trị thiếu/vô hạn ở tín hiệu bắt buộc hoặc khóa thời gian trùng. Nội dung dòng giải nén được kiểm SHA-256 theo file, đặc trưng được tính lại và nhãn được nối theo khóa pin/giai đoạn/chu kỳ.
+Có 25 điểm nghi vấn biến thiên đột ngột còn nằm trong bộ chọn, không điểm nào thuộc 120 giây đầu. Đây là cờ kiểm tra theo quy tắc, chưa phải xác nhận lỗi cảm biến; các điểm không bị tự xóa hoặc sửa. Có 23 bước thời gian đi lùi trong thứ tự ghi nguồn. Bản sao phục vụ xử lý được sắp theo thời gian trong từng chu kỳ, còn file nguồn giữ nguyên.
+Không có lỗi được phát hiện theo các kiểm tra trên không có nghĩa dữ liệu hoàn toàn không có nhiễu hoặc không có sai lệch đo. Những giới hạn kiểm tra và danh sách điểm nghi vấn được phát kèm để có thể xem xét lại.
+## 3.5. Tạo bảng đặc trưng
+Thời gian đầu xả của mỗi chu kỳ được quy về 0 trên bản xử lý. Cửa sổ lấy mẫu từ 0 đến 120 giây, ít nhất 5 điểm, thời gian bắt đầu không quá 20 giây và điểm cuối ít nhất 90 giây. Phần đang xả cần ít nhất 3 mẫu có dòng dưới −0,1 A và trải ít nhất 30 giây. Các thống kê được tính trên phần xả trong cửa sổ.
+{{FEATURE_TABLE}}
+Các cột capacity_ah, soh_pct, integrated_capacity_ah, measurement_rows, start_voltage_v và end_voltage_v có thể tồn tại trong bảng kiểm tra, nhưng chỉ đúng 12 cột FEATURES được đưa vào mô hình bảng. Đây là ranh giới quan trọng để tránh dùng biến liên quan trực tiếp đến nhãn.
+## 3.6. Phân hoạch và phòng tránh rò rỉ
+Chương trình dùng GroupKFold với 5 nhóm, trộn nhóm và seed 42. Đơn vị nhóm là mã pin vật lý. Khi một pin thuộc kiểm thử, mọi chu kỳ ở cả hai giai đoạn của pin đó đều không nằm trong huấn luyện của vòng tương ứng. Mỗi pin xuất hiện ở đúng một vòng kiểm thử.
+Không chia ngẫu nhiên các dòng cảm biến vì các điểm rất gần nhau trong cùng chu kỳ sẽ làm kết quả quá lạc quan. Không dùng mã pin làm đặc trưng. Các bộ chuẩn hóa của Ridge và GRU chỉ học từ tập huấn luyện. Tham số mô hình được cố định; không lựa chọn cấu hình bằng điểm kiểm thử.
+Thiết kế vẫn có giới hạn: các pin đến từ cùng một chiến dịch thí nghiệm và cùng loại hóa học, nên giữ riêng pin chưa tương đương giữ riêng phòng thí nghiệm, nhà sản xuất hay môi trường vận hành.
+## 3.7. Các kiểm tra bổ sung
+Thí nghiệm bỏ đặc trưng dùng Random Forest và cùng phân hoạch pin. Ba biến thể là bỏ số chu kỳ, bỏ giai đoạn và chỉ dùng điện áp; đối chiếu cấu hình đủ đặc trưng. Chênh lệch được mô tả theo sai số, chưa được kiểm định ý nghĩa thống kê.
+Kiểm thử thời gian sắp thứ tự trong từng pin và giai đoạn, dùng 70% mẫu đầu để học và 30% cuối để kiểm thử. Mô hình học trên phần quá khứ gộp của các pin; đối chứng là giữ nguyên SOH cuối đã biết của từng pin/giai đoạn. Đây là nghiên cứu tiếp diễn trên pin đã có lịch sử, không phải kiểm thử pin mới và chưa phải mô phỏng triển khai đồng bộ theo lịch tuyệt đối giữa mọi pin.
+## 3.8. Môi trường và khả năng tái lập
+Ngôn ngữ Python 3.12; pandas và NumPy xử lý bảng, PyArrow lưu Parquet, scikit-learn huấn luyện và đánh giá, LightGBM tăng cường cây, PyTorch triển khai GRU, Matplotlib và Altair biểu diễn kết quả, Streamlit triển khai giao diện. Phiên bản thực tế và cấu hình được lưu trong run_metadata.json và gru_metadata.json.
+Dữ liệu thô được đọc lần lượt theo pin/giai đoạn. Bản ứng dụng dùng Parquet, đọc theo chu kỳ cần xem thay vì nạp toàn bộ. Huấn luyện mô hình bảng chỉ cần 20.823 mẫu × 12 đặc trưng; GRU dùng chuỗi 25 × 3. Số luồng CPU giới hạn ở 2. Thiết kế giảm nhu cầu RAM nhưng không đảm bảo không chậm nếu máy đang chạy nhiều chương trình khác.
+
+# Chương 4. Kết quả và thảo luận
+## 4.1. Quy mô bộ dữ liệu
+Tập dùng trong sản phẩm có 10.000.000 dòng đo, 20.823 mẫu chu kỳ của 86 pin, gồm cả sử dụng ban đầu và tái sử dụng. Bảng dưới tổng hợp theo giai đoạn từ dữ liệu thực tế, không suy ra số chu kỳ bằng số dòng cảm biến.
+{{PHASE_TABLE}}
+![Hình 4.1. SOH của các pin theo từng giai đoạn](../reports/soh_by_phase.png)
+Hai giai đoạn được vẽ riêng vì số chu kỳ có thể bắt đầu lại. Đường cong của một pin không được nối trực tiếp qua điểm chuyển giai đoạn nếu chưa có thang thời gian thống nhất.
+## 4.2. Kết quả kiểm thử pin giữ riêng
 {{SUMMARY_TABLE}}
+Chỉ số trong bảng là trung bình theo 86 pin. Mốc trung bình cho biết mức sai số khi bỏ qua tín hiệu. Ridge thể hiện quan hệ tuyến tính có điều chuẩn. Random Forest và LightGBM biểu diễn phi tuyến trên cùng bảng 12 đặc trưng. GRU dùng biểu diễn chuỗi đầu xả cùng ngữ cảnh.
+{{RESULT_DISCUSSION}}
+![Hình 4.2. So sánh MAE giữa các mô hình](../reports/model_comparison.png)
+Đây là kết quả của các cấu hình đã cố định. Chưa có tìm kiếm siêu tham số lồng trong phân hoạch pin hoặc khảo sát nhiều seed, nên không kết luận một thuật toán luôn tốt nhất trên mọi bộ dữ liệu pin.
+## 4.3. Kết quả theo giai đoạn
+{{PHASE_METRICS_TABLE}}
+Bảng theo giai đoạn tính gộp các mẫu trong mỗi giai đoạn, khác cách lấy trung bình theo pin ở bảng chính. Do trọng số mẫu khác nhau, các con số không cần trùng với trung bình đơn giản của bảng chính. Chỉ số theo giai đoạn giúp nhận diện nơi mô hình cần cải thiện, nhưng không tự giải thích nguyên nhân vật lý.
+## 4.4. Phân tích dự đoán và sai số
+![Hình 4.3. SOH thực tế và dự đoán của Random Forest trên bốn pin giữ riêng](../reports/held_out_predictions.png)
+![Hình 4.4. Sai số Random Forest theo SOH thực tế](../reports/error_analysis.png)
+Sai số dương thể hiện mô hình đánh giá sức khỏe cao hơn tham chiếu; sai số âm thể hiện đánh giá thấp hơn. Việc xem phân bố và các pin sai số cao bổ sung thông tin mà MAE tổng hợp có thể che khuất. Các dự đoán trong hình đến từ pin giữ riêng trong từng vòng, không lấy từ mô hình học lại toàn bộ dữ liệu dùng cho ứng dụng.
+{{ERROR_DISCUSSION}}
+## 4.5. Bỏ nhóm đặc trưng
+{{ABLATION_TABLE}}
+{{ABLATION_DISCUSSION}}
+Việc bỏ một nhóm biến làm thay đổi khả năng mô hình sử dụng cả những biến tương quan còn lại. Vì vậy chênh lệch sai số không tương đương tác động nhân quả của đại lượng vật lý. Kết quả chỉ được dùng để đánh giá tính hữu ích trong cấu hình đã thử.
+![Hình 4.5. Mức quan trọng đặc trưng của mô hình ứng dụng](../reports/feature_importance.png)
+## 4.6. Kiểm thử theo thời gian
+{{TEMPORAL_TABLE}}
+{{TEMPORAL_DISCUSSION}}
+Mô hình cây thường khó ngoại suy khi các đặc trưng hoặc vùng SOH trong tương lai vượt miền dữ liệu học. Đối chứng SOH cuối đã biết là một cách kiểm tra thực tế hơn mốc trung bình trong thiết kế này. Không gộp kết quả 70/30 với GroupKFold để tạo một chỉ số duy nhất.
+## 4.7. Thời gian thực nghiệm
+{{TIMING_TABLE}}
+Thời gian là số đo trên môi trường chạy thực nghiệm, không phải cam kết thời gian trên máy khác. Với GRU, cột thời gian học bao gồm chuẩn hóa, huấn luyện và suy luận trong vòng; chưa đo suy luận riêng. Không so sánh trực tiếp hai cột này như một phép đo hiệu năng chuẩn hóa giữa các thư viện. Huấn luyện và dự đoán giao diện là hai hoạt động riêng, ứng dụng không tự huấn luyện lại khi đổi trang.
+## 4.8. Giới hạn kết luận
+Kết quả phản ánh bộ chọn xả tham chiếu cùng loại pin. Chưa có kiểm thử độc lập với dữ liệu Việt Nam, hóa học khác, nhà sản xuất khác, chế độ xả động hoặc pin ở cấp pack. Thông tin số chu kỳ và giai đoạn được giả định biết tại thời điểm ước lượng; không kết luận mô hình dùng được nếu thiếu các thông tin này.
+Số chu kỳ nhiều không loại bỏ giới hạn chỉ có 86 pin. Sai số trung bình không cung cấp khoảng tin cậy cho một dự đoán đơn. Chưa có hiệu chỉnh độ bất định, đánh giá nhiều seed hoặc kiểm định thống kê chênh lệch mô hình. Những nội dung này là hướng phát triển, không được báo cáo như kết quả đã hoàn thành.
 
-Random Forest có macro MAE {{RF_MAE}} và RMSE {{RF_RMSE}} điểm phần trăm. Cycle Ridge có MAE {{CYCLE_MAE}}. Mức giảm MAE tương đối là khoảng {{MAE_REDUCTION}}%, tính theo hai chỉ số này. Mean baseline không mô tả đủ biến thiên SOH của từng pin. Kết quả không phải bằng chứng rằng RF luôn hơn mô hình tuyến tính ở mọi pin hoặc mọi chế độ tải.
+# Chương 5. Xây dựng sản phẩm Vincent D
+## 5.1. Kiến trúc phần mềm
+Quy trình gồm tầng nguồn CSV gzip, tầng chuyển đổi Parquet, tầng đặc trưng và huấn luyện, tầng báo cáo kết quả và tầng giao diện. Thư mục src/battery_soh chứa hàm đặc trưng dùng chung; scripts chứa các bước có thể chạy lại; app/screens chia từng màn hình; reports lưu bằng chứng thực nghiệm; artifacts lưu mô hình tin cậy do dự án tạo.
+Giao diện đọc bảng nhỏ cho thống kê và chỉ đọc dữ liệu chu kỳ khi cần. Mô hình được nạp một lần trong bộ nhớ đệm. Trình duyệt nhận dữ liệu biểu đồ đã giới hạn điểm hiển thị, trong khi file xuất vẫn giữ các mẫu theo bộ lọc. Cách này tránh gửi hàng triệu điểm lên trình duyệt.
+## 5.2. Các chức năng
+Tổng quan trình bày quy mô dữ liệu, sai số và đường SOH theo giai đoạn. Tra cứu cho phép lọc pin, giai đoạn, khoảng chu kỳ, xem tín hiệu và so sánh hai chu kỳ. Đánh giá mô hình hiển thị chỉ số, dự đoán giữ riêng, sai số, thời gian và thử nghiệm bỏ đặc trưng.
+Dự đoán nhận CSV cho một chu kỳ hoặc tối đa 100 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
+Lịch sử chỉ lưu trong phiên làm việc, không phải cơ sở dữ liệu người dùng. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu.
+## 5.3. Mô hình ứng dụng
+Random Forest là mô hình triển khai được quy định trước cho bản ứng dụng. Mô hình này được học lại trên toàn bộ 20.823 mẫu để phục vụ ước lượng; không lấy sai số trên chính dữ liệu học lại để báo cáo chất lượng. Điểm thực nghiệm luôn đọc từ các dự đoán giữ riêng đã lưu.
+Ứng dụng hiển thị cảnh báo khi đặc trưng nằm ngoài khoảng quan sát của dữ liệu huấn luyện. Kiểm tra khoảng riêng từng biến chưa đủ phát hiện mọi trường hợp ngoài phân phối. Dự đoán không bị ép vào một khoảng đẹp hơn và không được dùng như chứng nhận an toàn pin.
+## 5.4. Kiểm tra sản phẩm
+Các kiểm thử bao gồm tính độc lập của đặc trưng với tín hiệu sau 120 giây và nhãn, tính đúng định nghĩa SOH, khóa pin/giai đoạn/chu kỳ, phân hoạch không trùng pin, đối chiếu chỉ số với dự đoán đã lưu và kiểm thử các màn hình Streamlit. Dự đoán mẫu, dự đoán theo lô, lịch sử phiên và lỗi CSV cũng được kiểm tra.
+{{TEST_DISCUSSION}}
+## 5.5. Lưu trữ và bàn giao
+Gói sản phẩm chứa mã nguồn, thư viện được khóa phiên bản, dữ liệu Parquet phục vụ tra cứu, bảng đặc trưng, mô hình, notebook đã chạy, kết quả thực nghiệm và báo cáo/slide. Bộ dữ liệu nguồn được nộp riêng dưới dạng source_rows với hai giai đoạn, các bảng chu kỳ và hồ sơ kiểm tra, trích dẫn. Không cần giải nén từng file CSV gzip để chương trình đọc.
+Các file nguồn lớn không được đưa vào bộ nhớ cùng lúc. Môi trường .venv không đóng gói vì phụ thuộc hệ điều hành; môi trường được tạo lại bằng danh sách thư viện. Dữ liệu nguồn không thuộc quyền sở hữu riêng của tác giả khóa luận và được sử dụng theo giấy phép CC BY 4.0.
 
-![So sánh mô hình trên bốn pin](../reports/model_comparison.png)
+# Kết luận
+Khóa luận xây dựng quy trình phân tích và ước lượng SOH từ cửa sổ đầu xả, so sánh bốn mô hình và triển khai ứng dụng tra cứu. Dữ liệu và kết quả có nguồn đối chiếu; đơn vị kiểm thử là pin vật lý thay vì điểm đo riêng lẻ. Quy trình giữ nguyên số đo nguồn, công khai việc lấy thưa và các điểm nghi vấn.
+Random Forest trong cấu hình đã chạy đạt MAE {{RF_MAE}} điểm phần trăm SOH trên kiểm thử pin giữ riêng. Các phép kiểm tra bổ sung cho thấy kết quả phụ thuộc biểu diễn đầu vào và thiết kế kiểm thử. Đây là bằng chứng trong phạm vi thí nghiệm SDU, chưa phải khẳng định hiệu quả trên xe thực tế.
+Hướng phát triển gồm dữ liệu vận hành độc lập, mở rộng điều kiện dòng và nhiệt độ, tối ưu siêu tham số trong kiểm thử lồng, khảo sát nhiều seed, ước lượng độ bất định và đánh giá ở cấp bộ pin. Những nội dung này cần dữ liệu và thực nghiệm mới.
 
-### 4.2. Kết quả theo pin
+# Tài liệu tham khảo
+[1] Wang, S., Gao, F., & Tian, H. (2025). Data for: Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14859405. CC BY 4.0.
+[2] Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions. Cell Reports Physical Science (2025). https://doi.org/10.1016/j.xcrp.2025.102657.
+[3] Hoerl, A. E., & Kennard, R. W. (1970). Ridge Regression: Biased Estimation for Nonorthogonal Problems. Technometrics, 12(1), 55–67. https://doi.org/10.1080/00401706.1970.10488634.
+[4] Breiman, L. (2001). Random Forests. Machine Learning, 45, 5–32. https://doi.org/10.1023/A:1010933404324.
+[5] Ke, G., et al. (2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. Advances in Neural Information Processing Systems, 30. https://proceedings.neurips.cc/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html.
+[6] Cho, K., et al. (2014). Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation. EMNLP. https://arxiv.org/abs/1406.1078.
+[7] Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825–2830. https://jmlr.org/papers/v12/pedregosa11a.html.
 
+# Phụ lục A. Kết quả Random Forest theo pin
+Bảng lấy từ dự đoán kiểm thử pin giữ riêng. Chi tiết mọi mô hình được lưu trong reports/metrics_by_battery.csv và reports/predictions.csv.
 {{BY_BATTERY_TABLE}}
 
-B0006 là trường hợp RF có sai số lớn hơn các pin còn lại trong thiết kế hiện tại. Đây là pin bổ sung so với bản thực nghiệm ba pin ban đầu, làm thay đổi cả tập train của các vòng khác. Không sử dụng điểm số 1,24 của bản ba pin cũ để mô tả bộ bốn pin mới. Việc mở rộng dữ liệu có thể làm chỉ số xấu đi nhưng phản ánh bài toán khó hơn.
+# Phụ lục B. Cấu trúc mã nguồn
+{{CODE_TABLE}}
+Các hàm đặc trưng được dùng chung cho huấn luyện và giao diện, tránh hai cách tính khác nhau. Các file CSV đầu ra chứa tên cột gốc để chương trình đọc lại; giao diện dịch bản sao sang tiếng Việt.
 
-Ở B0005, Cycle Ridge có MAE thấp hơn RF. Signal Ridge thất bại rõ ở B0007, có R² âm, cho thấy quan hệ tuyến tính của các tín hiệu và điều kiện giữa pin không ổn định theo cấu hình này. Không ẩn các cấu hình kém hoặc chỉ báo cáo pin tốt nhất.
-
-![SOH đo và dự đoán khi giữ riêng từng pin](../reports/held_out_predictions.png)
-
-### 4.3. Phân tích lỗi
-
-![Sai số và dự đoán kiểm thử RF](../reports/error_analysis.png)
-
-Đồ thị dự đoán so với nhãn có đường tham chiếu y=x; độ lệch khỏi đường này biểu thị sai số. Biểu đồ sai số theo chu kỳ cho phép quan sát thiên lệch theo giai đoạn sử dụng. Mỗi điểm là một dự đoán kiểm thử, không phải dự đoán từ mô hình fit cả bốn pin. Sai số có thể chịu ảnh hưởng khác biệt dung lượng ban đầu, ngưỡng kết thúc xả và tín hiệu đầu chu kỳ; chưa có thực nghiệm tách riêng từng nguyên nhân nên không đưa ra kết luận nhân quả.
-
-### 4.4. Bỏ nhóm đặc trưng
-
-{{ABLATION_TABLE}}
-
-Bỏ chỉ số chu kỳ làm macro MAE thay đổi nhẹ. Bỏ nhiệt độ có MAE thấp hơn cấu hình đầy đủ trong thí nghiệm bổ sung này. Không có cơ sở tuyên bố nhiệt độ không quan trọng trong mọi điều kiện; bốn pin và phạm vi môi trường hẹp chưa đủ đánh giá khái quát. Kết quả chỉ cho thấy nhóm nhiệt độ hiện tại không bảo đảm cải thiện ở cấu hình đã dùng.
-
-### 4.5. Kiểm thử theo thời gian
-
-{{TEMPORAL_TABLE}}
-
-Trong cả bốn pin, RF ở thiết kế 70/30 có MAE cao hơn baseline giữ SOH cuối cùng đã biết. Đây là kết quả không thuận lợi cho RF nhưng cần báo cáo. Khi chu kỳ tương lai vượt phạm vi quan sát, mô hình cây không tự ngoại suy xu hướng suy giảm như một mô hình thời gian chuyên biệt. Không dùng kết quả LOBO tốt hơn baseline để tuyên bố khả năng dự báo tuổi thọ tương lai.
-
-Mô hình chính vì vậy được giới thiệu như bộ ước lượng SOH từ tín hiệu đầu chu kỳ trong điều kiện dữ liệu tương ứng, không phải bộ dự báo RUL. Nếu mục tiêu chuyển sang dự báo dài hạn, cần thiết kế mô hình và đánh giá khác.
-
-### 4.6. Sản phẩm và kiểm thử
-
-Ứng dụng Vincent D xây dựng bằng Streamlit có sáu mục: Tổng quan, Tra cứu pin, Đánh giá mô hình, Dự đoán SOH, Lịch sử dự đoán và Thông tin. Giao diện sử dụng Arial, thanh điều hướng, các bảng và biểu đồ tiếng Việt. Có so sánh hai chu kỳ, dự đoán theo lô tối đa 100 chu kỳ, lịch sử phiên tối đa 500 chu kỳ và phiếu kết quả HTML tự chứa có thể in thành PDF bằng trình duyệt. Nhóm dữ liệu lỗi được báo riêng; không tự tạo điểm tin cậy dự đoán. Thông tin người thực hiện là Nguyễn Văn Duy, MSSV 2311553949, chuyên ngành Khoa Học Dữ Liệu. Đầu vào yêu cầu time, terminal_voltage, terminal_current và temperature; cycle nhập riêng hoặc phải nhất quán với CSV. Dữ liệu không đủ cửa sổ hoặc sai cấu trúc được báo lỗi bằng thông điệp cụ thể.
-
-Trang tra cứu cho chọn nhiều pin, lọc khoảng chu kỳ và xem điện áp, dòng, nhiệt độ của một chu kỳ. Trang đánh giá cho chọn mô hình và pin kiểm thử, đối chiếu SOH thực tế–dự đoán và tải bảng tiếng Việt. Trang dự đoán nhận cả tên cột gốc hoặc tên tiếng Việt, từ chối file trộn nhiều pin/chu kỳ, giữ kết quả khi tải và ẩn kết quả cũ khi thay đầu vào. Ứng dụng cảnh báo khi đặc trưng ngoài miền huấn luyện, cho tải mẫu và kết quả dự đoán. Dự đoán chỉ lưu từ mô hình cục bộ do pipeline tạo; không nhận file mô hình joblib từ người dùng. Đây là phần mềm nghiên cứu, không đưa ra quyết định thay pin hoặc chứng nhận an toàn.
-
-![Tổng quan Vincent D và thông tin sinh viên](images/00-tong-quan.png)
-
-![Giao diện đánh giá mô hình](images/03-danh-gia.png)
-
-![Giao diện xem dữ liệu chạy thực tế](images/01-du-lieu.png)
-
-![Giao diện nhận CSV và dự đoán chạy thực tế](images/02-du-doan.png)
-
-![Xử lý theo lô và báo nhóm dữ liệu không hợp lệ](images/04-theo-lo.png)
-
-![Lịch sử kết quả trong phiên](images/05-lich-su.png)
-
-Kiểm thử gồm kiểm tra hai triệu bản ghi theo khối và so với từng mảng MATLAB, chống rò rỉ đặc trưng, xác minh nhãn và khóa chu kỳ, kiểm tra số dự đoán test, tính lại MAE/RMSE/R² từ dự đoán đã lưu, kiểm tra thứ tự thời gian và chạy luồng demo. Kết quả thực tế nằm trong verification.json và pytest-results.xml; không dùng kiểm thử bỏ qua hoặc số test bằng 0 để xác nhận sản phẩm.
-
-### 4.7. Hạn chế
-
-Bộ dữ liệu có hơn hai triệu phép đo nhưng chỉ bốn cell. Chúng không phải các xe điện độc lập và không đại diện cho điều kiện Việt Nam. Tăng số dòng bằng dữ liệu sạc không làm tăng số pin hoặc số nhãn SOH. Chưa có kiểm thử chuyển miền với bộ dữ liệu khác, chưa có đánh giá trên pack hoặc thực địa.
-
-Nguồn MATLAB là bản lưu công khai, chưa đối chiếu byte với archive S3 của nhà phát hành. Việc trục thời gian giữa một số pin giống nhau có thể phản ánh dữ liệu lưu; đã xác minh không phải chỉ riêng CSV cũ, nhưng chưa đủ để giải thích toàn bộ quá trình thu thập.
-
-Không có khoảng tin cậy quần thể pin đáng tin cậy với bốn nhóm; không coi các chu kỳ tương quan là 636 pin độc lập để bootstrap rồi tuyên bố độ chắc chắn cao. Chưa chứng minh cửa sổ 120 giây tối ưu, chưa nested tuning và chưa thực nghiệm dữ liệu Việt Nam.
-
-## Chương 5. Kết luận và hướng phát triển
-
-### 5.1. Kết quả thực hiện
-
-Khóa luận đã triển khai được toàn bộ luồng kỹ thuật: tải nguồn có phiên bản, đọc cấu trúc MATLAB, làm sạch có nhật ký, xuất 2.089.048 dòng, xây dựng 636 mẫu SOH, đánh giá năm mô hình theo pin, phân tích bổ sung và ứng dụng demo. Các bảng kết quả được sinh từ lần chạy thực tế, không điền tay để tạo kết quả thuận lợi.
-
-Thực nghiệm chính hỗ trợ nhận định RF hữu ích hơn baseline số chu kỳ xét theo macro MAE của bốn pin hiện tại, nhưng không tốt nhất ở từng pin và không tốt hơn baseline cuối cùng đã biết trong kiểm thử theo thời gian. Kết luận cần giữ cả kết quả thuận lợi và bất lợi.
-
-### 5.2. Hướng phát triển
-
-Ưu tiên tiếp theo là đối chiếu kho phát hành, thu thập thêm cell và điều kiện vận hành. Nếu cần dữ liệu Việt Nam, nên phối hợp phòng thí nghiệm hoặc đơn vị có dữ liệu được phép sử dụng, ghi loại cell, phương pháp đo capacity, nhiệt độ, dòng và lịch sử chu kỳ; không chỉ đổi tên bộ NASA.
-
-Về phương pháp, có thể kiểm tra nhiều cửa sổ đầu, thêm đặc trưng vật lý có sẵn tại thời điểm dự đoán và đánh giá lựa chọn tham số trong validation phù hợp. Nếu làm RUL cần định nghĩa ngưỡng kết thúc tuổi thọ, nhãn số chu kỳ còn lại và cơ chế xử lý dữ liệu chưa đạt ngưỡng.
-
-### 5.3. Phạm vi xác nhận
-
-Kết quả được xác nhận trong phạm vi bộ dữ liệu và thiết kế thực nghiệm đã mô tả. Chưa có kiểm thử vận hành trên xe thực tế, dữ liệu Việt Nam hoặc xác nhận nghiệm thu học thuật.
-
-## Tài liệu tham khảo và trạng thái sử dụng
-
-[1] B. Saha và K. Goebel (2007), Battery Data Set, NASA Prognostics Data Repository, NASA Ames Research Center. Danh mục NASA đã đọc và xác nhận trích dẫn: https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/
-
-[2] psanabriaUC, BatteryDatasetImplementation, thư mục battery_data, commit 0007aead10cb85aafdd11fb3de1d64186c7c6c05. Đã đọc README và sử dụng bốn file MATLAB. https://github.com/psanabriaUC/BatteryDatasetImplementation/tree/0007aead10cb85aafdd11fb3de1d64186c7c6c05/battery_data
-
-[3] scikit-learn 1.8.0, Linear Models — Ridge Regression. Đã đọc tài liệu mã nguồn của phiên bản dùng thực nghiệm: https://github.com/scikit-learn/scikit-learn/blob/1.8.0/doc/modules/linear_model.rst
-
-[4] L. Breiman (2001), Random Forests, Machine Learning 45(1), 5–32. Thông tin thư mục và giải thích phương pháp được đối chiếu qua tài liệu ensemble scikit-learn; chưa tải toàn văn bài gốc trong môi trường này: https://github.com/scikit-learn/scikit-learn/blob/1.8.0/doc/modules/ensemble.rst
-
-[5] J. H. Friedman (2001), Greedy Function Approximation: A Gradient Boosting Machine, Annals of Statistics 29, 1189–1232, DOI: 10.1214/aos/1013203451. Thông tin thư mục được đối chiếu qua tài liệu ensemble nêu ở [4]; chưa đọc toàn văn bài gốc trong môi trường này.
-
-[6] scikit-learn 1.8.0, Cross-validation: evaluating estimator performance, phần LeaveOneGroupOut. Tài liệu đã đọc: https://github.com/scikit-learn/scikit-learn/blob/1.8.0/doc/modules/cross_validation.rst
-
-[7] standing-o, SoH_estimation_of_Lithium-ion_battery, commit f75a9dcb0a38244225b5807722ceac39e0cb4a20. CSV và README đã dùng ở bản đầu để đối chiếu; không sao chép kết quả nguồn thành kết quả của khóa luận. https://github.com/standing-o/SoH_estimation_of_Lithium-ion_battery
-
-## Phụ lục A. Từ điển dữ liệu
-
-{{DATA_DICTIONARY}}
-
-## Phụ lục B. Hướng dẫn tái lập
-
-Windows dùng Python 3.12 và file chay_windows.ps1 tại thư mục chính. Script kiểm tra từng lệnh, dừng ngay nếu lỗi thay vì tiếp tục với môi trường chưa tạo hoặc thư viện chưa cài xong. Trường hợp cài pip bị hủy, chạy lại bước cài và chờ kết thúc thành công.
-
-Linux dùng bash scripts/setup.sh. Script đọc manifest, kiểm tra checksum, làm sạch, đối chiếu toàn bộ CSV, huấn luyện, phân tích bổ sung, chạy kiểm thử và tạo lại notebook/tài liệu. Các bước xử lý chính dùng thư viện công khai, không yêu cầu API key hoặc dịch vụ AI trả phí.
-
-Dữ liệu lớn được đọc theo khối khi kiểm tra và ghi theo từng pin khi xuất. Bảng mô hình chỉ có 636 dòng nên không cần GPU. Sau khi đổi nguồn hoặc tham số, phải tạo lại kết quả và tài liệu; không sửa thủ công chỉ số trong bảng.
-
-## Phụ lục C. Các file cần kiểm tra khi bảo vệ
-
-Manifest xác định nguồn; dataset_summary.json xác định số dòng; dataset_check.json xác nhận kiểm tra mảng; removed_measurements.csv ghi hai dòng loại; cycle_features.csv là bảng mô hình; metrics_by_battery.csv và predictions.csv chứa kết quả test; ablation_summary.csv và temporal_metrics.csv chứa phân tích bổ sung; run_metadata.json ghi tham số; verification.json ghi kiểm thử.
-
-Dự đoán trên CSV mẫu của demo không được dùng thay điểm test độc lập.
+# Phụ lục C. Cấu hình thực nghiệm
+{{PARAMETER_TABLE}}
+GRU: 3 tín hiệu × 25 vị trí; 24 đơn vị ẩn; 2 biến ngữ cảnh; lớp kết nối 24 nút; 20 epoch; batch 256; Adam 0,002; clip chuẩn gradient bằng 1. Seed 42. Không chọn epoch bằng tập kiểm thử.
+Tham số, phiên bản và dấu vân tay bảng đặc trưng có tại reports/run_metadata.json và reports/gru_metadata.json. Các file chứa đầy đủ dự đoán được giữ để tính lại chỉ số, thay vì chỉ giữ ảnh biểu đồ.

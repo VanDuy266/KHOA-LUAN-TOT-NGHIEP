@@ -1,109 +1,114 @@
-# Khóa luận: Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy
+# Vincent D — Phân tích và dự đoán sức khỏe pin
 
-Nguyễn Văn Duy · MSSV 2311553949 · Lớp 23DTH2A · GVHD theo phiếu: ThS. Vương Xuân Chí.
+**Nguyễn Văn Duy · MSSV 2311553949 · Khoa Học Dữ Liệu · Lớp 23DTH2A**
 
-Tôi sử dụng dữ liệu pin NASA để phân tích quá trình suy giảm dung lượng và dự đoán tình trạng sức khỏe pin (SOH). Ứng dụng **Vincent D** dùng để tra cứu dữ liệu, so sánh mô hình và dự đoán SOH từ file CSV.
+Trường Đại học Nguyễn Tất Thành · GVHD: ThS. Vương Xuân Chí
 
-Ngôn ngữ và thư viện: **Python 3.12, pandas, SciPy, scikit-learn, Matplotlib và Streamlit**.
+Tôi sử dụng dữ liệu SDU công bố năm 2025 để phân tích dung lượng và ước lượng SOH từ 120 giây đầu xả. Ứng dụng **Vincent D** cung cấp tra cứu hai giai đoạn sử dụng pin, so sánh chu kỳ, đánh giá mô hình và dự đoán từ CSV.
 
-## Tải về
+## Tải sản phẩm và dữ liệu
 
-- [Code, mô hình, dữ liệu xả, notebook, báo cáo Word và slide](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/raw/refs/heads/main/delivery/KhoaLuan_NguyenVanDuy.zip).
-- [Dataset sạch đầy đủ 2.089.048 dòng](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/raw/refs/heads/main/delivery/Dataset_Pin_NASA_2tr_dong.zip).
+- [Bản sản phẩm đầy đủ, có dữ liệu tra cứu và mô hình](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/archive/refs/heads/san-pham-sdu.zip).
+- [Bộ dữ liệu nguồn đã chọn — 10 triệu dòng, một file ZIP](https://github.com/VanDuy266/KHOA-LUAN-TOT-NGHIEP/archive/refs/heads/dataset-sdu-10tr.zip).
 
-Dữ liệu đầy đủ nằm trong gói riêng. Mỗi file ZIP có mã SHA-256 để kiểm tra khi tải. Gói mã nguồn không kèm môi trường `.venv`.
+Kho riêng tư yêu cầu đăng nhập tài khoản GitHub có quyền truy cập. Gói sản phẩm có sẵn Parquet, mô hình và kết quả; không cần tải nguồn hoặc huấn luyện lại để mở ứng dụng. Gói dữ liệu riêng dùng để đối chiếu nguồn hoặc tạo lại Parquet. Chỉ giải nén ZIP ngoài; Python đọc trực tiếp các file `.csv.gz` bên trong.
 
-## Chạy sản phẩm trên Windows / VS Code
+## Chạy trên Windows / VS Code
 
-Yêu cầu Python 3.12. Chạy các lệnh sau trong PowerShell tại thư mục gốc của dự án:
+Cài Python **3.12**, giải nén gói sản phẩm, mở thư mục có `README.md`, `app`, `scripts` trong VS Code. Terminal PowerShell:
 
 ```powershell
-py -3.12 --version
 powershell -ExecutionPolicy Bypass -File .\chay_windows.ps1
 ```
 
-File `chay_windows.ps1` tạo môi trường, cài thư viện và chạy ứng dụng. Nếu máy chưa có Python 3.12, tải tại [python.org](https://www.python.org/downloads/).
-
-Các lệnh chạy thủ công:
+Hoặc chạy từng lệnh tại thư mục gốc dự án:
 
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\python.exe -m pip install -r requirements-app.txt
-.\.venv\Scripts\python.exe scripts\download_data.py
-.\.venv\Scripts\python.exe scripts\prepare_data.py
-.\.venv\Scripts\python.exe scripts\run_experiment.py
 .\.venv\Scripts\python.exe -m streamlit run app\streamlit_app.py
 ```
 
-Những lần sau, chạy lệnh cuối để mở ứng dụng tại `http://localhost:8501`. Nhấn `Ctrl+C` để dừng.
+Chờ cài thư viện hoàn tất. Nếu Python báo chưa có bản 3.12, cài bản này trước bằng `py install 3.12` nếu Launcher hỗ trợ, hoặc từ https://www.python.org/downloads/. Không chạy các lệnh `.venv` khi terminal đang ở thư mục `app`; dùng `cd ..` về gốc trước.
 
-## Chạy toàn bộ nghiên cứu và tạo lại tài liệu
-
-Linux: `bash scripts/setup.sh`. Windows: cài `requirements.txt` thay cho `requirements-app.txt`, rồi chạy thêm `scripts/check_dataset.py`, `scripts/analyze_results.py`, `python -m pytest -q`, `scripts/build_notebook.py` và `scripts/build_documents.py` bằng Python của `.venv`.
-
-Cần khoảng 2 GB ổ đĩa cho môi trường và CSV. Không cần GPU hoặc API key. `requirements-app.txt` chỉ cài phần chạy sản phẩm; `requirements.txt` thêm kiểm thử và xuất Word/PowerPoint/notebook; `requirements.lock.txt` ghim môi trường Linux đã kiểm thử. Môi trường kiểm thử hiện tại là Linux; script Windows chưa được kiểm thử trực tiếp trên Windows.
-
-## Giao diện Vincent D
-
-Thông tin hiển thị: **Nguyễn Văn Duy · MSSV 2311553949 · Chuyên ngành Khoa Học Dữ Liệu**.
-
-| Mục | Chức năng |
-| --- | --- |
-| Tổng quan | Hồ sơ sinh viên, số liệu nghiên cứu, đường SOH của bốn pin |
-| Tra cứu pin | Lọc pin/chu kỳ, xem tín hiệu và so sánh hai chu kỳ A/B, tải CSV |
-| Đánh giá mô hình | So sánh MAE/RMSE/R², chọn mô hình và pin kiểm thử, xem sai số, phân tích bổ sung |
-| Dự đoán SOH | Một chu kỳ hoặc theo lô tối đa 100 chu kỳ; lỗi theo nhóm; xuất CSV và phiếu HTML |
-| Lịch sử dự đoán | Lưu tạm tối đa 500 chu kỳ trong phiên, lọc trạng thái, tải hoặc xóa |
-| Thông tin | Nguồn, quy trình làm sạch, thuật ngữ và tải báo cáo/slide |
-
-Giao diện dùng tiếng Việt và phông Arial. Kết quả có thể tải dưới dạng CSV hoặc phiếu HTML để in và lưu PDF. Chế độ dự đoán một chu kỳ nhận dữ liệu của một pin và một chu kỳ; chế độ theo lô nhận tối đa 100 chu kỳ. Lịch sử chỉ lưu trong phiên sử dụng.
-
-![Tổng quan Vincent D](docs/images/00-tong-quan.png)
+Trình duyệt mở địa chỉ Streamlit hiển thị trong terminal. Đổi trang không huấn luyện lại. Đóng các ứng dụng nặng trước khi xử lý lại dữ liệu hoặc huấn luyện; giới hạn 2 luồng CPU không thể bảo đảm máy không chậm nếu RAM đang gần đầy.
 
 ## Dữ liệu
 
-| Nội dung | Số lượng |
+| Nội dung | Quy mô |
 | --- | ---: |
-| Dòng sạc/xả ban đầu | 2.089.050 |
-| Dòng sạc thiếu tín hiệu bị loại | 2 |
-| Dòng sạch | **2.089.048** |
-| Trong đó: dòng sạc sạch | 1.903.327 |
-| Trong đó: dòng xả | 185.721 |
-| Mẫu học máy theo chu kỳ xả | **636** |
-| Pin độc lập | **4** |
+| Pin vật lý | 86 |
+| Giai đoạn | 2 — sử dụng ban đầu và tái sử dụng |
+| File đo trong bộ chọn | 172 CSV gzip |
+| Dòng đo nguồn gốc | 145.112.317 |
+| Dòng xả tham chiếu trước lấy thưa | 30.929.675 |
+| Dòng đo được giữ trong bản sản phẩm | 10.000.000 |
+| Mẫu chu kỳ dùng huấn luyện | 20.823 |
+| Đặc trưng mô hình bảng | 12 |
 
-Sau làm sạch, dữ liệu không còn giá trị thiếu, giá trị vô hạn hoặc trùng khóa. Số dòng được giữ theo dữ liệu gốc, không nhân bản hay nội suy. Chi tiết tại [nguồn và mô tả dữ liệu](data/README.md).
+Nguồn: Wang, S., Gao, F., & Tian, H. (2025). *Data for: Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions*. Zenodo, [DOI 10.5281/zenodo.14859405](https://doi.org/10.5281/zenodo.14859405), CC BY 4.0. Bài báo liên quan: [10.1016/j.xcrp.2025.102657](https://doi.org/10.1016/j.xcrp.2025.102657).
 
-Dữ liệu thí nghiệm NASA tại Hoa Kỳ, gồm bốn pin. File MATLAB lấy từ bản lưu công khai có dẫn nguồn NASA và mã kiểm tra; chưa đối chiếu trực tiếp với file gốc trên S3 của NASA. Hơn hai triệu dòng đo tạo thành **636 mẫu theo chu kỳ xả**, không phải hai triệu mẫu SOH độc lập.
+Đây là tế bào Lishen LR1865SZ NMC(532)/graphite, 2,4 Ah trong phòng thí nghiệm Trung Quốc, chưa phải dữ liệu bộ pin xe chạy tại Việt Nam. Ngày công bố 2025 không có nghĩa mọi số đo được thu trong năm 2025.
 
-## Phương pháp và kết quả
+Bản chọn giữ đủ các chu kỳ xả tham chiếu, mọi điểm 120 giây đầu và điểm cuối; lấy thưa đoạn sau. Không sửa giá trị các dòng nguồn. Bộ chọn không bao gồm mọi chế độ sạc, nghỉ và xả trong gói gốc. Nhãn dung lượng lấy từ chu kỳ đầy đủ, không tính lại trên bản đã lấy thưa.
 
-- SOH (%) = 100 × dung lượng xả / 2 Ah. Giữ nguyên giá trị hơi trên 100% nếu dung lượng đo vượt danh định.
-- 11 đặc trưng: số chu kỳ và thống kê điện áp, dòng, nhiệt độ trong 120 giây đầu xả. Không dùng capacity hoặc SOH làm đầu vào.
-- Mỗi vòng dùng ba pin để huấn luyện và một pin để kiểm thử. Tổng cộng bốn vòng với năm cấu hình mô hình.
-- Random Forest: macro MAE **2,724**, RMSE **3,189** điểm phần trăm SOH. Cycle Ridge: MAE **4,074**.
-- Kiểm thử theo thời gian dùng 70% chu kỳ đầu để huấn luyện và 30% còn lại để đánh giá. Trong thử nghiệm này, Random Forest có sai số cao hơn cách lấy SOH cuối đã biết làm dự đoán. Đề tài chưa dự đoán tuổi thọ còn lại của pin.
+Kiểm tra toàn bộ 10 triệu dòng không phát hiện thiếu tín hiệu bắt buộc hoặc khóa thời gian trùng. Có **25 điểm nghi vấn**, không điểm nào trong cửa sổ mô hình; các điểm được giữ để xem xét. Có 23 bước thời gian đi lùi trong thứ tự nguồn; bản sao xử lý được sắp trong từng chu kỳ. Chi tiết tại [nguồn dữ liệu](data/README.md), [kết quả kiểm tra](data/KIEM_TRA_DU_LIEU.md) và `reports/dataset_check.json`.
 
-Mô hình trong ứng dụng được huấn luyện trên cả bốn pin. Kết quả với CSV mẫu chỉ dùng để minh họa chức năng; chỉ số kiểm thử lấy từ các vòng giữ riêng từng pin.
+## Mô hình và kết quả
 
-## Cấu trúc dự án
+Bốn mô hình: **Ridge, Random Forest, LightGBM, GRU**; thêm mốc dự đoán trung bình SOH. GroupKFold 5 vòng theo mã pin vật lý, seed 42; hai giai đoạn của một pin luôn ở cùng phía. Chuẩn hóa học trên train, không tối ưu tham số trên test. Chỉ số chính lấy trung bình không trọng số theo 86 pin.
 
-| File / thư mục | Vai trò |
+| Mô hình | MAE (điểm % SOH) | RMSE | R² |
+| --- | ---: | ---: | ---: |
+| Trung bình SOH | 13,246 | 15,249 | −0,281 |
+| Ridge | 2,582 | 3,299 | 0,933 |
+| Random Forest | 1,619 | 2,157 | 0,970 |
+| LightGBM | 1,734 | 2,270 | 0,968 |
+| GRU | 2,141 | 2,718 | 0,953 |
+
+GRU dùng chuỗi 25 vị trí V/I/T trong 120 giây cùng chu kỳ/giai đoạn; các mô hình bảng dùng 12 thống kê. Phép so sánh gồm cả khác biệt biểu diễn. MAE không phải “độ chính xác phần trăm”. Mô hình ứng dụng được học lại trên toàn bộ bảng và tách khỏi kết quả kiểm thử pin giữ riêng. CSV mẫu đã tham gia huấn luyện.
+
+Kết quả theo giai đoạn, bỏ nhóm đặc trưng và kiểm thử thời gian nằm trong `reports/`. Điểm 70/30 theo thời gian không gộp với điểm kiểm thử pin mới. Chưa kiểm chứng trên xe thực tế, chưa dự báo RUL hoặc chứng nhận an toàn pin.
+
+## Chạy lại thực nghiệm
+
+Cài thư viện nghiên cứu trong cùng môi trường Python:
+
+```powershell
+.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-deep.txt
+```
+
+Nếu cần tạo lại Parquet từ gói nguồn tải riêng:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\download_data.py --zip "D:\DuLieu\KHOA-LUAN-TOT-NGHIEP-dataset-sdu-10tr.zip"
+.\.venv\Scripts\python.exe scripts\prepare_data.py
+```
+
+Tái lập kiểm tra, huấn luyện và tài liệu:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\reproduce.py
+```
+
+Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment.py` → `train_gru.py` → `analyze_results.py` → `save_models.py` → pytest → notebook → báo cáo/slide. Việc tái tạo từ bộ nguồn tác giả 145 triệu dòng được mô tả trong `data/provenance/`; đó là bước riêng, nặng hơn nhiều so với mở sản phẩm. Các script ở đó giữ theo cấu trúc bộ chọn ban đầu và có README riêng.
+
+## Cấu trúc sản phẩm
+
+| Thư mục | Nội dung |
 | --- | --- |
-| `scripts/download_data.py` | Tải dữ liệu và kiểm tra checksum |
-| `scripts/prepare_data.py` | Đọc MATLAB, làm sạch, xuất CSV và đặc trưng |
-| `scripts/check_dataset.py` | Kiểm chứng toàn bộ dataset |
-| `src/battery_soh/features.py` | Đặc trưng 120 giây dùng chung |
-| `scripts/run_experiment.py` | Huấn luyện, kiểm thử và lưu mô hình |
-| `scripts/analyze_results.py` | Bỏ đặc trưng, đánh giá theo thời gian |
-| `app/streamlit_app.py` | Giao diện dữ liệu, kết quả và dự đoán CSV |
-| `notebooks/01_eda.ipynb` | Notebook đã thực thi |
-| `docs/giai-thich-code.md` | Giải thích mã nguồn |
-| `docs/so-tay-hoc-va-bao-ve.md` | Phương pháp, mô hình và kết quả thực nghiệm |
-| `docs/bao-cao-khoa-luan.docx` | Báo cáo có kết quả thực nghiệm |
-| `docs/slide-bao-ve.pptx` | Slide bảo vệ |
-| `reports/` | Thống kê, chỉ số, dự đoán test, hình và nhật ký |
+| `app/` | 7 trang Streamlit, dự đoán CSV, biểu đồ, lịch sử phiên |
+| `src/battery_soh/` | Hàm đặc trưng và kiểm nhãn dùng chung |
+| `scripts/` | Nhận dữ liệu, chuyển đổi, huấn luyện, đánh giá, tạo tài liệu |
+| `data/clean/` | Parquet theo pin/giai đoạn, mẫu CSV, bảng đặc trưng và nhãn |
+| `data/provenance/` | Hồ sơ nguồn, nhật ký chọn và mã xây dựng bộ chọn |
+| `artifacts/` | Mô hình bảng, trọng số GRU và thông số chuẩn hóa |
+| `reports/` | Dự đoán kiểm thử, chỉ số, phân hoạch, thời gian và biểu đồ |
+| `notebooks/01_eda.ipynb` | Notebook phân tích đã chạy |
+| `docs/` | Báo cáo Word/Markdown/PDF, 18 slide, tài liệu kỹ thuật |
+| `tests/` | Kiểm thử dữ liệu, mô hình, CSV và giao diện |
 
-## Phạm vi nghiên cứu
+[Giải thích mã nguồn](docs/giai-thich-code.md) · [Nội dung trình bày](docs/noi-dung-trinh-bay.md) · [Danh mục bàn giao](docs/danh-muc-ban-giao.md)
 
-Tôi đánh giá mô hình trên bốn cell pin trong phòng thí nghiệm. Kết quả chưa được kiểm chứng trên bộ pin hoàn chỉnh hoặc xe điện tại Việt Nam.
+Bản báo cáo dùng thông tin trường và GVHD theo phiếu đăng ký. Mẫu trình bày, số trang và thủ tục nộp cuối cùng phụ thuộc quy định khoa và xác nhận của giảng viên.

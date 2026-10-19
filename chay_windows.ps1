@@ -23,7 +23,7 @@ $Python = Join-Path $PSScriptRoot ".venv\Scripts\python.exe"
 & $Python -m pip install -r requirements-app.txt
 KiemTraLenh "Cai thu vien - hay cho den khi hoan tat"
 $DaCoDemo = (Test-Path "artifacts\random_forest.joblib") -and
-    (Test-Path "data\clean\measurements.csv") -and
+    (Test-Path "data\clean\sample_measurements.csv") -and
     (Test-Path "reports\dataset_summary.json") -and
     (Test-Path "reports\metrics_summary.csv")
 if (-not $DaCoDemo) {
@@ -31,10 +31,18 @@ if (-not $DaCoDemo) {
     KiemTraLenh "Tai du lieu"
     & $Python scripts\prepare_data.py
     KiemTraLenh "Lam sach du lieu"
+    & $Python -m pip install -r requirements.txt
+    KiemTraLenh "Cai thu vien huan luyen"
     & $Python scripts\run_experiment.py
     KiemTraLenh "Huan luyen va danh gia"
 } else {
-    Write-Host "Da co du lieu va mo hinh trong goi ban giao. Mo demo; xem README de chay lai nghien cuu."
+    Write-Host "Da co mo hinh SDU va du lieu mau."
+}
+if (-not (Test-Path "data\clean\cells\primary_SDU_01.parquet")) {
+    & $Python scripts\download_data.py
+    KiemTraLenh "Tai SDU day du"
+    & $Python scripts\prepare_data.py
+    KiemTraLenh "Xu ly SDU"
 }
 & $Python -m streamlit run app\streamlit_app.py
 KiemTraLenh "Chay ung dung"

@@ -1,59 +1,37 @@
-# Bộ dữ liệu pin sạch: 2.089.048 dòng đo
+# Nguồn dữ liệu SDU 2025
 
-Đây là phép đo của **4 cell lithium-ion**, được NASA PCoE công bố theo danh mục chính thức [1]. File MATLAB được tải từ bản lưu công khai [2], ghim commit trong `manifest.json`. Dữ liệu **không phải của Việt Nam**. Đã đọc trang NASA và README thí nghiệm; chưa so sánh byte với archive S3 của đơn vị phát hành vì đường tải đó bị chặn.
+## Trích dẫn bộ dữ liệu
 
-## Số lượng thực tế
+Wang, S., Gao, F., & Tian, H. (2025). *Data for: Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions* [Data set]. Zenodo. https://doi.org/10.5281/zenodo.14859405
 
-| Pin | Dòng sạc sạch | Dòng xả | Tổng dòng sạch | Chu kỳ xả / mẫu SOH |
-| --- | ---: | ---: | ---: | ---: |
-| B0005 | 541.173 | 50.285 | 591.458 | 168 |
-| B0006 | 541.173 | 50.285 | 591.458 | 168 |
-| B0007 | 541.173 | 50.285 | 591.458 | 168 |
-| B0018 | 279.808 | 34.866 | 314.674 | 132 |
-| **Tổng** | **1.903.327** | **185.721** | **2.089.048** | **636** |
+- Trang tải của tác giả: https://zenodo.org/records/14859405
+- Đơn vị của ba tác giả theo metadata: Shandong University.
+- Ngày công bố dữ liệu: 12/02/2025. Đây là ngày công bố, không phải khẳng định toàn bộ phép đo được thực hiện năm 2025.
+- Giấy phép: Creative Commons Attribution 4.0 International (CC BY 4.0), cần ghi công nguồn khi sử dụng.
+- Bài báo liên quan theo metadata Zenodo: *Deep sorting of reused batteries for enabling long-term consistency grouping with unknown prior conditions*, Cell Reports Physical Science. https://doi.org/10.1016/j.xcrp.2025.102657
 
-Nguồn có 2.089.050 dòng sạc/xả. Loại đúng **2 dòng sạc thiếu tín hiệu** tại B0018, operation 115, thời gian 4528.156 và 4786.328 giây. Không nội suy, không nhân bản để tăng số lượng. Không trộn phép đo trở kháng vì cấu trúc khác.
+## Hai file gốc
 
-## Các file CSV
+| File | Kích thước byte | MD5 do Zenodo cung cấp |
+| --- | ---: | --- |
+| Primary_use_phase.zip | 2694002794 | 15d94a62d47dd9036899889b3f36992d |
+| Second_life_phase.zip | 1794732202 | 0ba11864d2c1017c84d96dfe578956fc |
 
-- `clean/measurements_all.csv`: 2.089.048 dòng, 9 cột, gồm sạc và xả; **không có nhãn SOH cho phần sạc**.
-- `clean/measurements.csv`: 185.721 dòng xả, có capacity (Ah) và SOH (tỷ lệ, chưa nhân 100).
-- `clean/cycle_features.csv`: 636 dòng, 13 cột, gồm mã pin, nhãn `soh_pct` và 11 đặc trưng. Đây mới là bảng đưa vào mô hình SOH.
+Hai file gốc đã tải đủ và khớp MD5; không bị ghi đè. Metadata đầy đủ nằm trong source_metadata.json.
 
-Các file sinh ra được bỏ qua bởi Git; tải gói dataset ZIP hoặc chạy `scripts/download_data.py` rồi `scripts/prepare_data.py`.
+## Dữ liệu thí nghiệm
 
-## Từ điển cột bảng toàn bộ phép đo
+Theo tác giả, dữ liệu thu từ 86 cell Lishen LR1865SZ, điện cực NMC(532)/graphite, dung lượng danh định 2,4 Ah. Thí nghiệm lão hóa kéo dài 30 tháng, gồm sử dụng ban đầu và tái sử dụng. Hai giai đoạn thuộc cùng 86 pin, không phải 172 pin độc lập. File được đặt tên theo số hiệu thí nghiệm ban đầu; cột Battery_ID là mã đối chiếu trong bài báo.
 
-| Cột | Kiểu / đơn vị | Ý nghĩa |
-| --- | --- | --- |
-| battery | chuỗi | Mã cell, không phải mã xe |
-| operation_type | charge / discharge | Loại hoạt động sạc hoặc xả |
-| operation_index | số nguyên | Thứ tự operation trong MATLAB; khóa cùng battery và time |
-| cycle | số nguyên | Thứ tự sạc hoặc xả, đếm riêng theo operation_type |
-| time | giây | Thời gian từ đầu operation, bắt đầu lại ở operation tiếp theo |
-| terminal_voltage | V | Điện áp tại cell |
-| terminal_current | A | Dòng đo; xả mang dấu âm |
-| temperature | °C | Nhiệt độ cell |
-| ambient_temperature | °C | Nhiệt độ môi trường ghi trong thí nghiệm |
+Đây là dữ liệu phòng thí nghiệm trên cell pin, chưa phải dữ liệu pack hoặc xe điện vận hành tại Việt Nam.
 
-Không dùng `cycle` để ghép sạc/xả như thể luôn một-một: có 170 lần sạc nhưng 168 lần xả ở B0005/B0006/B0007. Giữ operation_index để tái hiện trình tự thực.
+## Tập con trong gói này
 
-## Quy tắc dùng cho khóa luận
+1. Đọc và kiểm tra 145.112.317 dòng, 89.677 chu kỳ ghi nhận từ 172 CSV nguồn.
+2. Chọn các đoạn xả ở điều kiện tham chiếu khoảng 0,2C: dòng -0,48 A, đầu xả ít nhất 4 V, cuối xả gần 3 V, cùng các kiểm tra tín hiệu và dung lượng. Kết quả: 30.929.675 dòng thuộc 20.823 chu kỳ của 86 pin. Đây là nhận diện điều kiện xả từ tín hiệu, không phải khẳng định mọi chu kỳ đều có nhãn chẩn đoán do tác giả cấp.
+3. Bản 10.000.000 dòng giữ đủ 20.823 chu kỳ và 86 pin. Giữ toàn bộ mẫu 120 giây đầu xả và điểm cuối mỗi chu kỳ; giảm mật độ mẫu ở đoạn sau theo thứ tự thời gian. Đây là lấy thưa, không phải tuyên bố mọi điểm bị bỏ là nhiễu.
+4. Dòng CSV được chọn giữ nguyên văn: tên cột, số đo, mã pin, số chu kỳ và thứ tự nguồn. Không nội suy, điền giá trị thiếu, nhân bản hoặc sửa số đo. Đây là tập con do dự án tạo, không phải nguyên gói tác giả phát hành.
+5. Bảng đặc trưng và nhãn được tạo riêng. SOH (%) = dung lượng xả tham chiếu / 2,4 × 100. Nhãn lấy từ chu kỳ đầy đủ; không tính lại bằng đường đã lấy thưa. Các file bảng mô hình được đối chiếu với bộ đầy đủ.
 
-SOH (%) = 100 × capacity / 2 Ah, dựa trên dung lượng danh định trong README thí nghiệm. B0006 có SOH ban đầu khoảng 101,77%; giữ nguyên thay vì cắt về 100%. Đặc trưng chỉ dùng 120 giây đầu của chu kỳ xả, không dùng capacity, SOH hoặc thời gian toàn chu kỳ làm đầu vào. Không gán dung lượng của lần xả sau cho từng dòng sạc rồi chia ngẫu nhiên để tăng số mẫu.
 
-Hai triệu dòng đo không đồng nghĩa hai triệu pin hoặc hai triệu mẫu nhãn độc lập. Bài toán SOH hiện có 636 chu kỳ và 4 nhóm pin. Đánh giá chính phải giữ riêng toàn bộ một pin, không chia ngẫu nhiên các thời điểm của cùng pin.
-
-## Kiểm chứng
-
-`scripts/check_dataset.py` đọc CSV theo khối, xác minh trên 2 triệu dòng, không thiếu/vô hạn, không trùng khóa, thứ tự đúng và so sánh từng mảng tín hiệu với MATLAB sau khi loại hai dòng thiếu. Kết quả và SHA-256 CSV ở `reports/dataset_check.json`; nhật ký loại dòng ở `reports/removed_measurements.csv`.
-
-`reports/source_comparison.csv` ghi đối chiếu 468 chu kỳ của B0005/B0007/B0018 với bản CSV cộng đồng trước đây: thời gian, điện áp, dung lượng và số mẫu khớp. Hiện tượng trục thời gian giống nhau giữa pin cũng tồn tại trong file MATLAB của bản lưu, không đủ cơ sở gọi là lỗi chuyển CSV. Chưa xác thực byte với archive chính thức nên vẫn lưu giới hạn nguồn.
-
-## Nguồn và ghi công
-
-1. B. Saha và K. Goebel (2007), **Battery Data Set**, NASA Prognostics Data Repository, NASA Ames Research Center. Danh mục: https://www.nasa.gov/intelligent-systems-division/discovery-and-systems-health/pcoe/pcoe-data-set-repository/
-2. Bản lưu MATLAB và README: https://github.com/psanabriaUC/BatteryDatasetImplementation/tree/0007aead10cb85aafdd11fb3de1d64186c7c6c05/battery_data
-3. CSV cộng đồng dùng để đối chiếu bản cũ: https://github.com/standing-o/SoH_estimation_of_Lithium-ion_battery — `community_manifest.json` và `SOURCE_LICENSE.txt` chỉ áp dụng cho nguồn cộng đồng cũ, không gán giấy phép đó cho dữ liệu NASA hoặc toàn bộ dự án.
-
-Chưa xác minh được bộ dữ liệu xe điện Việt Nam công khai đủ cấu trúc chu kỳ, dung lượng tham chiếu và quyền sử dụng tương đương. Nếu có dữ liệu từ phòng thí nghiệm/đơn vị vận hành trong nước, phải được phép sử dụng và kiểm tra đơn vị, ẩn thông tin nhận dạng xe trước khi thay nguồn.
+Chất lượng của bản được phát kèm nằm trong KET_QUA_KIEM_TRA.md và verification/. Tính toàn vẹn file không chứng minh mọi tín hiệu đều không có nhiễu.

@@ -6,12 +6,25 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 def open_page(name):
-    app = AppTest.from_file(str(ROOT / "app/streamlit_app.py"), default_timeout=30).run()
+    app = AppTest.from_file(
+        str(ROOT / "app/streamlit_app.py"), default_timeout=30
+    ).run()
     app.radio(key="navigation").set_value(name).run()
     return app
 
 
-@pytest.mark.parametrize("name", ["Tổng quan", "Tra cứu pin", "Đánh giá mô hình", "Dự đoán SOH", "Thông tin", "Lịch sử dự đoán"])
+@pytest.mark.parametrize(
+    "name",
+    [
+        "Tổng quan",
+        "Tra cứu pin",
+        "Đánh giá mô hình",
+        "Dự đoán SOH",
+        "Thông tin",
+        "Lịch sử dự đoán",
+        "Chất lượng dữ liệu",
+    ],
+)
 def test_each_page_renders(name):
     app = open_page(name)
     assert not app.exception
@@ -70,7 +83,10 @@ def test_batch_sample_and_session_history():
     assert len(app.session_state["prediction_history"]) == 3
     app.radio(key="navigation").set_value("Lịch sử dự đoán").run()
     assert not app.exception
-    assert any(metric.label == "Thành công" and str(metric.value) == "3" for metric in app.metric)
+    assert any(
+        metric.label == "Thành công" and str(metric.value) == "3"
+        for metric in app.metric
+    )
     app.button[0].click().run()
     assert any("Chưa có lịch sử" in info.value for info in app.info)
 

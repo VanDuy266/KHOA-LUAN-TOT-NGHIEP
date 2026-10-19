@@ -1,54 +1,48 @@
-"""Các kiểm tra có thể phát hiện mất dữ liệu, sai nhãn hoặc trộn chu kỳ."""
-import json
-import sys
-from pathlib import Path
+"""Phát hiện thiếu pin, sai nhãn hoặc lẫn dữ liệu giữa các tập kiểm thử SDU."""
 
+import json
+from pathlib import Path
 import numpy as np
 import pandas as pd
-import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT / "scripts"))
-from prepare_data import clean_battery
 
 
-def test_dataset_verified_over_two_million_rows():
+def test_full_sdu_dataset_verified():
     check = json.loads((ROOT / "reports/dataset_check.json").read_text())
-    assert check["status"] == "passed"
-    assert check["measurement_rows"] >= 2_000_000
-    assert check["source_arrays_match"] is True
+    assert check["status"] == "passed" and check["dataset"] == "SDU"
+    assert check["measurement_rows"] == 10_000_000
+    assert check["independent_batteries"] == 86
     assert check["missing_values"] == check["duplicate_measurement_keys"] == 0
-    assert check["independent_batteries"] == 4
+    assert check["nominal_capacity_ah"] == 2.4
 
 
-def test_cleaning_only_removes_invalid_measurement_rows():
-    frame = pd.DataFrame({"battery": ["B0005"]*3, "operation_index": [1]*3,
-        "time": [0., 1., 2.], "terminal_voltage": [4., np.nan, 3.9],
-        "terminal_current": [-2.]*3, "temperature": [25.]*3, "ambient_temperature": [24.]*3})
-    cleaned = clean_battery(frame)
-    assert cleaned.time.to_list() == [0., 2.]
-    assert cleaned.terminal_voltage.to_list() == [4., 3.9]
+def test_feature_labels_and_sample_count():
+    data = pd.read_csv(ROOT / "data/clean/cycle_features.csv")
+    labels = pd.read_csv(ROOT / "data/clean/cycle_labels.csv")
+    summary = json.loads((ROOT / "reports/dataset_summary.json").read_text())
+    assert len(data) == summary["feature_rows"] and data.battery.nunique() == 86
+    assert not data.duplicated(["battery", "phase", "cycle"]).any()
+    assert np.isfinite(data.select_dtypes("number").to_numpy()).all()
+    merged = data.merge(labels, on=["battery", "phase", "cycle"], validate="one_to_one")
+    assert len(merged) == len(data)
+    assert np.allclose(merged.soh_pct_x, merged.capacity_ah_y / 2.4 * 100)
+    assert "temperature_mean" in data.columns and set(data.phase_code) == {0, 1}
 
 
-def test_cleaning_rejects_conflicting_time_keys():
-    frame = pd.DataFrame({"battery": ["B0005"]*2, "operation_index": [1]*2,
-        "time": [0., 0.], "terminal_voltage": [4., 3.9],
-        "terminal_current": [-2.]*2, "temperature": [25.]*2, "ambient_temperature": [24.]*2})
-    with pytest.raises(ValueError, match="xung đột"):
-        clean_battery(frame)
-
-
-def test_feature_samples_and_labels():
-    features = pd.read_csv(ROOT / "data/clean/cycle_features.csv")
-    assert len(features) == 636
-    assert features.groupby("battery").size().to_dict() == {"B0005": 168, "B0006": 168, "B0007": 168, "B0018": 132}
-    assert not features.isna().any().any()
-    assert not features.duplicated(["battery", "cycle"]).any()
-    # Dung lượng ban đầu có thể vượt 2 Ah, không tự cắt SOH về 100%.
-    assert features.soh_pct.max() > 100
+def test_five_fold_split_has_no_battery_leakage():
+    split = pd.read_csv(ROOT / "reports/split_assignments.csv")
+    data = pd.read_csv(ROOT / "reports/features.csv")
+    assert len(split) == 86 and split.battery.nunique() == 86
+    assert set(split.test_fold) == {1, 2, 3, 4, 5}
+    pred = pd.read_csv(ROOT / "reports/predictions.csv")
+    assert pred.groupby(["model", "battery", "phase", "cycle"]).size().eq(1).all()
+    joined = pred.merge(split, on="battery", validate="many_to_one")
+    assert joined.fold.eq(joined.test_fold).all()
+    assert pred.groupby("model").size().eq(len(data)).all()
 
 
 def test_temporal_split_is_strictly_forward():
     metrics = pd.read_csv(ROOT / "reports/temporal_metrics.csv")
-    assert len(metrics) == 8
+    assert len(metrics) == 86 * 2 * 2
     assert (metrics.last_train_cycle < metrics.first_test_cycle).all()

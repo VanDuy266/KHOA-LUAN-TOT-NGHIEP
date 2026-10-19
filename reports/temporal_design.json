@@ -1,0 +1,1211 @@
+{
+  "design": "Pooled first 70% cycles within each battery and phase for training; remaining 30% for test",
+  "training_cycles": 14497,
+  "test_cycles": 6326,
+  "cutoffs": {
+    "SDU_01|primary": {
+      "n_train": 135,
+      "n_test": 58,
+      "last_train_cycle": 671,
+      "first_test_cycle": 676,
+      "last_soh": 90.38454166666668
+    },
+    "SDU_01|second_life": {
+      "n_train": 67,
+      "n_test": 30,
+      "last_train_cycle": 331,
+      "first_test_cycle": 336,
+      "last_soh": 66.839375
+    },
+    "SDU_02|primary": {
+      "n_train": 125,
+      "n_test": 55,
+      "last_train_cycle": 621,
+      "first_test_cycle": 626,
+      "last_soh": 91.61041666666668
+    },
+    "SDU_02|second_life": {
+      "n_train": 62,
+      "n_test": 28,
+      "last_train_cycle": 306,
+      "first_test_cycle": 311,
+      "last_soh": 64.51416666666667
+    },
+    "SDU_03|primary": {
+      "n_train": 120,
+      "n_test": 52,
+      "last_train_cycle": 596,
+      "first_test_cycle": 601,
+      "last_soh": 86.90120833333333
+    },
+    "SDU_03|second_life": {
+      "n_train": 43,
+      "n_test": 19,
+      "last_train_cycle": 211,
+      "first_test_cycle": 216,
+      "last_soh": 65.82625
+    },
+    "SDU_04|primary": {
+      "n_train": 124,
+      "n_test": 54,
+      "last_train_cycle": 616,
+      "first_test_cycle": 621,
+      "last_soh": 91.52316666666668
+    },
+    "SDU_04|second_life": {
+      "n_train": 53,
+      "n_test": 24,
+      "last_train_cycle": 261,
+      "first_test_cycle": 266,
+      "last_soh": 65.95850000000002
+    },
+    "SDU_05|primary": {
+      "n_train": 147,
+      "n_test": 64,
+      "last_train_cycle": 736,
+      "first_test_cycle": 741,
+      "last_soh": 89.67887499999999
+    },
+    "SDU_05|second_life": {
+      "n_train": 52,
+      "n_test": 23,
+      "last_train_cycle": 256,
+      "first_test_cycle": 261,
+      "last_soh": 60.79766666666667
+    },
+    "SDU_06|primary": {
+      "n_train": 156,
+      "n_test": 68,
+      "last_train_cycle": 776,
+      "first_test_cycle": 781,
+      "last_soh": 90.48391666666666
+    },
+    "SDU_06|second_life": {
+      "n_train": 58,
+      "n_test": 25,
+      "last_train_cycle": 286,
+      "first_test_cycle": 291,
+      "last_soh": 62.66716666666666
+    },
+    "SDU_07|primary": {
+      "n_train": 146,
+      "n_test": 63,
+      "last_train_cycle": 726,
+      "first_test_cycle": 736,
+      "last_soh": 90.98758333333332
+    },
+    "SDU_07|second_life": {
+      "n_train": 69,
+      "n_test": 30,
+      "last_train_cycle": 341,
+      "first_test_cycle": 346,
+      "last_soh": 61.97675
+    },
+    "SDU_08|primary": {
+      "n_train": 100,
+      "n_test": 43,
+      "last_train_cycle": 496,
+      "first_test_cycle": 501,
+      "last_soh": 86.224625
+    },
+    "SDU_08|second_life": {
+      "n_train": 74,
+      "n_test": 32,
+      "last_train_cycle": 366,
+      "first_test_cycle": 371,
+      "last_soh": 65.78516666666665
+    },
+    "SDU_09|primary": {
+      "n_train": 58,
+      "n_test": 26,
+      "last_train_cycle": 286,
+      "first_test_cycle": 291,
+      "last_soh": 93.322625
+    },
+    "SDU_09|second_life": {
+      "n_train": 52,
+      "n_test": 23,
+      "last_train_cycle": 256,
+      "first_test_cycle": 261,
+      "last_soh": 56.126291666666674
+    },
+    "SDU_10|primary": {
+      "n_train": 61,
+      "n_test": 27,
+      "last_train_cycle": 301,
+      "first_test_cycle": 306,
+      "last_soh": 94.43745833333334
+    },
+    "SDU_10|second_life": {
+      "n_train": 44,
+      "n_test": 20,
+      "last_train_cycle": 216,
+      "first_test_cycle": 221,
+      "last_soh": 62.08233333333334
+    },
+    "SDU_11|primary": {
+      "n_train": 77,
+      "n_test": 34,
+      "last_train_cycle": 381,
+      "first_test_cycle": 386,
+      "last_soh": 93.34550000000002
+    },
+    "SDU_11|second_life": {
+      "n_train": 44,
+      "n_test": 19,
+      "last_train_cycle": 216,
+      "first_test_cycle": 221,
+      "last_soh": 57.18079166666666
+    },
+    "SDU_12|primary": {
+      "n_train": 68,
+      "n_test": 30,
+      "last_train_cycle": 336,
+      "first_test_cycle": 341,
+      "last_soh": 93.67475
+    },
+    "SDU_12|second_life": {
+      "n_train": 37,
+      "n_test": 17,
+      "last_train_cycle": 181,
+      "first_test_cycle": 186,
+      "last_soh": 62.503625
+    },
+    "SDU_13|primary": {
+      "n_train": 73,
+      "n_test": 32,
+      "last_train_cycle": 361,
+      "first_test_cycle": 366,
+      "last_soh": 92.29708333333332
+    },
+    "SDU_13|second_life": {
+      "n_train": 50,
+      "n_test": 22,
+      "last_train_cycle": 246,
+      "first_test_cycle": 251,
+      "last_soh": 61.20195833333334
+    },
+    "SDU_14|primary": {
+      "n_train": 72,
+      "n_test": 31,
+      "last_train_cycle": 356,
+      "first_test_cycle": 361,
+      "last_soh": 91.48620833333334
+    },
+    "SDU_14|second_life": {
+      "n_train": 57,
+      "n_test": 25,
+      "last_train_cycle": 281,
+      "first_test_cycle": 286,
+      "last_soh": 61.86591666666668
+    },
+    "SDU_15|primary": {
+      "n_train": 82,
+      "n_test": 36,
+      "last_train_cycle": 406,
+      "first_test_cycle": 411,
+      "last_soh": 92.36266666666668
+    },
+    "SDU_15|second_life": {
+      "n_train": 72,
+      "n_test": 32,
+      "last_train_cycle": 356,
+      "first_test_cycle": 361,
+      "last_soh": 60.91066666666667
+    },
+    "SDU_16|primary": {
+      "n_train": 82,
+      "n_test": 36,
+      "last_train_cycle": 406,
+      "first_test_cycle": 411,
+      "last_soh": 92.70779166666668
+    },
+    "SDU_16|second_life": {
+      "n_train": 65,
+      "n_test": 28,
+      "last_train_cycle": 321,
+      "first_test_cycle": 326,
+      "last_soh": 58.190916666666666
+    },
+    "SDU_17|primary": {
+      "n_train": 59,
+      "n_test": 26,
+      "last_train_cycle": 291,
+      "first_test_cycle": 296,
+      "last_soh": 95.91504166666668
+    },
+    "SDU_17|second_life": {
+      "n_train": 35,
+      "n_test": 16,
+      "last_train_cycle": 171,
+      "first_test_cycle": 176,
+      "last_soh": 71.19104166666666
+    },
+    "SDU_18|primary": {
+      "n_train": 62,
+      "n_test": 27,
+      "last_train_cycle": 306,
+      "first_test_cycle": 311,
+      "last_soh": 94.819375
+    },
+    "SDU_18|second_life": {
+      "n_train": 30,
+      "n_test": 13,
+      "last_train_cycle": 146,
+      "first_test_cycle": 151,
+      "last_soh": 68.89033333333333
+    },
+    "SDU_19|primary": {
+      "n_train": 58,
+      "n_test": 26,
+      "last_train_cycle": 286,
+      "first_test_cycle": 291,
+      "last_soh": 96.12745833333337
+    },
+    "SDU_19|second_life": {
+      "n_train": 29,
+      "n_test": 13,
+      "last_train_cycle": 141,
+      "first_test_cycle": 146,
+      "last_soh": 76.216375
+    },
+    "SDU_20|primary": {
+      "n_train": 58,
+      "n_test": 26,
+      "last_train_cycle": 286,
+      "first_test_cycle": 291,
+      "last_soh": 95.67583333333334
+    },
+    "SDU_20|second_life": {
+      "n_train": 37,
+      "n_test": 16,
+      "last_train_cycle": 181,
+      "first_test_cycle": 186,
+      "last_soh": 65.66641666666666
+    },
+    "SDU_21|primary": {
+      "n_train": 68,
+      "n_test": 30,
+      "last_train_cycle": 336,
+      "first_test_cycle": 341,
+      "last_soh": 91.47670833333336
+    },
+    "SDU_21|second_life": {
+      "n_train": 36,
+      "n_test": 16,
+      "last_train_cycle": 176,
+      "first_test_cycle": 181,
+      "last_soh": 59.41704166666667
+    },
+    "SDU_22|primary": {
+      "n_train": 69,
+      "n_test": 30,
+      "last_train_cycle": 341,
+      "first_test_cycle": 346,
+      "last_soh": 95.03533333333336
+    },
+    "SDU_22|second_life": {
+      "n_train": 40,
+      "n_test": 18,
+      "last_train_cycle": 196,
+      "first_test_cycle": 201,
+      "last_soh": 67.82900000000001
+    },
+    "SDU_23|primary": {
+      "n_train": 68,
+      "n_test": 30,
+      "last_train_cycle": 336,
+      "first_test_cycle": 341,
+      "last_soh": 89.54291666666668
+    },
+    "SDU_23|second_life": {
+      "n_train": 46,
+      "n_test": 20,
+      "last_train_cycle": 226,
+      "first_test_cycle": 231,
+      "last_soh": 63.48141666666667
+    },
+    "SDU_24|primary": {
+      "n_train": 62,
+      "n_test": 27,
+      "last_train_cycle": 306,
+      "first_test_cycle": 311,
+      "last_soh": 88.68716666666667
+    },
+    "SDU_24|second_life": {
+      "n_train": 33,
+      "n_test": 15,
+      "last_train_cycle": 161,
+      "first_test_cycle": 166,
+      "last_soh": 62.89666666666667
+    },
+    "SDU_25|primary": {
+      "n_train": 62,
+      "n_test": 27,
+      "last_train_cycle": 306,
+      "first_test_cycle": 311,
+      "last_soh": 88.17066666666668
+    },
+    "SDU_25|second_life": {
+      "n_train": 40,
+      "n_test": 18,
+      "last_train_cycle": 196,
+      "first_test_cycle": 201,
+      "last_soh": 63.93370833333333
+    },
+    "SDU_26|primary": {
+      "n_train": 77,
+      "n_test": 33,
+      "last_train_cycle": 381,
+      "first_test_cycle": 386,
+      "last_soh": 90.12604166666668
+    },
+    "SDU_26|second_life": {
+      "n_train": 49,
+      "n_test": 22,
+      "last_train_cycle": 241,
+      "first_test_cycle": 246,
+      "last_soh": 62.53241666666667
+    },
+    "SDU_27|primary": {
+      "n_train": 69,
+      "n_test": 30,
+      "last_train_cycle": 341,
+      "first_test_cycle": 346,
+      "last_soh": 88.29525
+    },
+    "SDU_27|second_life": {
+      "n_train": 60,
+      "n_test": 26,
+      "last_train_cycle": 296,
+      "first_test_cycle": 301,
+      "last_soh": 63.522958333333335
+    },
+    "SDU_28|primary": {
+      "n_train": 65,
+      "n_test": 28,
+      "last_train_cycle": 321,
+      "first_test_cycle": 326,
+      "last_soh": 88.90345833333335
+    },
+    "SDU_28|second_life": {
+      "n_train": 48,
+      "n_test": 21,
+      "last_train_cycle": 236,
+      "first_test_cycle": 241,
+      "last_soh": 63.68329166666668
+    },
+    "SDU_29|primary": {
+      "n_train": 69,
+      "n_test": 30,
+      "last_train_cycle": 341,
+      "first_test_cycle": 346,
+      "last_soh": 88.58666666666667
+    },
+    "SDU_29|second_life": {
+      "n_train": 49,
+      "n_test": 21,
+      "last_train_cycle": 241,
+      "first_test_cycle": 246,
+      "last_soh": 61.313375
+    },
+    "SDU_30|primary": {
+      "n_train": 62,
+      "n_test": 28,
+      "last_train_cycle": 306,
+      "first_test_cycle": 311,
+      "last_soh": 88.90870833333334
+    },
+    "SDU_30|second_life": {
+      "n_train": 58,
+      "n_test": 26,
+      "last_train_cycle": 286,
+      "first_test_cycle": 291,
+      "last_soh": 65.93929166666666
+    },
+    "SDU_31|primary": {
+      "n_train": 25,
+      "n_test": 12,
+      "last_train_cycle": 121,
+      "first_test_cycle": 126,
+      "last_soh": 89.178625
+    },
+    "SDU_31|second_life": {
+      "n_train": 40,
+      "n_test": 18,
+      "last_train_cycle": 196,
+      "first_test_cycle": 201,
+      "last_soh": 62.24083333333334
+    },
+    "SDU_32|primary": {
+      "n_train": 18,
+      "n_test": 8,
+      "last_train_cycle": 86,
+      "first_test_cycle": 91,
+      "last_soh": 90.18104166666669
+    },
+    "SDU_32|second_life": {
+      "n_train": 61,
+      "n_test": 27,
+      "last_train_cycle": 301,
+      "first_test_cycle": 306,
+      "last_soh": 60.53295833333333
+    },
+    "SDU_33|primary": {
+      "n_train": 28,
+      "n_test": 12,
+      "last_train_cycle": 136,
+      "first_test_cycle": 141,
+      "last_soh": 87.23375
+    },
+    "SDU_33|second_life": {
+      "n_train": 71,
+      "n_test": 31,
+      "last_train_cycle": 351,
+      "first_test_cycle": 356,
+      "last_soh": 63.994708333333335
+    },
+    "SDU_34|primary": {
+      "n_train": 23,
+      "n_test": 11,
+      "last_train_cycle": 111,
+      "first_test_cycle": 116,
+      "last_soh": 88.55708333333334
+    },
+    "SDU_34|second_life": {
+      "n_train": 42,
+      "n_test": 18,
+      "last_train_cycle": 206,
+      "first_test_cycle": 211,
+      "last_soh": 61.99154166666667
+    },
+    "SDU_35|primary": {
+      "n_train": 22,
+      "n_test": 10,
+      "last_train_cycle": 106,
+      "first_test_cycle": 111,
+      "last_soh": 87.17416666666666
+    },
+    "SDU_35|second_life": {
+      "n_train": 36,
+      "n_test": 16,
+      "last_train_cycle": 176,
+      "first_test_cycle": 181,
+      "last_soh": 61.289125
+    },
+    "SDU_36|primary": {
+      "n_train": 20,
+      "n_test": 9,
+      "last_train_cycle": 96,
+      "first_test_cycle": 101,
+      "last_soh": 87.81745833333335
+    },
+    "SDU_36|second_life": {
+      "n_train": 35,
+      "n_test": 16,
+      "last_train_cycle": 171,
+      "first_test_cycle": 176,
+      "last_soh": 61.13691666666667
+    },
+    "SDU_37|primary": {
+      "n_train": 21,
+      "n_test": 10,
+      "last_train_cycle": 101,
+      "first_test_cycle": 106,
+      "last_soh": 87.94145833333333
+    },
+    "SDU_37|second_life": {
+      "n_train": 35,
+      "n_test": 15,
+      "last_train_cycle": 171,
+      "first_test_cycle": 176,
+      "last_soh": 59.9945
+    },
+    "SDU_38|primary": {
+      "n_train": 16,
+      "n_test": 7,
+      "last_train_cycle": 76,
+      "first_test_cycle": 81,
+      "last_soh": 87.91195833333335
+    },
+    "SDU_38|second_life": {
+      "n_train": 47,
+      "n_test": 21,
+      "last_train_cycle": 231,
+      "first_test_cycle": 236,
+      "last_soh": 61.37404166666667
+    },
+    "SDU_39|primary": {
+      "n_train": 11,
+      "n_test": 5,
+      "last_train_cycle": 51,
+      "first_test_cycle": 56,
+      "last_soh": 86.321
+    },
+    "SDU_39|second_life": {
+      "n_train": 54,
+      "n_test": 24,
+      "last_train_cycle": 266,
+      "first_test_cycle": 271,
+      "last_soh": 66.24283333333334
+    },
+    "SDU_40|primary": {
+      "n_train": 10,
+      "n_test": 5,
+      "last_train_cycle": 46,
+      "first_test_cycle": 51,
+      "last_soh": 87.969875
+    },
+    "SDU_40|second_life": {
+      "n_train": 65,
+      "n_test": 28,
+      "last_train_cycle": 321,
+      "first_test_cycle": 326,
+      "last_soh": 61.36575
+    },
+    "SDU_41|primary": {
+      "n_train": 13,
+      "n_test": 6,
+      "last_train_cycle": 61,
+      "first_test_cycle": 66,
+      "last_soh": 87.53183333333332
+    },
+    "SDU_41|second_life": {
+      "n_train": 65,
+      "n_test": 29,
+      "last_train_cycle": 326,
+      "first_test_cycle": 331,
+      "last_soh": 62.46916666666667
+    },
+    "SDU_42|primary": {
+      "n_train": 11,
+      "n_test": 5,
+      "last_train_cycle": 51,
+      "first_test_cycle": 56,
+      "last_soh": 87.71045833333334
+    },
+    "SDU_42|second_life": {
+      "n_train": 40,
+      "n_test": 18,
+      "last_train_cycle": 196,
+      "first_test_cycle": 201,
+      "last_soh": 63.07804166666667
+    },
+    "SDU_43|primary": {
+      "n_train": 11,
+      "n_test": 5,
+      "last_train_cycle": 51,
+      "first_test_cycle": 56,
+      "last_soh": 87.08691666666667
+    },
+    "SDU_43|second_life": {
+      "n_train": 43,
+      "n_test": 19,
+      "last_train_cycle": 216,
+      "first_test_cycle": 221,
+      "last_soh": 61.40420833333333
+    },
+    "SDU_44|primary": {
+      "n_train": 9,
+      "n_test": 5,
+      "last_train_cycle": 41,
+      "first_test_cycle": 46,
+      "last_soh": 88.42625000000001
+    },
+    "SDU_44|second_life": {
+      "n_train": 59,
+      "n_test": 26,
+      "last_train_cycle": 291,
+      "first_test_cycle": 296,
+      "last_soh": 61.04091666666667
+    },
+    "SDU_45|primary": {
+      "n_train": 157,
+      "n_test": 68,
+      "last_train_cycle": 781,
+      "first_test_cycle": 786,
+      "last_soh": 87.56341666666667
+    },
+    "SDU_45|second_life": {
+      "n_train": 45,
+      "n_test": 20,
+      "last_train_cycle": 221,
+      "first_test_cycle": 226,
+      "last_soh": 60.759791666666665
+    },
+    "SDU_46|primary": {
+      "n_train": 150,
+      "n_test": 65,
+      "last_train_cycle": 751,
+      "first_test_cycle": 756,
+      "last_soh": 87.347375
+    },
+    "SDU_46|second_life": {
+      "n_train": 48,
+      "n_test": 21,
+      "last_train_cycle": 236,
+      "first_test_cycle": 241,
+      "last_soh": 59.858625
+    },
+    "SDU_47|primary": {
+      "n_train": 157,
+      "n_test": 68,
+      "last_train_cycle": 781,
+      "first_test_cycle": 786,
+      "last_soh": 88.36
+    },
+    "SDU_47|second_life": {
+      "n_train": 54,
+      "n_test": 24,
+      "last_train_cycle": 266,
+      "first_test_cycle": 271,
+      "last_soh": 62.43241666666667
+    },
+    "SDU_48|primary": {
+      "n_train": 148,
+      "n_test": 64,
+      "last_train_cycle": 741,
+      "first_test_cycle": 746,
+      "last_soh": 87.73595833333333
+    },
+    "SDU_48|second_life": {
+      "n_train": 52,
+      "n_test": 23,
+      "last_train_cycle": 256,
+      "first_test_cycle": 261,
+      "last_soh": 62.727583333333335
+    },
+    "SDU_49|primary": {
+      "n_train": 189,
+      "n_test": 82,
+      "last_train_cycle": 941,
+      "first_test_cycle": 946,
+      "last_soh": 87.17254166666666
+    },
+    "SDU_49|second_life": {
+      "n_train": 224,
+      "n_test": 96,
+      "last_train_cycle": 1116,
+      "first_test_cycle": 1121,
+      "last_soh": 58.283625
+    },
+    "SDU_50|primary": {
+      "n_train": 198,
+      "n_test": 86,
+      "last_train_cycle": 986,
+      "first_test_cycle": 991,
+      "last_soh": 86.08783333333334
+    },
+    "SDU_50|second_life": {
+      "n_train": 273,
+      "n_test": 117,
+      "last_train_cycle": 1361,
+      "first_test_cycle": 1366,
+      "last_soh": 57.62304166666667
+    },
+    "SDU_51|primary": {
+      "n_train": 200,
+      "n_test": 87,
+      "last_train_cycle": 1001,
+      "first_test_cycle": 1006,
+      "last_soh": 87.24316666666667
+    },
+    "SDU_51|second_life": {
+      "n_train": 251,
+      "n_test": 108,
+      "last_train_cycle": 1251,
+      "first_test_cycle": 1256,
+      "last_soh": 59.29766666666667
+    },
+    "SDU_52|primary": {
+      "n_train": 175,
+      "n_test": 76,
+      "last_train_cycle": 871,
+      "first_test_cycle": 876,
+      "last_soh": 87.29333333333334
+    },
+    "SDU_52|second_life": {
+      "n_train": 184,
+      "n_test": 80,
+      "last_train_cycle": 916,
+      "first_test_cycle": 921,
+      "last_soh": 59.083458333333326
+    },
+    "SDU_53|primary": {
+      "n_train": 18,
+      "n_test": 8,
+      "last_train_cycle": 86,
+      "first_test_cycle": 91,
+      "last_soh": 87.72229166666668
+    },
+    "SDU_53|second_life": {
+      "n_train": 54,
+      "n_test": 24,
+      "last_train_cycle": 266,
+      "first_test_cycle": 271,
+      "last_soh": 61.55433333333333
+    },
+    "SDU_54|primary": {
+      "n_train": 28,
+      "n_test": 12,
+      "last_train_cycle": 136,
+      "first_test_cycle": 141,
+      "last_soh": 87.38716666666667
+    },
+    "SDU_54|second_life": {
+      "n_train": 72,
+      "n_test": 31,
+      "last_train_cycle": 356,
+      "first_test_cycle": 361,
+      "last_soh": 61.35279166666668
+    },
+    "SDU_55|primary": {
+      "n_train": 18,
+      "n_test": 9,
+      "last_train_cycle": 86,
+      "first_test_cycle": 91,
+      "last_soh": 89.40641666666667
+    },
+    "SDU_55|second_life": {
+      "n_train": 46,
+      "n_test": 21,
+      "last_train_cycle": 226,
+      "first_test_cycle": 231,
+      "last_soh": 62.672375
+    },
+    "SDU_56|primary": {
+      "n_train": 21,
+      "n_test": 9,
+      "last_train_cycle": 101,
+      "first_test_cycle": 106,
+      "last_soh": 88.31475
+    },
+    "SDU_56|second_life": {
+      "n_train": 55,
+      "n_test": 24,
+      "last_train_cycle": 271,
+      "first_test_cycle": 276,
+      "last_soh": 59.477291666666666
+    },
+    "SDU_57|primary": {
+      "n_train": 13,
+      "n_test": 6,
+      "last_train_cycle": 61,
+      "first_test_cycle": 66,
+      "last_soh": 90.29208333333332
+    },
+    "SDU_57|second_life": {
+      "n_train": 62,
+      "n_test": 27,
+      "last_train_cycle": 306,
+      "first_test_cycle": 311,
+      "last_soh": 61.10425000000001
+    },
+    "SDU_58|primary": {
+      "n_train": 11,
+      "n_test": 5,
+      "last_train_cycle": 51,
+      "first_test_cycle": 56,
+      "last_soh": 89.1245
+    },
+    "SDU_58|second_life": {
+      "n_train": 35,
+      "n_test": 16,
+      "last_train_cycle": 171,
+      "first_test_cycle": 176,
+      "last_soh": 62.346250000000005
+    },
+    "SDU_59|primary": {
+      "n_train": 13,
+      "n_test": 6,
+      "last_train_cycle": 61,
+      "first_test_cycle": 66,
+      "last_soh": 88.44595833333334
+    },
+    "SDU_59|second_life": {
+      "n_train": 38,
+      "n_test": 17,
+      "last_train_cycle": 186,
+      "first_test_cycle": 191,
+      "last_soh": 60.76983333333335
+    },
+    "SDU_60|primary": {
+      "n_train": 12,
+      "n_test": 6,
+      "last_train_cycle": 56,
+      "first_test_cycle": 61,
+      "last_soh": 89.28345833333333
+    },
+    "SDU_60|second_life": {
+      "n_train": 36,
+      "n_test": 16,
+      "last_train_cycle": 176,
+      "first_test_cycle": 181,
+      "last_soh": 63.20870833333334
+    },
+    "SDU_61|primary": {
+      "n_train": 56,
+      "n_test": 24,
+      "last_train_cycle": 276,
+      "first_test_cycle": 281,
+      "last_soh": 91.63620833333334
+    },
+    "SDU_61|second_life": {
+      "n_train": 44,
+      "n_test": 20,
+      "last_train_cycle": 216,
+      "first_test_cycle": 221,
+      "last_soh": 59.67670833333334
+    },
+    "SDU_62|primary": {
+      "n_train": 61,
+      "n_test": 27,
+      "last_train_cycle": 301,
+      "first_test_cycle": 306,
+      "last_soh": 89.62004166666667
+    },
+    "SDU_62|second_life": {
+      "n_train": 79,
+      "n_test": 34,
+      "last_train_cycle": 391,
+      "first_test_cycle": 396,
+      "last_soh": 62.03120833333335
+    },
+    "SDU_63|primary": {
+      "n_train": 51,
+      "n_test": 23,
+      "last_train_cycle": 251,
+      "first_test_cycle": 256,
+      "last_soh": 90.31904166666668
+    },
+    "SDU_63|second_life": {
+      "n_train": 60,
+      "n_test": 26,
+      "last_train_cycle": 296,
+      "first_test_cycle": 301,
+      "last_soh": 61.19308333333333
+    },
+    "SDU_64|primary": {
+      "n_train": 58,
+      "n_test": 26,
+      "last_train_cycle": 286,
+      "first_test_cycle": 291,
+      "last_soh": 90.56904166666668
+    },
+    "SDU_64|second_life": {
+      "n_train": 67,
+      "n_test": 29,
+      "last_train_cycle": 331,
+      "first_test_cycle": 336,
+      "last_soh": 61.74516666666668
+    },
+    "SDU_65|primary": {
+      "n_train": 33,
+      "n_test": 15,
+      "last_train_cycle": 161,
+      "first_test_cycle": 166,
+      "last_soh": 91.51829166666666
+    },
+    "SDU_65|second_life": {
+      "n_train": 42,
+      "n_test": 18,
+      "last_train_cycle": 211,
+      "first_test_cycle": 216,
+      "last_soh": 65.41108333333334
+    },
+    "SDU_66|primary": {
+      "n_train": 39,
+      "n_test": 17,
+      "last_train_cycle": 191,
+      "first_test_cycle": 196,
+      "last_soh": 89.82204166666668
+    },
+    "SDU_66|second_life": {
+      "n_train": 67,
+      "n_test": 30,
+      "last_train_cycle": 331,
+      "first_test_cycle": 336,
+      "last_soh": 61.61391666666667
+    },
+    "SDU_67|primary": {
+      "n_train": 26,
+      "n_test": 12,
+      "last_train_cycle": 126,
+      "first_test_cycle": 131,
+      "last_soh": 90.03275
+    },
+    "SDU_67|second_life": {
+      "n_train": 36,
+      "n_test": 16,
+      "last_train_cycle": 176,
+      "first_test_cycle": 181,
+      "last_soh": 63.207
+    },
+    "SDU_68|primary": {
+      "n_train": 28,
+      "n_test": 12,
+      "last_train_cycle": 136,
+      "first_test_cycle": 141,
+      "last_soh": 88.62691666666666
+    },
+    "SDU_68|second_life": {
+      "n_train": 42,
+      "n_test": 18,
+      "last_train_cycle": 206,
+      "first_test_cycle": 211,
+      "last_soh": 63.43833333333334
+    },
+    "SDU_69|primary": {
+      "n_train": 11,
+      "n_test": 5,
+      "last_train_cycle": 51,
+      "first_test_cycle": 56,
+      "last_soh": 88.09745833333335
+    },
+    "SDU_69|second_life": {
+      "n_train": 89,
+      "n_test": 39,
+      "last_train_cycle": 441,
+      "first_test_cycle": 446,
+      "last_soh": 58.094750000000005
+    },
+    "SDU_70|primary": {
+      "n_train": 16,
+      "n_test": 7,
+      "last_train_cycle": 76,
+      "first_test_cycle": 81,
+      "last_soh": 89.25616666666669
+    },
+    "SDU_70|second_life": {
+      "n_train": 93,
+      "n_test": 41,
+      "last_train_cycle": 461,
+      "first_test_cycle": 466,
+      "last_soh": 62.68758333333334
+    },
+    "SDU_71|primary": {
+      "n_train": 12,
+      "n_test": 6,
+      "last_train_cycle": 56,
+      "first_test_cycle": 61,
+      "last_soh": 88.92120833333334
+    },
+    "SDU_71|second_life": {
+      "n_train": 93,
+      "n_test": 41,
+      "last_train_cycle": 461,
+      "first_test_cycle": 466,
+      "last_soh": 57.841375000000006
+    },
+    "SDU_72|primary": {
+      "n_train": 12,
+      "n_test": 6,
+      "last_train_cycle": 56,
+      "first_test_cycle": 61,
+      "last_soh": 89.319625
+    },
+    "SDU_72|second_life": {
+      "n_train": 74,
+      "n_test": 33,
+      "last_train_cycle": 366,
+      "first_test_cycle": 371,
+      "last_soh": 58.73129166666667
+    },
+    "SDU_73|primary": {
+      "n_train": 826,
+      "n_test": 355,
+      "last_train_cycle": 826,
+      "first_test_cycle": 827,
+      "last_soh": 92.33383333333332
+    },
+    "SDU_73|second_life": {
+      "n_train": 75,
+      "n_test": 33,
+      "last_train_cycle": 371,
+      "first_test_cycle": 376,
+      "last_soh": 59.153041666666674
+    },
+    "SDU_74|primary": {
+      "n_train": 924,
+      "n_test": 397,
+      "last_train_cycle": 924,
+      "first_test_cycle": 925,
+      "last_soh": 91.81804166666667
+    },
+    "SDU_74|second_life": {
+      "n_train": 91,
+      "n_test": 39,
+      "last_train_cycle": 456,
+      "first_test_cycle": 461,
+      "last_soh": 59.668625000000006
+    },
+    "SDU_75|primary": {
+      "n_train": 669,
+      "n_test": 287,
+      "last_train_cycle": 669,
+      "first_test_cycle": 670,
+      "last_soh": 90.967625
+    },
+    "SDU_75|second_life": {
+      "n_train": 121,
+      "n_test": 53,
+      "last_train_cycle": 606,
+      "first_test_cycle": 611,
+      "last_soh": 62.10395833333333
+    },
+    "SDU_76|primary": {
+      "n_train": 158,
+      "n_test": 68,
+      "last_train_cycle": 786,
+      "first_test_cycle": 791,
+      "last_soh": 92.559625
+    },
+    "SDU_76|second_life": {
+      "n_train": 85,
+      "n_test": 37,
+      "last_train_cycle": 421,
+      "first_test_cycle": 426,
+      "last_soh": 62.61683333333333
+    },
+    "SDU_77|primary": {
+      "n_train": 150,
+      "n_test": 65,
+      "last_train_cycle": 746,
+      "first_test_cycle": 751,
+      "last_soh": 92.27495833333334
+    },
+    "SDU_77|second_life": {
+      "n_train": 82,
+      "n_test": 36,
+      "last_train_cycle": 406,
+      "first_test_cycle": 411,
+      "last_soh": 63.894625000000005
+    },
+    "SDU_78|primary": {
+      "n_train": 143,
+      "n_test": 62,
+      "last_train_cycle": 711,
+      "first_test_cycle": 716,
+      "last_soh": 92.59833333333334
+    },
+    "SDU_78|second_life": {
+      "n_train": 63,
+      "n_test": 28,
+      "last_train_cycle": 311,
+      "first_test_cycle": 316,
+      "last_soh": 65.14445833333333
+    },
+    "SDU_79|primary": {
+      "n_train": 151,
+      "n_test": 66,
+      "last_train_cycle": 751,
+      "first_test_cycle": 756,
+      "last_soh": 92.463125
+    },
+    "SDU_79|second_life": {
+      "n_train": 84,
+      "n_test": 37,
+      "last_train_cycle": 416,
+      "first_test_cycle": 421,
+      "last_soh": 62.070625
+    },
+    "SDU_80|primary": {
+      "n_train": 149,
+      "n_test": 65,
+      "last_train_cycle": 741,
+      "first_test_cycle": 746,
+      "last_soh": 92.53475
+    },
+    "SDU_80|second_life": {
+      "n_train": 67,
+      "n_test": 29,
+      "last_train_cycle": 331,
+      "first_test_cycle": 336,
+      "last_soh": 65.03408333333334
+    },
+    "SDU_81|primary": {
+      "n_train": 167,
+      "n_test": 72,
+      "last_train_cycle": 831,
+      "first_test_cycle": 836,
+      "last_soh": 91.78829166666668
+    },
+    "SDU_81|second_life": {
+      "n_train": 99,
+      "n_test": 43,
+      "last_train_cycle": 491,
+      "first_test_cycle": 496,
+      "last_soh": 60.83745833333334
+    },
+    "SDU_82|primary": {
+      "n_train": 161,
+      "n_test": 69,
+      "last_train_cycle": 801,
+      "first_test_cycle": 806,
+      "last_soh": 92.37291666666668
+    },
+    "SDU_82|second_life": {
+      "n_train": 88,
+      "n_test": 38,
+      "last_train_cycle": 436,
+      "first_test_cycle": 441,
+      "last_soh": 62.138958333333335
+    },
+    "SDU_83|primary": {
+      "n_train": 168,
+      "n_test": 73,
+      "last_train_cycle": 836,
+      "first_test_cycle": 841,
+      "last_soh": 90.662375
+    },
+    "SDU_83|second_life": {
+      "n_train": 77,
+      "n_test": 34,
+      "last_train_cycle": 381,
+      "first_test_cycle": 386,
+      "last_soh": 60.57279166666667
+    },
+    "SDU_84|primary": {
+      "n_train": 159,
+      "n_test": 69,
+      "last_train_cycle": 791,
+      "first_test_cycle": 796,
+      "last_soh": 90.35470833333332
+    },
+    "SDU_84|second_life": {
+      "n_train": 72,
+      "n_test": 31,
+      "last_train_cycle": 356,
+      "first_test_cycle": 361,
+      "last_soh": 64.53416666666666
+    },
+    "SDU_85|primary": {
+      "n_train": 169,
+      "n_test": 73,
+      "last_train_cycle": 841,
+      "first_test_cycle": 846,
+      "last_soh": 91.05625
+    },
+    "SDU_85|second_life": {
+      "n_train": 103,
+      "n_test": 45,
+      "last_train_cycle": 511,
+      "first_test_cycle": 516,
+      "last_soh": 61.90658333333333
+    },
+    "SDU_86|primary": {
+      "n_train": 146,
+      "n_test": 63,
+      "last_train_cycle": 726,
+      "first_test_cycle": 731,
+      "last_soh": 91.10366666666668
+    },
+    "SDU_86|second_life": {
+      "n_train": 70,
+      "n_test": 31,
+      "last_train_cycle": 346,
+      "first_test_cycle": 351,
+      "last_soh": 62.48579166666667
+    }
+  }
+}

@@ -1,142 +1,165 @@
-"""Đọc MATLAB bằng scipy, xuất CSV sạch và đặc trưng cho bài toán SOH.
+"""Chiếu dữ liệu SDU sang Parquet theo pin/giai đoạn, giữ ZIP nguồn nguyên vẹn."""
 
-Chạy: python scripts/prepare_data.py
-Giữ dữ liệu đo thật. Không nội suy, không nhân bản, không cắt SOH về 100%.
-"""
-import hashlib
-import json
-import sys
+import hashlib, json, sys, shutil
 from pathlib import Path
-
 import numpy as np
 import pandas as pd
-from scipy.io import loadmat
+import pyarrow as pa
+import pyarrow.parquet as pq
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from battery_soh.features import extract_window, validate_target
-
-SIGNALS = ["time", "terminal_voltage", "terminal_current", "temperature"]
-FULL_COLUMNS = ["battery", "operation_type", "operation_index", "cycle",
-                *SIGNALS, "ambient_temperature"]
-
-
-def read_battery(path):
-    """Một operation là một lần sạc, xả hoặc đo trở kháng trong MATLAB."""
-    battery = path.stem
-    operations = loadmat(path, simplify_cells=True)[battery]["cycle"]
-    frames = []
-    counters = {"charge": 0, "discharge": 0}
-    for operation_number, operation in enumerate(operations, start=1):
-        kind = operation["type"]
-        if kind not in counters:
-            continue  # Trở kháng có cấu trúc khác, không ghép vào bảng tín hiệu.
-        counters[kind] += 1
-        signals = operation["data"]
-        frame = pd.DataFrame({
-            "time": signals["Time"],
-            "terminal_voltage": signals["Voltage_measured"],
-            "terminal_current": signals["Current_measured"],
-            "temperature": signals["Temperature_measured"],
-        })
-        frame["battery"] = battery
-        frame["operation_type"] = kind
-        frame["operation_index"] = operation_number
-        frame["cycle"] = counters[kind]
-        frame["ambient_temperature"] = float(operation["ambient_temperature"])
-        # Chỉ chu kỳ xả có nhãn dung lượng. Không gán nhãn tương lai cho sạc.
-        frame["capacity"] = float(signals["Capacity"]) if kind == "discharge" else np.nan
-        frame["SOH"] = frame["capacity"] / 2.0
-        frames.append(frame)
-    if not frames:
-        raise ValueError(f"{battery}: không có chu kỳ sạc/xả")
-    return pd.concat(frames, ignore_index=True)
-
-
-def clean_battery(frame):
-    """Xác minh tính nhất quán, chỉ loại dòng trùng toàn bộ nếu có."""
-    numeric = [*SIGNALS, "ambient_temperature"]
-    valid = np.isfinite(frame[numeric].to_numpy()).all(axis=1)
-    # Nguồn B0018 có hai bản ghi sạc thiếu cả ba tín hiệu đo.
-    # Loại bản ghi không sử dụng được, không nội suy để bù số lượng.
-    frame = frame.loc[valid].copy()
-    if (frame.time < 0).any():
-        raise ValueError("Có thời gian âm")
-    cleaned = frame.drop_duplicates().copy()
-    if cleaned.duplicated(["battery", "operation_index", "time"]).any():
-        raise ValueError("Một thời điểm trong cùng operation có tín hiệu xung đột")
-    return cleaned.sort_values(["battery", "operation_index", "time"]).reset_index(drop=True)
+from battery_soh.features import FEATURES, extract_window
 
 
 def main():
-    manifest = json.loads((ROOT / "data/manifest.json").read_text(encoding="utf-8"))
+    source = Path((ROOT / "data/source/location.txt").read_text().strip())
     folder = ROOT / "data/clean"
-    folder.mkdir(parents=True, exist_ok=True)
+    cells = folder / "cells"
+    cells.mkdir(parents=True, exist_ok=True)
     reports = ROOT / "reports"
     reports.mkdir(exist_ok=True)
-    discharge_frames, features, audit, excluded, removed = [], [], [], [], []
-    full_path = folder / "measurements_all.csv"
-    temporary = full_path.with_suffix(".tmp")
-    first_battery = True
-    for item in manifest["files"]:
-        if not item["name"].endswith(".mat"):
-            continue
-        path = ROOT / "data/mat" / item["name"]
-        if hashlib.sha256(path.read_bytes()).hexdigest() != item["sha256"]:
-            raise ValueError("Sai checksum: " + path.name)
-        original = read_battery(path)
-        valid = np.isfinite(original[[*SIGNALS, "ambient_temperature"]].to_numpy()).all(axis=1)
-        for record in original.loc[~valid, ["battery", "operation_type", "operation_index", "cycle", "time"]].to_dict("records"):
-            removed.append({**record, "reason": "Missing or non-finite measured signals"})
-        cleaned = clean_battery(original)
-        # Ghi từng pin để không phải giữ 2 triệu dòng trong RAM cùng lúc.
-        cleaned[FULL_COLUMNS].to_csv(temporary, mode="w" if first_battery else "a",
-                                    header=first_battery, index=False)
-        first_battery = False
-        discharge = cleaned[cleaned.operation_type == "discharge"].copy()
-        discharge_frames.append(discharge)
-        battery = path.stem
-        audit.append({"battery": battery, "rows_before": len(original), "all_rows": len(cleaned),
-            "charge_rows": int((cleaned.operation_type == "charge").sum()), "rows": len(discharge),
-            "invalid_rows_removed": int((~valid).sum()),
-            "duplicates_removed": int(valid.sum()) - len(cleaned),
-            "missing_values": int(cleaned[FULL_COLUMNS].isna().sum().sum()),
-            "charge_cycles": int(cleaned[cleaned.operation_type == "charge"].cycle.nunique()),
-            "cycles": discharge.cycle.nunique(), "min_soh_pct": discharge.SOH.min() * 100,
-            "max_soh_pct": discharge.SOH.max() * 100})
-        for cycle, group in discharge.groupby("cycle"):
-            target = validate_target(group)
-            try:
-                values = extract_window(group, cycle)
-                features.append({"battery": battery, "soh_pct": target, **values})
-            except ValueError as error:
-                excluded.append({"battery": battery, "cycle": int(cycle), "reason": str(error)})
-    if first_battery:
-        raise ValueError("Manifest không có file MATLAB")
-    temporary.replace(full_path)
-    data = pd.concat(discharge_frames, ignore_index=True)
-    data = data[[*FULL_COLUMNS, "capacity", "SOH"]]
-    feature_frame = pd.DataFrame(features)
-    data.to_csv(folder / "measurements.csv", index=False)
-    feature_frame.to_csv(folder / "cycle_features.csv", index=False)
-    feature_frame.to_csv(reports / "features.csv", index=False)
+    original = pd.read_csv(source / "cycle_features.csv")
+    original["battery"] = original.battery.map(lambda x: f"SDU_{int(x):02d}")
+    original.to_csv(folder / "cycle_features.csv", index=False)
+    original.to_csv(reports / "features.csv", index=False)
+    records = pd.read_csv(source / "source_preservation_audit.csv")
+    audit = []
+    samples = []
+    mismatches = 0
+    for n, row in enumerate(records.itertuples(), 1):
+        import gzip
+
+        with gzip.open(source / row.output, "rb") as f:
+            digest = hashlib.sha256()
+            for block in iter(lambda: f.read(1024 * 1024), b""):
+                digest.update(block)
+        if digest.hexdigest() != row.uncompressed_sha256:
+            raise ValueError("SHA-256 sai: " + row.output)
+        raw = pd.read_csv(source / row.output)
+        battery = f"SDU_{int(row.battery):02d}"
+        phase = row.phase
+        expected = original[
+            (original.battery == battery) & (original.phase == phase)
+        ].set_index("cycle")
+        raw = raw.rename(
+            columns={
+                "Cycle_Index": "cycle",
+                "Test_Time(s)": "time",
+                "Voltage(V)": "terminal_voltage",
+                "Current(A)": "terminal_current",
+                "Aux_Temperature_1(C)": "temperature",
+            }
+        )
+        data = raw[
+            ["cycle", "time", "terminal_voltage", "terminal_current", "temperature"]
+        ].copy()
+        data["battery"] = battery
+        data["phase"] = phase
+        data["phase_code"] = 0 if phase == "primary" else 1
+        data = data.sort_values(["cycle", "time"])
+        data["time"] -= data.groupby("cycle").time.transform("min")
+        data["capacity"] = data.cycle.map(expected.capacity_ah)
+        data["SOH"] = data.capacity / 2.4
+        path = cells / f"{phase}_{battery}.parquet"
+        with pq.ParquetWriter(
+            path,
+            pa.Table.from_pandas(data.iloc[:1], preserve_index=False).schema,
+            compression="zstd",
+        ) as writer:
+            for cycle, part in data.groupby("cycle", sort=True):
+                values = extract_window(part, int(cycle))
+                truth = expected.loc[cycle]
+                mismatches += int(
+                    not all(
+                        np.isclose(values[key], truth[key], atol=1e-10, rtol=1e-10)
+                        for key in FEATURES
+                        if key != "cycle"
+                    )
+                )
+                writer.write_table(pa.Table.from_pandas(part, preserve_index=False))
+                if battery == "SDU_01" and phase == "primary" and len(samples) < 3:
+                    samples.append(part.loc[part.time <= 120].copy())
+        audit.append(
+            dict(
+                battery=battery,
+                phase=phase,
+                rows_before=len(data),
+                all_rows=len(data),
+                cycles=data.cycle.nunique(),
+                missing_values=int(data.isna().sum().sum()),
+                nominal_capacity_ah=2.4,
+            )
+        )
+        print(f"SDU {n}/172: {battery} {phase}, {len(data):,} dòng", flush=True)
+    if mismatches:
+        raise ValueError("Đặc trưng không khớp bộ nguồn: " + str(mismatches))
+    pd.concat(samples).to_csv(folder / "sample_measurements.csv", index=False)
     pd.DataFrame(audit).to_csv(reports / "data_audit.csv", index=False)
-    pd.DataFrame(excluded, columns=["battery", "cycle", "reason"]).to_csv(reports / "excluded_cycles.csv", index=False)
-    pd.DataFrame(removed).to_csv(reports / "removed_measurements.csv", index=False)
-    summary = {"source": manifest["repository"], "commit": manifest["commit"],
-        "country": "United States (NASA); not Vietnam", "battery_count": data.battery.nunique(),
-        "all_measurement_rows": sum(row["all_rows"] for row in audit),
-        "charge_rows": sum(row["charge_rows"] for row in audit), "measurement_rows": len(data),
-        "discharge_cycles": int(data.groupby("battery").cycle.nunique().sum()),
-        "feature_rows": len(feature_frame), "excluded_cycles": len(excluded),
-        "missing_values": sum(row["missing_values"] for row in audit),
-        "duplicates_removed": sum(row["duplicates_removed"] for row in audit),
-        "invalid_rows_removed": sum(row["invalid_rows_removed"] for row in audit),
-        "nominal_capacity_ah": 2.0, "soh_above_100_cycle_count": int((feature_frame.soh_pct > 100).sum()),
-        "notes": "All signals: charge+discharge. SOH labels: discharge only. MAT mirror; publisher S3 bytes not verified."}
-    (reports / "dataset_summary.json").write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
-    print(pd.DataFrame(audit).to_string(index=False))
-    print(f"Đã xuất {summary['all_measurement_rows']:,} dòng sạc/xả; {len(feature_frame):,} mẫu SOH")
+    original[["battery", "phase", "cycle", "capacity_ah", "soh_pct"]].to_csv(
+        folder / "cycle_labels.csv", index=False
+    )
+    verification = json.loads((source / "verification/summary.json").read_text())
+    summary = dict(
+        dataset="SDU",
+        source="https://zenodo.org/records/14859405",
+        source_doi="10.5281/zenodo.14859405",
+        original_year=2025,
+        battery_count=86,
+        all_measurement_rows=sum(r["all_rows"] for r in audit),
+        measurement_rows=sum(r["all_rows"] for r in audit),
+        feature_rows=len(original),
+        discharge_cycles=len(original),
+        nominal_capacity_ah=2.4,
+        window_seconds=120,
+        features=FEATURES,
+        missing_values=0,
+        duplicates_removed=0,
+        invalid_rows_removed=0,
+        excluded_cycles=0,
+        source_parent_rows=30929675,
+        source_original_rows=145112317,
+        suspected_points=verification["retained_parent_spike_candidates"],
+        suspected_points_in_window=verification["spike_candidates_first120s"],
+        source_backward_steps=verification["backward_time_steps"],
+        phases={"primary": "Sử dụng ban đầu", "second_life": "Tái sử dụng"},
+        country="China; laboratory cells, not Vietnam vehicle packs",
+    )
+    if summary["all_measurement_rows"] != 10_000_000 or len(original) != 20823:
+        raise ValueError("Sai quy mô SDU")
+    (reports / "dataset_summary.json").write_text(
+        json.dumps(summary, ensure_ascii=False, indent=2) + "\n"
+    )
+    shutil.copy2(
+        source / "verification/retained_spike_candidates.csv",
+        reports / "suspected_measurements.csv",
+    )
+    source_text = (source / "NGUON_DU_LIEU.md").read_text()
+    (ROOT / "data/README.md").write_text(
+        "\n".join(
+            line
+            for line in source_text.splitlines()
+            if not line.startswith("Trong báo cáo có thể ghi:")
+        )
+        + "\n"
+    )
+    quality = (
+        (source / "KET_QUA_KIEM_TRA.md")
+        .read_text()
+        .replace(
+            "Các kiểm tra này chưa đánh giá chất lượng dự đoán; cần huấn luyện và kiểm thử bốn cấu hình đã chọn. Chưa cập nhật dataset này vào ứng dụng.",
+            "Kiểm tra dữ liệu tách biệt với đánh giá mô hình. Kết quả thực nghiệm nằm trong reports/ sau khi chạy các bước huấn luyện.",
+        )
+    )
+    (ROOT / "data/KIEM_TRA_DU_LIEU.md").write_text(quality)
+    (reports / "excluded_cycles.csv").write_text("battery,phase,cycle,reason\n")
+    (reports / "removed_measurements.csv").write_text("battery,phase,cycle,reason\n")
+    example = pd.concat(samples).query("cycle == 1")
+    (ROOT / "examples").mkdir(exist_ok=True)
+    for p in (ROOT / "examples").glob("*B0005*"):
+        p.unlink()
+    example.to_csv(ROOT / "examples/chu_ky_mau_SDU.csv", index=False)
+    print(json.dumps(summary, ensure_ascii=False), flush=True)
 
 
 if __name__ == "__main__":

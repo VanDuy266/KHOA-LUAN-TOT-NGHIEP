@@ -1,0 +1,23 @@
+{
+  "model": "GRU",
+  "torch": "2.14.1+cpu",
+  "seed": 42,
+  "epochs": 20,
+  "batch_size": 256,
+  "hidden_units": 24,
+  "sequence_length": 25,
+  "signals": [
+    "voltage",
+    "current",
+    "temperature"
+  ],
+  "context": [
+    "phase_code",
+    "cycle"
+  ],
+  "window_seconds": 120,
+  "learning_rate": 0.002,
+  "preprocessing": "25 equally spaced positions within first 120 seconds; linear interpolation with nearest endpoint at boundaries; training-fold scalers only; source CSV unchanged",
+  "comparison": "Same 5 physical-battery folds as tabular models. Different representation, not an isolated algorithm comparison.",
+  "timing": "fit_seconds includes fold preprocessing, training and inference; predict_seconds not measured separately"
+}

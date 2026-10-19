@@ -1,55 +1,14 @@
 {
   "status": "passed",
-  "measurement_rows": 2089048,
-  "minimum_rows": 2000000,
+  "dataset": "SDU",
+  "measurement_rows": 10000000,
+  "independent_batteries": 86,
+  "feature_samples": 20823,
   "missing_values": 0,
   "duplicate_measurement_keys": 0,
-  "source_arrays_match": true,
-  "relative_tolerance": 1e-12,
-  "feature_rows": 636,
-  "independent_batteries": 4,
-  "per_battery_operation": [
-    {
-      "battery": "B0005",
-      "type": "charge",
-      "rows": 541173
-    },
-    {
-      "battery": "B0005",
-      "type": "discharge",
-      "rows": 50285
-    },
-    {
-      "battery": "B0006",
-      "type": "charge",
-      "rows": 541173
-    },
-    {
-      "battery": "B0006",
-      "type": "discharge",
-      "rows": 50285
-    },
-    {
-      "battery": "B0007",
-      "type": "charge",
-      "rows": 541173
-    },
-    {
-      "battery": "B0007",
-      "type": "discharge",
-      "rows": 50285
-    },
-    {
-      "battery": "B0018",
-      "type": "charge",
-      "rows": 279808
-    },
-    {
-      "battery": "B0018",
-      "type": "discharge",
-      "rows": 34866
-    }
-  ],
-  "csv_sha256": "1b53735124203c2ef1290ba08a85254f6cc5b690a6344c9b2cbcac14faa1d5fa",
-  "note": "Over 2M measurements, not 2M independent SOH samples. MAT mirror, not publisher-byte-verified."
+  "nominal_capacity_ah": 2.4,
+  "source_doi": "10.5281/zenodo.14859405",
+  "suspected_points": 25,
+  "suspected_points_in_window": 0,
+  "scope": "All prepared Parquet batches checked; source-byte hashes and all window features checked during preparation. Suspect points retained."
 }

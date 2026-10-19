@@ -9,3 +9,5 @@ artifacts/
 *.log
 
 data/hust/
+
+data/source/

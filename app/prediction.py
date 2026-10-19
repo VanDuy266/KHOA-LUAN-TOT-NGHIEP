@@ -1,13 +1,18 @@
 """Kiểm tra CSV và dự đoán một chu kỳ; dùng chung với kiểm thử giao diện."""
+
 import io
 import pandas as pd
 from battery_soh.features import FEATURES, extract_window
 
 # Chấp nhận cả tên gốc và tên tiếng Việt trong các bảng tải từ ứng dụng.
 INPUT_NAMES = {
-    "Thời gian (giây)": "time", "Điện áp (V)": "terminal_voltage",
-    "Dòng điện (A)": "terminal_current", "Nhiệt độ (°C)": "temperature",
-    "Chu kỳ xả": "cycle", "Mã pin": "battery",
+    "Thời gian (giây)": "time",
+    "Điện áp (V)": "terminal_voltage",
+    "Dòng điện (A)": "terminal_current",
+    "Nhiệt độ (°C)": "temperature",
+    "Chu kỳ xả": "cycle",
+    "Mã pin": "battery",
+    "Giai đoạn (0/1)": "phase_code",
 }
 
 
@@ -31,11 +36,16 @@ def predict(frame, cycle, artifact):
         supplied = pd.to_numeric(frame.cycle, errors="raise")
         if not supplied.eq(cycle).all():
             raise ValueError("CSV phải có đúng một chu kỳ và khớp số chu kỳ bạn nhập.")
+    if artifact.get("dataset") != "SDU":
+        raise ValueError("Mô hình không khớp SDU")
     features = pd.DataFrame([extract_window(frame, cycle)])[FEATURES]
     outside = []
     for column in FEATURES:
         value = features[column].iloc[0]
-        if value < artifact["training_min"][column] or value > artifact["training_max"][column]:
+        if (
+            value < artifact["training_min"][column]
+            or value > artifact["training_max"][column]
+        ):
             outside.append(column)
     estimate = float(artifact["model"].predict(features)[0])
     return estimate, features, outside
@@ -53,17 +63,37 @@ def predict_batch(frame, artifact, limit=100):
         data["battery"] = "Không cung cấp"
     if data.battery.isna().any() or data.battery.astype(str).str.strip().eq("").any():
         raise ValueError("Mã pin không được để trống.")
-    groups = data.groupby(["battery", "cycle"], sort=False)
+    if "phase_code" not in data:
+        raise ValueError("CSV cần phase_code (0 hoặc 1)")
+    data["phase_code"] = pd.to_numeric(data.phase_code, errors="raise")
+    if not data.phase_code.isin([0, 1]).all():
+        raise ValueError("phase_code phải là 0 hoặc 1")
+    groups = data.groupby(["battery", "phase_code", "cycle"], sort=False)
     if groups.ngroups > limit:
         raise ValueError(f"Mỗi lần xử lý tối đa {limit} chu kỳ.")
     results = []
-    for (battery, cycle), group in groups:
-        row = {"battery": str(battery), "cycle": int(cycle), "measurement_count": len(group)}
+    for (battery, phase_code, cycle), group in groups:
+        row = {
+            "battery": str(battery),
+            "phase_code": int(phase_code),
+            "cycle": int(cycle),
+            "measurement_count": len(group),
+        }
         try:
             estimate, _, outside = predict(group, int(cycle), artifact)
-            row.update(predicted_soh_pct=estimate, status="Thành công", outside_count=len(outside), error="")
+            row.update(
+                predicted_soh_pct=estimate,
+                status="Thành công",
+                outside_count=len(outside),
+                error="",
+            )
         except (ValueError, TypeError, KeyError) as error:
-            row.update(predicted_soh_pct=float("nan"), status="Không hợp lệ", outside_count=0, error=str(error))
+            row.update(
+                predicted_soh_pct=float("nan"),
+                status="Không hợp lệ",
+                outside_count=0,
+                error=str(error),
+            )
         results.append(row)
     if not results:
         raise ValueError("CSV chưa có chu kỳ để xử lý.")

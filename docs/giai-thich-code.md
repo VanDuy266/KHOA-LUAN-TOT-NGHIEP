@@ -1,83 +1,83 @@
-# Giải thích code dành cho sinh viên
+# Cấu trúc mã nguồn và phương pháp xử lý
 
-## Chọn công nghệ
+Tôi chia chương trình thành bốn phần: dữ liệu, mô hình, đánh giá và giao diện. Mỗi phần có đầu vào và đầu ra riêng để kiểm tra được kết quả.
 
-Python 3.12 phù hợp vì có thư viện xử lý dữ liệu và học máy phổ biến. `pandas` thao tác bảng, `NumPy` tính thống kê, `scipy.io.loadmat` đọc MATLAB, `scikit-learn` cung cấp mô hình và chỉ số, `matplotlib` vẽ kết quả. `Streamlit` tạo giao diện bằng Python, không cần làm thêm backend Java hoặc frontend JavaScript. Word và PowerPoint chỉ là phần xuất tài liệu, không cần cài để chạy dự đoán.
+## 1. Dữ liệu và khóa chu kỳ
 
-Code cố ý dùng hàm và vòng lặp thông thường. Không có mô hình mạng sâu tự viết, hệ thống agent, API AI hay framework triển khai phân tán. Không cần tự viết Random Forest: phần sinh viên cần hiểu là dữ liệu, cách tạo đặc trưng, cách gọi fit/predict và cách đánh giá.
+Nguồn SDU công bố năm 2025 có 86 pin qua hai giai đoạn. Bản chọn dùng trong sản phẩm có 10 triệu dòng đo và 20.823 mẫu chu kỳ. Một mẫu được xác định bởi `battery + phase + cycle`; số chu kỳ có thể lặp khi đổi giai đoạn nên không bỏ cột `phase` khỏi khóa.
 
-## Luồng chạy
+`download_data.py` nhận gói ZIP tải về hoặc lấy nhánh dữ liệu riêng bằng Git. `prepare_data.py` kiểm SHA-256 của nội dung nguồn, đọc từng file, sắp bản sao theo chu kỳ/thời gian rồi tạo Parquet. CSV nguồn không bị ghi đè. Mỗi file Parquet ứng với một pin trong một giai đoạn; mỗi nhóm dòng Parquet ứng với một chu kỳ để đọc nhanh.
 
-`MATLAB → bảng sạc/xả → làm sạch → bảng đặc trưng từng chu kỳ → chia theo pin → fit trên train → predict trên test → tính sai số → fit lại mô hình demo → giao diện`.
+Bảng `cycle_features.csv` chứa cả thông tin kiểm tra và nhãn. Chỉ các tên trong hằng `FEATURES` được dùng làm đầu vào mô hình. Không đưa mọi cột của bảng vào `fit()`.
 
-### Bước 1 — download_data.py
+## 2. Hàm tính đặc trưng
 
-Đọc `data/manifest.json`; mỗi file có URL và SHA-256. Nếu đã có file, kiểm tra checksum; nếu chưa có, tải bằng HTTPS. Khi checksum sai thì dừng. Không tự đổi checksum để chấp nhận file khác.
+`src/battery_soh/features.py` có hai hàm chính:
 
-### Bước 2 — prepare_data.py
+| Hàm | Mục đích |
+| --- | --- |
+| `extract_window(frame, cycle)` | Kiểm tín hiệu, lấy 0–120 giây, chọn phần đang xả và tính 12 đặc trưng |
+| `validate_target(frame)` | Kiểm dung lượng/SOH hữu hạn, nhất quán và đúng mẫu số 2,4 Ah |
 
-`read_battery` lấy mảng operation trong MATLAB. Với từng operation, xem đó là sạc hay xả; tạo DataFrame từ time, điện áp, dòng và nhiệt độ. Mã pin, loại operation và chỉ số operation được thêm để giữ nguồn gốc từng dòng.
+`voltage_mean` là điện áp trung bình, `voltage_std` là độ lệch chuẩn. `voltage_slope` tính bằng tổng tích thời gian đã trừ trung bình với điện áp đã trừ trung bình, chia cho tổng bình phương thời gian đã trừ trung bình. Nhiệt độ cũng có độ dốc tương tự.
 
-`clean_battery` loại dòng thiếu/vô hạn, loại trùng hoàn toàn nếu có và từ chối khóa thời gian xung đột. Trong dữ liệu thật chỉ có 2 dòng sạc B0018 thiếu tín hiệu. Sau xử lý còn 2.089.048 dòng; không có dữ liệu được nội suy hoặc tạo ngẫu nhiên.
+`phase_code` bằng 0 cho sử dụng ban đầu và 1 cho tái sử dụng. `cycle` và `phase_code` là thông tin giả định có sẵn khi dự đoán. Dung lượng xả toàn chu kỳ chỉ tạo nhãn `soh_pct = capacity_ah / 2.4 * 100`.
 
-Bảng toàn bộ phép đo không có nhãn SOH. Bảng xả có dung lượng vì file MATLAB đo capacity ở cuối chu kỳ xả. Không dùng capacity của một chu kỳ xả để tự gán nhãn cho mọi dòng sạc trước nó.
+## 3. Huấn luyện mô hình bảng
 
-### Bước 3 — features.py
+`scripts/run_experiment.py` định nghĩa mốc trung bình, Ridge, Random Forest và LightGBM. Mỗi cấu hình được fit lại trong từng vòng GroupKFold. Bộ chuẩn hóa của Ridge nằm trong Pipeline nên chỉ học từ phần train.
 
-`validate_target` xác nhận nhãn của cùng một chu kỳ nhất quán và SOH = capacity / 2 Ah. `extract_window` chỉ lấy các mẫu trong 120 giây đầu và chọn mẫu đang xả có dòng < -0,1 A. Hàm tính mean, min, max, std và slope tùy nhóm tín hiệu.
+Ví dụ luồng chính:
 
-Một chu kỳ có nhiều dòng đo nhưng chỉ có một nhãn SOH. Vì vậy 185.721 dòng xả tạo 636 mẫu mô hình, không phải 185.721 mẫu độc lập. Bốn nhóm pin vẫn là bốn cell bất kể số thời điểm đo.
+```python
+for train, test in splits:
+    model.fit(data.iloc[train][columns], data.iloc[train].soh_pct)
+    predicted = model.predict(data.iloc[test][columns])
+```
 
-### Bước 4 — run_experiment.py
+`train` và `test` là vị trí mẫu; `columns` là đúng danh sách đầu vào. Nhóm chia tập là mã pin vật lý, không phải từng dòng cảm biến. Hai giai đoạn của pin kiểm thử không xuất hiện trong train.
 
-`models()` tạo các mô hình có sẵn từ scikit-learn. `LeaveOneGroupOut` chia theo cột battery. Ở mỗi vòng, code lấy các chỉ số train/test, gọi `model.fit(X_train, y_train)` và `model.predict(X_test)`, rồi tính MAE/RMSE/R².
+`save_models.py` học lại các mô hình bảng trên toàn bộ dữ liệu để bàn giao. Bản học lại không tạo chỉ số kiểm thử. Random Forest được ứng dụng sử dụng tại `artifacts/random_forest.joblib`.
 
-Không chuẩn hóa bằng toàn bộ dữ liệu rồi mới chia: StandardScaler nằm trong Pipeline nên fit cùng model trên train. RF và boosting không cần chuẩn hóa trong cấu hình này. Các tham số được giữ cố định, không thử nhiều giá trị rồi chọn theo test.
+## 4. GRU
 
-Sau đánh giá, RF được fit lại bằng cả 636 mẫu để tạo model demo. Mô hình này không được dùng để tạo điểm kiểm thử đã báo cáo. Hai việc "đánh giá" và "fit lại để sử dụng" phải được giải thích rõ khi bảo vệ.
+`train_gru.py` đọc cửa sổ đầu xả, tạo chuỗi 25 vị trí của V/I/T. Nội suy chỉ tạo biểu diễn dẫn xuất trong bộ nhớ; không sửa dữ liệu gốc. Mỗi mẫu gồm chuỗi `[25, 3]` và hai biến ngữ cảnh `[phase_code, cycle]`.
 
-### Bước 5 — analyze_results.py
+Lớp `HealthGRU` có GRU 24 đơn vị ẩn. Trạng thái cuối được ghép ngữ cảnh rồi đưa qua lớp Linear/ReLU/Linear. Vòng học tối ưu MSE bằng Adam, 20 epoch và batch 256. Tất cả thang chuẩn hóa lấy từ train trong từng vòng. Trọng số học lại toàn bộ nằm ở `artifacts/gru.pt`, tham số chuẩn hóa ở `artifacts/gru.json`.
 
-Thử bỏ số chu kỳ hoặc nhiệt độ để quan sát thay đổi. Đây là phân tích bổ sung sau kết quả chính, không phải bằng chứng rằng nhóm đặc trưng nào không có giá trị trong mọi dữ liệu.
+## 5. Đánh giá
 
-Thiết kế theo thời gian dùng 70% đầu một pin để học, 30% sau để test. Baseline dùng SOH cuối cùng đã biết trong train. RF không hơn baseline này trên dữ liệu hiện tại; cần báo cáo thật vì bài toán ngoại suy tương lai khác với ước lượng trên pin mới.
+`reports/predictions.csv` chứa dự đoán ngoài tập học của từng mẫu và tên mô hình, vòng, pin, giai đoạn, chu kỳ. `metrics_by_battery.csv` tính MAE/RMSE/R² theo từng pin. `metrics_summary.csv` lấy trung bình 86 pin; không phải R² tính gộp tất cả mẫu.
 
-### Bước 6 — streamlit_app.py và các màn hình
+| Chỉ số | Ý nghĩa |
+| --- | --- |
+| MAE | Độ lớn sai số trung bình; thấp hơn tốt hơn |
+| RMSE | Sai số nhạy với trường hợp lệch lớn; thấp hơn tốt hơn |
+| R² | Mức cải thiện so với dự đoán trung bình trong nhóm đánh giá; có thể âm |
 
-File chính chỉ kiểm tra dữ liệu, nạp CSS, tạo thanh điều hướng và gọi màn hình được chọn. Mỗi màn hình có hàm `render()` trong `app/screens`, không dùng hệ thống class phức tạp:
+MAE 1,619 nghĩa là sai số trung bình 1,619 điểm phần trăm SOH trong thiết kế đã chạy. Không diễn giải thành độ chính xác 98,381%.
 
-- `overview.py`: số liệu tổng quan và hồ sơ Nguyễn Văn Duy, MSSV 2311553949, Khoa Học Dữ Liệu.
-- `explorer.py`: lọc pin/chu kỳ, tra cứu tín hiệu thật, xuất CSV.
-- `evaluation.py`: chọn mô hình, xem MAE/RMSE/R² và dự đoán trên pin giữ riêng.
-- `forecast.py`: nhập CSV, nhận kết quả, lưu tạm trong phiên để tải file không làm mất kết quả.
-- `history.py`: lịch sử phiên, lọc, tải và xóa kết quả.
-- `profile.py`: nguồn dữ liệu và hồ sơ thực nghiệm.
+`analyze_results.py` làm hai thí nghiệm riêng. Bỏ đặc trưng kiểm tính hữu ích của số chu kỳ, giai đoạn và nhóm điện áp. Kiểm thử thời gian học 70% chu kỳ đầu của từng pin/giai đoạn, kiểm tra 30% cuối, so với SOH cuối đã biết. Bài toán này khác kiểm thử pin mới.
 
-`app/charts.py` gọi Altair để tạo biểu đồ. `app/labels.py` ánh xạ tên cột sang tiếng Việt trên một bản sao; không đổi tên cột trong pipeline tính toán. `app/app_data.py` dùng cache theo thời điểm sửa file để tránh đọc lại 185.721 dòng mỗi khi bấm bộ lọc. Dữ liệu upload không nằm trong cache dùng chung và không được thêm vào dữ liệu huấn luyện.
+## 6. Ứng dụng
 
-`app/prediction.py` kiểm tra CSV một pin/một chu kỳ, quy đổi tên cột tiếng Việt nếu có rồi gọi `extract_window` dùng chung với train. Khi đầu vào thay đổi, giao diện không hiển thị nhầm kết quả cũ. Mẫu B0005 đã nằm trong train demo nên không dùng kết quả đó làm điểm kiểm thử.
+| File | Vai trò |
+| --- | --- |
+| `streamlit_app.py` | Tạo trang, thanh điều hướng và kiểm file cần thiết |
+| `app_data.py` | Bộ nhớ đệm, nạp mô hình và đọc đúng chu kỳ Parquet |
+| `screens/overview.py` | Tổng quan dữ liệu và SOH theo giai đoạn |
+| `screens/explorer.py` | Lọc, xem tín hiệu, so sánh hai chu kỳ và xuất CSV |
+| `screens/evaluation.py` | Đọc kết quả kiểm thử, không tự huấn luyện |
+| `screens/forecast.py` | Nhận CSV, dự đoán một chu kỳ hoặc theo lô |
+| `screens/history.py` | Lịch sử trong phiên, xuất và xóa lịch sử |
+| `screens/quality.py` | Nguồn, tiến trình chọn và điểm nghi vấn |
+| `screens/profile.py` | Thông tin tác giả, phạm vi và tài liệu |
+| `prediction.py` | Chuẩn hóa tên cột, kiểm CSV, tách nhóm và gọi mô hình |
+| `result_report.py` | Tạo phiếu HTML, thoát ký tự đầu vào và quản lý lịch sử |
+| `labels.py` | Tên tiếng Việt trên bản sao hiển thị |
 
-`app/styles.css` chỉ tạo màu sắc, khoảng cách và hiệu ứng nhẹ, không tham gia tính SOH. `.streamlit/config.toml` quy định theme sáng và giới hạn upload.
+## 7. Kiểm tra và tái lập
 
-## Những chỗ có thể chỉnh để học
+`check_dataset.py` đọc toàn bộ 10 triệu dòng theo từng lô để kiểm số dòng, tín hiệu, nhãn và khóa. Các bài pytest kiểm rò rỉ đặc trưng tương lai, phân hoạch pin, đối chiếu chỉ số từ dự đoán đã lưu, CSV và các màn hình.
 
-- Đọc `FEATURES` để biết chính xác đầu vào; không thêm capacity/SOH vào đó.
-- Đọc `models()` để hiểu tham số; thay đổi tham số thì phải chạy lại và ghi nhận đây là thử nghiệm tiếp nối.
-- Đọc `data/README.md` trước khi đổi đơn vị hoặc nguồn dữ liệu.
-- Thêm pin phải có metadata, nguồn và checksum; không chỉ copy cùng pin rồi đổi mã.
-- Học cách đọc những trường hợp model sai thay vì chỉ chọn biểu đồ đẹp.
-
-## Lỗi Windows thường gặp
-
-- Thiếu Python: kiểm tra `py -3.12 --version` trước khi tạo `.venv`.
-- Đang đứng trong `app`: quay ra thư mục có README trước khi chạy.
-- `No module named streamlit`: cài thư viện chưa xong hoặc dùng nhầm Python; dùng đúng `.venv\Scripts\python.exe`.
-- `Operation cancelled by user`: chạy lại pip và đợi kết thúc; không tạo lại toàn bộ môi trường chỉ vì cài bị hủy.
-- Lỗi checksum: giữ file và kiểm tra nguồn, không xóa bước xác minh.
-- Cổng đang bận: dừng ứng dụng cũ hoặc thêm `--server.port=8502` khi chạy trên máy cá nhân.
-
-## Điều cần tự giải thích khi bảo vệ
-
-Định nghĩa SOH; lý do dùng 120 giây; khác nhau giữa dòng đo và mẫu nhãn; lý do giữ riêng pin; tại sao không dùng capacity làm đầu vào; MAE có đơn vị gì; tại sao RF chưa dự đoán được tuổi thọ còn lại; giới hạn bốn pin và dữ liệu không phải Việt Nam. Nguồn hỗ trợ và mã thư viện cần được ghi nhận theo quy định của trường, không dùng cách trình bày để che giấu quá trình thực hiện.
-
-Bản Vincent D bổ sung `predict_batch` để xử lý riêng nhóm pin/chu kỳ, `result_report.py` tạo phiếu HTML có escape dữ liệu người dùng và quản lý lịch sử tối đa 500 dòng. Lịch sử chỉ nằm trong phiên, không lưu thành dataset huấn luyện.
+`reproduce.py` điều phối lần lượt các bước và dừng khi có lỗi. `build_notebook.py` thực thi notebook trước khi lưu. `build_documents.py` lấy số liệu thực từ CSV để tạo báo cáo và slide, không ghi cứng kết quả trong nội dung báo cáo.

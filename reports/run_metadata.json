@@ -1,14 +1,17 @@
 {
-  "run_utc": "2026-10-18T22:01:12.893140+00:00",
+  "run_utc": "2026-10-19T19:51:32.407194+00:00",
   "seed": 42,
   "python": "3.12.14",
   "numpy": "2.3.5",
   "pandas": "2.2.3",
   "sklearn": "1.8.0",
-  "dataset_commit": "0007aead10cb85aafdd11fb3de1d64186c7c6c05",
-  "n_cycles": 636,
+  "dataset_commit": "zenodo-14859405-sdu-10m",
+  "data_sha256": "9dd1c7c85323d8d8d802ff7c1af999dab1bcfb23397ae43a96b9201083548790",
+  "n_cycles": 20823,
+  "dataset": "SDU",
   "n_excluded": 0,
   "features": [
+    "phase_code",
     "cycle",
     "voltage_mean",
     "voltage_min",
@@ -21,30 +24,15 @@
     "temperature_max",
     "temperature_slope"
   ],
-  "validation": "LeaveOneGroupOut by battery; no tuning; macro mean across 4 batteries",
-  "demo_model": "Random Forest refit on all primary data; demo predictions are not test results",
+  "validation": "5-fold GroupKFold by battery; shuffle=True, seed=42; no tuning; macro mean across 86 physical batteries",
+  "demo_model": "Random Forest refit on all selected cycles from both phases; demo predictions are not test results",
   "parameters": {
     "Mean baseline": {
       "constant": null,
       "quantile": null,
       "strategy": "mean"
     },
-    "Cycle Ridge": {
-      "memory": null,
-      "steps": [
-        [
-          "standardscaler",
-          "StandardScaler()"
-        ],
-        [
-          "ridge",
-          "Ridge()"
-        ]
-      ],
-      "transform_input": null,
-      "verbose": false
-    },
-    "Signal Ridge": {
+    "Ridge": {
       "memory": null,
       "steps": [
         [
@@ -63,44 +51,43 @@
       "bootstrap": true,
       "ccp_alpha": 0.0,
       "criterion": "squared_error",
-      "max_depth": null,
+      "max_depth": 16,
       "max_features": 1.0,
       "max_leaf_nodes": null,
-      "max_samples": null,
+      "max_samples": 0.7,
       "min_impurity_decrease": 0.0,
       "min_samples_leaf": 5,
       "min_samples_split": 2,
       "min_weight_fraction_leaf": 0.0,
       "monotonic_cst": null,
-      "n_estimators": 200,
+      "n_estimators": 100,
       "n_jobs": 2,
       "oob_score": false,
       "random_state": 42,
       "verbose": 0,
       "warm_start": false
     },
-    "HistGradientBoosting": {
-      "categorical_features": "from_dtype",
-      "early_stopping": false,
-      "interaction_cst": null,
-      "l2_regularization": 1.0,
-      "learning_rate": 0.1,
-      "loss": "squared_error",
-      "max_bins": 255,
-      "max_depth": null,
-      "max_features": 1.0,
-      "max_iter": 150,
-      "max_leaf_nodes": 15,
-      "min_samples_leaf": 20,
-      "monotonic_cst": null,
-      "n_iter_no_change": 10,
-      "quantile": null,
+    "LightGBM": {
+      "boosting_type": "gbdt",
+      "class_weight": null,
+      "colsample_bytree": 1.0,
+      "importance_type": "split",
+      "learning_rate": 0.05,
+      "max_depth": -1,
+      "min_child_samples": 20,
+      "min_child_weight": 0.001,
+      "min_split_gain": 0.0,
+      "n_estimators": 150,
+      "n_jobs": 2,
+      "num_leaves": 15,
+      "objective": null,
       "random_state": 42,
-      "scoring": "loss",
-      "tol": 1e-07,
-      "validation_fraction": 0.1,
-      "verbose": 0,
-      "warm_start": false
+      "reg_alpha": 0.0,
+      "reg_lambda": 1.0,
+      "subsample": 1.0,
+      "subsample_for_bin": 200000,
+      "subsample_freq": 0,
+      "verbosity": -1
     }
   }
 }
