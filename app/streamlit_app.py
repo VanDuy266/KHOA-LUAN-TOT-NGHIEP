@@ -1,3 +1,5 @@
+
+
 """Điểm vào ứng dụng. Mỗi màn hình nằm riêng trong app/screens để dễ sửa."""
 
 import sys
@@ -11,11 +13,11 @@ ROOT = APP.parent
 sys.path.insert(0, str(APP))
 sys.path.insert(0, str(ROOT / "src"))
 
-from screens import overview, explorer, evaluation, forecast, profile, history, quality
+from screens import overview, explorer, evaluation, forecast, profile, history, quality, demo, input_check
 
 st.set_page_config(
     page_title="Vincent D · Sức khỏe pin",
-    page_icon="🔋",
+    page_icon=":material/battery_charging_full:",
     layout="wide",
     initial_sidebar_state="auto",
 )
@@ -27,7 +29,7 @@ st.markdown(
 with st.sidebar:
     st.markdown(
         '<div class="brand"><div class="brand-mark">VD</div><div><div class="brand-name">Vincent D</div>'
-        '<div class="brand-sub">Dữ liệu sức khỏe pin</div></div></div><div class="sidebar-heading">Chức năng</div>',
+        '<div class="brand-sub">Phân tích sức khỏe pin</div></div></div><div class="sidebar-heading">Không gian làm việc</div>',
         unsafe_allow_html=True,
     )
     page = st.radio(
@@ -40,6 +42,8 @@ with st.sidebar:
             "Lịch sử dự đoán",
             "Chất lượng dữ liệu",
             "Thông tin",
+            "Demo pin giữ riêng",
+            "Kiểm tra file đầu vào",
         ],
         label_visibility="collapsed",
         key="navigation",
@@ -74,6 +78,8 @@ if dataset.get("dataset") != "SDU":
     st.stop()
 
 screens = {
+    "Kiểm tra file đầu vào": input_check.render,
+    "Demo pin giữ riêng": demo.render,
     "Chất lượng dữ liệu": quality.render,
     "Tổng quan": overview.render,
     "Tra cứu pin": explorer.render,

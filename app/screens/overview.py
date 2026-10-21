@@ -12,22 +12,23 @@ def render():
     rf = table("reports/metrics_summary.csv").query("model == 'Random Forest'").iloc[0]
     heading(
         "",
-        "Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy",
-        "",
+        "Tổng quan sức khỏe pin",
+        "Dữ liệu SDU · Phân tích chu kỳ xả và đánh giá SOH",
     )
     left, right = st.columns([1.55, 1], gap="large")
     with left:
         st.markdown(
             '<div class="hero-panel"><span class="status-pill"><i></i> Dữ liệu nghiên cứu</span>'
-            "<h2>Phân tích dữ liệu và dự đoán SOH</h2><p>Dữ liệu SDU · 86 tế bào pin lithium-ion · Hai giai đoạn sử dụng.</p>"
-            '<div class="hero-tags"><span>86 pin SDU</span><span>12 đặc trưng</span><span>120 giây đầu</span></div></div>',
+            "<h2>Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy</h2><p>Tra cứu tín hiệu đo, so sánh mô hình và ước lượng dung lượng còn lại.</p>"
+            '<div class="hero-tags"><span>SDU · NMC/graphite</span><span>12 đặc trưng</span><span>Cửa sổ 120 giây</span></div></div>',
             unsafe_allow_html=True,
         )
     with right:
         st.markdown(
-            '<div class="author-card"><div class="author-monogram">VD</div>'
-            '<div class="eyebrow">Người thực hiện</div><h2>Nguyễn Văn Duy</h2>'
-            "<dl><dt>MSSV</dt><dd>2311553949</dd><dt>Chuyên ngành</dt><dd>Khoa Học Dữ Liệu</dd></dl></div>",
+            '<div class="author-card"><div class="eyebrow">Phạm vi phân tích</div>'
+            '<h2>Hai giai đoạn sử dụng</h2>'
+            '<dl><dt>Loại pin</dt><dd>NMC(532)/graphite</dd><dt>Dung lượng</dt><dd>2,4 Ah</dd>'
+            '<dt>Giai đoạn</dt><dd>Ban đầu · Tái sử dụng</dd><dt>Chỉ số</dt><dd>SOH theo dung lượng</dd></dl></div>',
             unsafe_allow_html=True,
         )
     st.write("")
@@ -53,18 +54,24 @@ def render():
         with column:
             stat(*item, accent=index == 3)
     section("01", "SOH theo chu kỳ", "Dung lượng tham chiếu: 2,4 Ah")
-    phase = st.selectbox("Giai đoạn", list(PHASES), format_func=PHASES.get)
+    filter_phase, filter_pins = st.columns([1, 2], gap="large")
+    with filter_phase:
+        phase = st.selectbox("Giai đoạn", list(PHASES), format_func=PHASES.get)
     data = data[data.phase == phase]
-    pins = st.multiselect(
-        "Pin trên biểu đồ",
-        sorted(data.battery.unique()),
-        default=sorted(data.battery.unique())[:4],
-        max_selections=6,
-    )
-    with st.container(border=True):
-        st.altair_chart(
-            soh_trend(data[data.battery.isin(pins)]), width="stretch", theme=None
+    with filter_pins:
+        pins = st.multiselect(
+            "Pin trên biểu đồ",
+            sorted(data.battery.unique()),
+            default=sorted(data.battery.unique())[:4],
+            max_selections=6,
         )
+    with st.container(border=True):
+        if pins:
+            st.altair_chart(
+                soh_trend(data[data.battery.isin(pins)]), width="stretch", theme=None
+            )
+        else:
+            st.info("Chọn ít nhất một pin để xem đường SOH.")
     section("02", "Thống kê từng pin")
     shown = (
         data.groupby("battery")
@@ -77,3 +84,10 @@ def render():
     )
     shown.columns = ["Mã pin", "Chu kỳ xả", "SOH thấp nhất (%)", "SOH cao nhất (%)"]
     st.dataframe(shown.round(2), hide_index=True, width="stretch")
+    st.download_button(
+        "Tải thống kê CSV",
+        shown.round(2).to_csv(index=False).encode("utf-8-sig"),
+        file_name=f"thong_ke_pin_{phase}.csv",
+        mime="text/csv",
+        icon=":material/download:",
+    )
