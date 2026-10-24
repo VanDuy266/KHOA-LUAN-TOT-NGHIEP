@@ -95,6 +95,25 @@ def main():
         ),
         code("json.loads((ROOT/'reports/dataset_check.json').read_text())"),
     ]
+    cells.extend(
+        [
+            md(
+                "## 8. Giám sát xu hướng SOH bất thường\nQuy tắc lịch sử và Isolation Forest giữ riêng pin. Dùng SOH tham chiếu đã đo, không dùng quan sát tương lai để tạo nền. Chưa có nhãn lỗi nên tỷ lệ gắn cờ không phải độ chính xác; chưa kiểm chứng bằng BMS trên xe."
+            ),
+            code("pd.read_csv(ROOT/'reports/anomaly_summary.csv')"),
+            code(
+                "flags = pd.read_csv(ROOT/'reports/anomaly_predictions.csv')\nflags[flags.flag][['battery','phase','cycle','soh_pct','expected_soh','reason']].head(20)"
+            ),
+        ]
+    )
+    cells.extend(
+        [
+            md(
+                "## 9. Ridge–RF hiệu chỉnh phần dư\nPhương án kết hợp thuật toán có sẵn. Cùng 12 đặc trưng và 5 nhóm pin. Ridge và phần dư chỉ học trên train; chưa khẳng định thuật toán mới hoặc cải thiện có ý nghĩa thống kê."
+            ),
+            code("pd.read_csv(ROOT/'reports/hybrid_comparison.csv')"),
+        ]
+    )
     notebook = nbformat.v4.new_notebook(
         cells=cells,
         metadata={

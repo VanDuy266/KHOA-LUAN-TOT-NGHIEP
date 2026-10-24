@@ -34,8 +34,14 @@ def _model(path, modified):
     return joblib.load(path)
 
 
-def model():
-    p = ROOT / "artifacts/random_forest.joblib"
+def model(name="Random Forest"):
+    names = {
+        "Random Forest": "random_forest.joblib",
+        "Ridge–RF phần dư": "ridge_residual_forest.joblib",
+    }
+    if name not in names:
+        raise ValueError("Mô hình không được hỗ trợ")
+    p = ROOT / "artifacts" / names[name]
     result = _model(str(p), p.stat().st_mtime_ns)
     if result.get("dataset") != "SDU":
         raise ValueError("Mô hình chưa khớp SDU")

@@ -1,14 +1,14 @@
 {
   "dataset": "SDU",
-  "utc": "2026-10-19T20:45:14.962796+00:00",
+  "utc": "2026-10-24T14:59:06.551746+00:00",
   "pytest": {
-    "tests": 47,
+    "tests": 74,
     "failures": 0,
     "errors": 0,
     "skipped": 0
   },
   "notebook_executed": true,
-  "notebook_code_cells": 10,
+  "notebook_code_cells": 13,
   "documents_generated": true,
   "browser_prediction_soh": 101.37,
   "mobile_viewport": 390,
@@ -20,5 +20,13 @@
     "successful": 1321,
     "failed": 0
   },
-  "model_inputs_unchanged_sha256": "9dd1c7c85323d8d8d802ff7c1af999dab1bcfb23397ae43a96b9201083548790"
+  "model_inputs_unchanged_sha256": "9dd1c7c85323d8d8d802ff7c1af999dab1bcfb23397ae43a96b9201083548790",
+  "anomaly_monitoring": {
+    "measured_soh_history": true,
+    "fault_labels_available": false,
+    "bms_vehicle_validation": false,
+    "held_out_battery_folds": 5
+  },
+  "hybrid_evaluation": "Same 5 battery folds; fixed parameters; no claim of statistically significant improvement",
+  "preserved_remote_update": "3cb933d"
 }

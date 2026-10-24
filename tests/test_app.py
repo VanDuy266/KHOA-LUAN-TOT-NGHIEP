@@ -23,6 +23,7 @@ def open_page(name):
         "Thông tin",
         "Lịch sử dự đoán",
         "Chất lượng dữ liệu",
+        "Xu hướng bất thường",
     ],
 )
 def test_each_page_renders(name):
@@ -96,3 +97,12 @@ def test_product_has_new_name_without_coaching_copy():
     text = " ".join(item.value for item in app.markdown)
     assert "Vincent D" in text and "PinLab" not in text
     assert "Trước khi nộp" not in text
+
+
+def test_hybrid_prediction_can_be_selected_and_reported():
+    app = open_page("Dự đoán SOH")
+    app.selectbox(key="soh_model").set_value("Ridge–RF phần dư").run()
+    app.checkbox[0].check().run()
+    app.button[0].click().run()
+    assert not app.exception and not app.error
+    assert app.session_state["prediction_history"][-1]["model"] == "Ridge–RF phần dư"

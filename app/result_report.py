@@ -30,6 +30,9 @@ def html_report(rows, created_at, source):
 
     # pandas escape=True và html.escape bảo vệ tên file/mã pin do người dùng nhập.
     shown = vietnamese_table(rows).round(3)
+    model_name = (
+        str(rows.model.iloc[0]) if "model" in rows and len(rows) else "Random Forest"
+    )
     table_html = shown.to_html(index=False, border=0, escape=True, na_rep="—")
     return f"""<!doctype html><html lang="vi"><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -42,6 +45,6 @@ table{{width:100%;border-collapse:collapse;font-size:12px}}th,td{{text-align:lef
 </style><header><small>VINCENT D / PHÂN TÍCH PIN</small><h1>Phiếu kết quả ước lượng SOH</h1>
 Nguyễn Văn Duy · MSSV 2311553949 · Khoa Học Dữ Liệu</header>
 <div class="meta">Thời điểm: {escape(created_at)} (UTC+7)<br>Nguồn đầu vào: {escape(source)}<br>
-Mô hình: Random Forest · Cửa sổ: 120 giây đầu chu kỳ xả · Dung lượng tham chiếu: 2,4 Ah</div>
+Mô hình: {escape(model_name)} · Cửa sổ: 120 giây đầu chu kỳ xả · Dung lượng tham chiếu: 2,4 Ah</div>
 {table_html}<footer>Kết quả từ mô hình nghiên cứu trên 86 cell SDU trong phòng thí nghiệm. SOH là tỷ lệ dung lượng, không phải mức sạc SOC.
 Mẫu có sẵn thuộc dữ liệu đã dùng huấn luyện.</footer></html>"""

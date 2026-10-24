@@ -2,6 +2,7 @@
 
 import io
 import gzip
+import csv
 import numpy as np
 import pandas as pd
 from battery_soh.features import FEATURES, extract_window
@@ -34,12 +35,23 @@ def csv_chunks(content):
     """Đọc từng khối; nhận gzip theo nội dung dù Windows ẩn phần mở rộng."""
     stream = io.BytesIO(content)
     source = gzip.GzipFile(fileobj=stream) if content[:2] == b"\x1f\x8b" else stream
-    return pd.read_csv(source, encoding="utf-8-sig", chunksize=50000)
+    prefix = source.read(65536)
+    source.seek(0)
+    encoding = "utf-16" if prefix.startswith((b"\xff\xfe", b"\xfe\xff")) else "utf-8-sig"
+    header = prefix.decode(encoding, errors="replace").splitlines()[0] if prefix else ""
+    try:
+        separator = csv.Sniffer().sniff(header, delimiters=",;\t|").delimiter
+    except csv.Error:
+        separator = ","
+    return pd.read_csv(source, encoding=encoding, sep=separator,
+                       decimal="," if separator == ";" else ".", chunksize=50000)
 
 
 def normalize_columns(frame):
     frame.columns = frame.columns.str.strip()
-    frame = frame.rename(columns={**INPUT_NAMES, **RAW_NAMES})
+    aliases = {name.casefold(): value for name, value in {**INPUT_NAMES, **RAW_NAMES}.items()}
+    aliases.update({name.casefold(): name for name in [*FEATURES, "battery", "time", "terminal_voltage", "terminal_current", "temperature"]})
+    frame = frame.rename(columns=lambda name: aliases.get(name.casefold(), name))
     if frame.columns.duplicated().any():
         raise ValueError("Tên cột bị trùng sau khi quy đổi về định dạng chuẩn.")
     return frame
@@ -55,15 +67,17 @@ def read_csv(content, phase_code=None):
         first = next(reader)
     except StopIteration:
         raise ValueError("CSV chưa có dòng dữ liệu.")
-    raw = "Test_Time(s)" in first.columns.str.strip()
+    raw = "test_time(s)" in first.columns.str.strip().str.casefold()
     if not raw:
         chunks = [normalize_columns(first)]
         chunks.extend(normalize_columns(chunk) for chunk in reader)
         frame = pd.concat(chunks, ignore_index=True)
         if frame.empty:
             raise ValueError("CSV chưa có dòng dữ liệu.")
-        if "phase_code" not in frame and phase_code is not None:
+        phase_added = "phase_code" not in frame and phase_code is not None
+        if phase_added:
             frame["phase_code"] = phase_code
+        frame.attrs.update(source_format="normalized_csv", phase_from_selection=phase_added)
         return frame
     # Thời gian của nguồn là thời gian toàn thí nghiệm. Tìm đầu xả theo
     # pin/chu kỳ trước khi lấy cửa sổ, kể cả khi thứ tự nguồn đi lùi nhẹ.

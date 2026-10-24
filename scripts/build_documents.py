@@ -302,6 +302,32 @@ def slides(summary, temporal):
             None,
         ),
     ]
+    sections.insert(
+        -2,
+        (
+            "Giám sát xu hướng SOH",
+            [
+                "Quy tắc quá khứ và Isolation Forest · giữ riêng pin",
+                "74 cờ giai đoạn đầu; 135 cờ tái sử dụng",
+                "Chưa có nhãn lỗi; cờ không phải kết luận hỏng pin",
+                "Chưa có dữ liệu BMS để kiểm chứng trên xe",
+            ],
+            None,
+        ),
+    )
+    sections.insert(
+        -2,
+        (
+            "Ridge–RF hiệu chỉnh phần dư",
+            [
+                "Ridge học nền; RF học sai số trên train",
+                "Cùng 12 đặc trưng và 5 nhóm pin",
+                "MAE 1,612 so với RF 1,619; RMSE hơi tăng",
+                "Kết hợp có sẵn, chưa khẳng định thuật toán mới hay vượt trội",
+            ],
+            None,
+        ),
+    )
     prs = Presentation()
     prs.core_properties.author = "Nguyễn Văn Duy"
     prs.slide_width = Inches(13.333)
@@ -424,6 +450,9 @@ def main():
         "RF_MAE": f"{rf.mae:.3f}",
         "RF_RMSE": f"{rf.rmse:.3f}",
         "RF_R2": f"{rf.r2:.3f}",
+        "HYBRID_TABLE": md_table(
+            vietnamese_table(pd.read_csv(ROOT / "reports/hybrid_comparison.csv"))
+        ),
         "FEATURE_TABLE": md_table(
             pd.DataFrame(
                 {"Tên cột": FEATURES, "Ý nghĩa": [COLUMNS[x] for x in FEATURES]}
@@ -550,7 +579,7 @@ def main():
     elif pdf.exists():
         pdf.unlink()
         print("Chưa xuất PDF mới: máy không có LibreOffice; bản Word đã cập nhật.")
-    print("Đã tạo báo cáo Word/Markdown và 18 slide từ kết quả SDU.")
+    print("Đã tạo báo cáo Word/Markdown và 20 slide từ kết quả SDU.")
 
 
 if __name__ == "__main__":

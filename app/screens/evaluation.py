@@ -23,6 +23,24 @@ def render():
         st.caption(
             "GRU dùng 25 vị trí trong 120 giây và hai biến ngữ cảnh; các mô hình bảng dùng 12 thống kê. Mốc trung bình SOH là đối chứng. Khác biệt điểm số gồm cả ảnh hưởng biểu diễn và cấu hình, chưa phải kết luận về mọi cấu hình của thuật toán."
         )
+    if (ROOT / "reports/hybrid_comparison.csv").exists():
+        with st.expander("Phương án khóa luận: Ridge–RF hiệu chỉnh phần dư"):
+            st.write(
+                "Ridge dự đoán xu hướng nền, Random Forest học y_train − Ridge(X_train). Dự đoán cuối là tổng hai thành phần. Cùng 12 đặc trưng và cùng 5 nhóm pin; không học từ nhãn pin kiểm thử."
+            )
+            st.dataframe(
+                vietnamese_table(table("reports/hybrid_comparison.csv")).round(3),
+                hide_index=True,
+                width="stretch",
+            )
+            st.caption(
+                "Kết hợp thuật toán có sẵn để kiểm chứng trong khóa luận; chưa khẳng định thuật toán mới trong nghiên cứu hoặc ưu thế trên mọi bộ dữ liệu."
+            )
+            csv_download(
+                "Tải đối chiếu phương án phần dư",
+                table("reports/hybrid_paired_comparison.csv"),
+                "so_sanh_cap_ridge_rf.csv",
+            )
     names = metrics.model.tolist()
     model = st.selectbox(
         "Mô hình cần xem",

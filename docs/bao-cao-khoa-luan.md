@@ -174,6 +174,25 @@ Thời gian là số đo trên môi trường chạy thực nghiệm, không ph�
 Kết quả phản ánh bộ chọn xả tham chiếu cùng loại pin. Chưa có kiểm thử độc lập với dữ liệu Việt Nam, hóa học khác, nhà sản xuất khác, chế độ xả động hoặc pin ở cấp pack. Thông tin số chu kỳ và giai đoạn được giả định biết tại thời điểm ước lượng; không kết luận mô hình dùng được nếu thiếu các thông tin này.
 Số chu kỳ nhiều không loại bỏ giới hạn chỉ có 86 pin. Sai số trung bình không cung cấp khoảng tin cậy cho một dự đoán đơn. Chưa có hiệu chỉnh độ bất định, đánh giá nhiều seed hoặc kiểm định thống kê chênh lệch mô hình. Những nội dung này là hướng phát triển, không được báo cáo như kết quả đã hoàn thành.
 
+## 4.9. Giám sát xu hướng SOH bất thường
+Phần bổ sung giám sát SOH tham chiếu đã quan sát theo từng pin và giai đoạn. Nền dự kiến dùng tốc độ biến thiên trung vị của tối đa 8 khoảng quá khứ, ít nhất 5 khoảng. Tốc độ tính theo chênh lệch số chu kỳ thực, không coi các mẫu xả tham chiếu là những chu kỳ liên tiếp. Độ lệch chuẩn hóa dùng MAD quá khứ với sàn thang đo 0,01 điểm phần trăm SOH mỗi chu kỳ. Quy tắc gắn cờ yêu cầu độ lệch chuẩn hóa trên 4,5 và sai lệch tuyệt đối ít nhất 1 điểm phần trăm SOH.
+Isolation Forest [8] dùng 150 cây, max_samples 256 và seed 42. Đặc trưng là tốc độ hiện tại, tốc độ nền quá khứ, sai lệch SOH và độ lệch chuẩn hóa. Cùng phân hoạch 5 vòng theo pin; ngưỡng là phân vị 99% điểm các pin học của từng vòng. Không chọn ngưỡng bằng tập kiểm thử. Dữ liệu học chưa có nhãn lỗi, nên cách làm giả định đa số diễn biến là thông thường, không chứng minh tập học hoàn toàn bình thường.
+Kết hợp hai phương pháp theo phép hoặc cho 74 cờ trong 12.145 mẫu đủ lịch sử giai đoạn đầu và 135 cờ trong 7.646 mẫu đủ lịch sử tái sử dụng, tương ứng khoảng 0,61% và 1,77%. Cờ chu kỳ SOH khác các điểm nghi vấn tín hiệu điện áp/nhiệt độ ở phần kiểm tra dữ liệu, không cộng chung hai số đếm. Số cờ không phải số lỗi xác nhận hoặc độ chính xác. Chưa có nhãn lỗi nên không báo cáo precision, recall hay mức cải thiện phát hiện lỗi thực tế. Các điểm không bị tự sửa hoặc xóa.
+Thiết kế dùng các quan sát SOH quá khứ của chính pin đang giám sát, nhưng không dùng tương lai để tạo nền. SOH tham chiếu cần phép đo dung lượng; kết quả không đồng nghĩa cảnh báo BMS trực tuyến hoặc chứng nhận pin nguy hiểm. Chưa có dữ liệu BMS trên xe, nên chưa thực hiện kiểm chứng thực tế. Kế hoạch và dữ liệu cần có được ghi riêng trong docs/kiem-chung-bms.md.
+
+## 4.10. Phương án khóa luận: Ridge–RF hiệu chỉnh phần dư
+Tôi kiểm chứng cách kết hợp hai thuật toán có sẵn [3,4]: Ridge học xu hướng nền; Random Forest học phần dư r_train = y_train − Ridge(X_train). Kết quả cuối là SOH_dự_đoán = Ridge(X) + RF_phần_dư(X). Chỉ tập train được dùng để học bộ chuẩn hóa, hệ số Ridge và cây phần dư. Không dùng nhãn pin kiểm thử để hiệu chỉnh. Bảng đầu vào giữ đúng 12 đặc trưng, cùng 5 nhóm pin và seed 42; cấu hình được cố định, không tối ưu theo các điểm test.
+| Mô hình | MAE (điểm % SOH) | RMSE (điểm % SOH) | R² |
+| --- | --- | --- | --- |
+| Trung bình SOH — mốc cơ sở | 13.246 | 15.249 | -0.281 |
+| Hồi quy Ridge | 2.582 | 3.299 | 0.933 |
+| Rừng ngẫu nhiên — Random Forest | 1.619 | 2.157 | 0.970 |
+| Tăng cường cây — LightGBM | 1.734 | 2.270 | 0.968 |
+| Mạng chuỗi thời gian — GRU | 2.141 | 2.718 | 0.953 |
+| Ridge–RF hiệu chỉnh phần dư | 1.612 | 2.160 | 0.971 |
+Phương án phần dư đạt MAE khoảng 1,612 điểm phần trăm SOH so với 1,619 của RF; RMSE khoảng 2,160 so với 2,157. Cải thiện MAE nhỏ và RMSE hơi tăng, chưa chứng minh ưu thế rõ ràng. Kết quả theo từng pin, cả trường hợp tăng và giảm sai số, được giữ trong reports/hybrid_paired_comparison.csv. Chưa khảo sát nhiều seed hoặc bộ dữ liệu độc lập nên không khẳng định cải tiến có ý nghĩa thống kê hoặc tổng quát.
+Đây là phương án kết hợp được triển khai và đánh giá trong khóa luận, không tuyên bố là thuật toán hoàn toàn mới hoặc công bố đầu tiên. Mô hình học lại toàn bộ được lưu riêng và có thể chọn trên trang dự đoán; kết quả này tách khỏi các dự đoán giữ riêng dùng đánh giá. Random Forest vẫn là lựa chọn mặc định của ứng dụng, không dùng chênh lệch nhỏ trên test để tuyên bố đổi mô hình tốt nhất.
+
 # Chương 5. Xây dựng sản phẩm Vincent D
 ## 5.1. Kiến trúc phần mềm
 Quy trình gồm tầng nguồn CSV gzip, tầng chuyển đổi Parquet, tầng đặc trưng và huấn luyện, tầng báo cáo kết quả và tầng giao diện. Thư mục src/battery_soh chứa hàm đặc trưng dùng chung; scripts chứa các bước có thể chạy lại; app/screens chia từng màn hình; reports lưu bằng chứng thực nghiệm; artifacts lưu mô hình tin cậy do dự án tạo.
@@ -181,7 +200,7 @@ Giao diện đọc bảng nhỏ cho thống kê và chỉ đọc dữ liệu chu
 ## 5.2. Các chức năng
 Tổng quan trình bày quy mô dữ liệu, sai số và đường SOH theo giai đoạn. Tra cứu cho phép lọc pin, giai đoạn, khoảng chu kỳ, xem tín hiệu và so sánh hai chu kỳ. Đánh giá mô hình hiển thị chỉ số, dự đoán giữ riêng, sai số, thời gian và thử nghiệm bỏ đặc trưng.
 Dự đoán nhận CSV hoặc CSV.GZ tới 512 MiB cho một chu kỳ hoặc tối đa 2.000 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
-Lịch sử chỉ lưu trong phiên làm việc, không phải cơ sở dữ liệu người dùng. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu.
+Lịch sử được giữ trong phiên; khi người dùng chọn lưu, kết quả và tên nguồn được ghi vào SQLite cục bộ trên máy chủ, không lưu nội dung CSV tải lên. Kho này dùng chung trên máy chủ, chưa có phân quyền tài khoản. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang Xu hướng bất thường hiển thị chuỗi SOH, nền quá khứ, cờ của quy tắc/Isolation Forest và lý do; dữ liệu có thể xuất CSV. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu. Các trang kiểm tra đầu vào và demo trên pin giữ riêng được giữ lại. Phần phân rã dự đoán dùng hệ số Ridge và đường đi trong cây phù hợp với mô hình đang chọn, không gọi là SHAP hoặc quan hệ nhân quả.
 ![Hình 5.1. Tổng quan Vincent D với dữ liệu SDU](images/vincent_d_sdu_overview.png)
 
 ## 5.3. Mô hình ứng dụng
@@ -189,7 +208,7 @@ Random Forest là mô hình triển khai được quy định trước cho bản
 Ứng dụng hiển thị cảnh báo khi đặc trưng nằm ngoài khoảng quan sát của dữ liệu huấn luyện. Kiểm tra khoảng riêng từng biến chưa đủ phát hiện mọi trường hợp ngoài phân phối. Dự đoán không bị ép vào một khoảng đẹp hơn và không được dùng như chứng nhận an toàn pin.
 ## 5.4. Kiểm tra sản phẩm
 Các kiểm thử bao gồm tính độc lập của đặc trưng với tín hiệu sau 120 giây và nhãn, tính đúng định nghĩa SOH, khóa pin/giai đoạn/chu kỳ, phân hoạch không trùng pin, đối chiếu chỉ số với dự đoán đã lưu và kiểm thử các màn hình Streamlit. Dự đoán mẫu, dự đoán theo lô, lịch sử phiên và lỗi CSV cũng được kiểm tra.
-Lần kiểm thử lưu trong reports/pytest-results.xml gồm 47 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
+Lần kiểm thử lưu trong reports/pytest-results.xml gồm 74 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
 ## 5.5. Lưu trữ và bàn giao
 Gói sản phẩm chứa mã nguồn, thư viện được khóa phiên bản, dữ liệu Parquet phục vụ tra cứu, bảng đặc trưng, mô hình, notebook đã chạy, kết quả thực nghiệm và báo cáo/slide. Bộ dữ liệu nguồn được nộp riêng dưới dạng source_rows với hai giai đoạn, các bảng chu kỳ và hồ sơ kiểm tra, trích dẫn. Không cần giải nén từng file CSV gzip để chương trình đọc.
 Các file nguồn lớn không được đưa vào bộ nhớ cùng lúc. Môi trường .venv không đóng gói vì phụ thuộc hệ điều hành; môi trường được tạo lại bằng danh sách thư viện. Dữ liệu nguồn không thuộc quyền sở hữu riêng của tác giả khóa luận và được sử dụng theo giấy phép CC BY 4.0.
@@ -207,6 +226,7 @@ Hướng phát triển gồm dữ liệu vận hành độc lập, mở rộng �
 [5] Ke, G., et al. (2017). LightGBM: A Highly Efficient Gradient Boosting Decision Tree. Advances in Neural Information Processing Systems, 30. https://proceedings.neurips.cc/paper/2017/hash/6449f44a102fde848669bdd9eb6b76fa-Abstract.html.
 [6] Cho, K., et al. (2014). Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation. EMNLP. https://arxiv.org/abs/1406.1078.
 [7] Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825–2830. https://jmlr.org/papers/v12/pedregosa11a.html.
+[8] Liu, F. T., Ting, K. M., & Zhou, Z.-H. (2008). Isolation Forest. IEEE ICDM, 413–422. https://doi.org/10.1109/ICDM.2008.17.
 
 # Phụ lục A. Kết quả Random Forest theo pin
 Bảng lấy từ dự đoán kiểm thử pin giữ riêng. Chi tiết mọi mô hình được lưu trong reports/metrics_by_battery.csv và reports/predictions.csv.

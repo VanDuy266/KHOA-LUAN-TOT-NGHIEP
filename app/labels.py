@@ -1,6 +1,7 @@
 """Tên hiển thị tiếng Việt; giữ tên cột gốc trong CSV để chạy lại nghiên cứu."""
 
 MODEL_NAMES = {
+    "Ridge-RF residual": "Ridge–RF hiệu chỉnh phần dư",
     "Mean baseline": "Trung bình SOH — mốc cơ sở",
     "GRU": "Mạng chuỗi thời gian — GRU",
     "LightGBM": "Tăng cường cây — LightGBM",

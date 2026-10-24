@@ -1,0 +1,72 @@
+{
+  "method": "Ridge-RF residual",
+  "formula": "SOH = Ridge(X) + RandomForest(X; residual_train)",
+  "parameters": {
+    "alpha": 10.0,
+    "n_estimators": 100,
+    "n_jobs": 2,
+    "random_state": 42
+  },
+  "features": [
+    "phase_code",
+    "cycle",
+    "voltage_mean",
+    "voltage_min",
+    "voltage_max",
+    "voltage_std",
+    "voltage_slope",
+    "current_mean",
+    "current_std",
+    "temperature_mean",
+    "temperature_max",
+    "temperature_slope"
+  ],
+  "validation": "Same 5 physical battery folds; Ridge/scaler and residual forest fitted only on training pins",
+  "data_sha256": "b686d3cb9af5e1dc22369c50ef53199f2284e1dfe90eee64592fc914ac50a008",
+  "novelty": "Project-specific evaluated combination of existing algorithms; no claim of a novel algorithm or first publication",
+  "improved_pins": 40,
+  "total_pins": 86,
+  "mean_mae_difference_vs_rf": -0.006712619508804143,
+  "timings": [
+    {
+      "fold": 1,
+      "fit_seconds": 4.950275051989593
+    },
+    {
+      "fold": 2,
+      "fit_seconds": 5.004319753032178
+    },
+    {
+      "fold": 3,
+      "fit_seconds": 4.702975425985642
+    },
+    {
+      "fold": 4,
+      "fit_seconds": 4.78128008893691
+    },
+    {
+      "fold": 5,
+      "fit_seconds": 4.844609637977555
+    }
+  ],
+  "forest_parameters": {
+    "bootstrap": true,
+    "ccp_alpha": 0.0,
+    "criterion": "squared_error",
+    "max_depth": 16,
+    "max_features": 1.0,
+    "max_leaf_nodes": null,
+    "max_samples": 0.7,
+    "min_impurity_decrease": 0.0,
+    "min_samples_leaf": 5,
+    "min_samples_split": 2,
+    "min_weight_fraction_leaf": 0.0,
+    "monotonic_cst": null,
+    "n_estimators": 100,
+    "n_jobs": 2,
+    "oob_score": false,
+    "random_state": 42,
+    "verbose": 0,
+    "warm_start": false
+  }
+}
