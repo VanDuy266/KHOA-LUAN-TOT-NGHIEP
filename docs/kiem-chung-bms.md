@@ -33,3 +33,5 @@ Mô hình hiện tại dùng tế bào 2,4 Ah và cửa sổ xả tham chiếu S
 ## Khảo sát nguồn công khai
 
 Đã tải và kiểm tra bảng SOH trên xe thực tế tại Zenodo 22643868: 3.171 bản ghi, 15 cột. Bảng không có chuỗi điện áp/dòng điện/nhiệt độ để kiểm thử trực tiếp mô hình SDU. Đã khảo sát thêm dữ liệu BMS LFP năm 2024 tại Zenodo 13715694; chưa tải toàn bộ và chưa kiểm chứng mô hình trên bộ này. Chi tiết phạm vi, nguồn và kết quả kiểm tra: [Phạm vi và dữ liệu kiểm thử bổ sung](pham-vi-va-du-lieu-kiem-thu.md).
+
+Kết quả tìm nguồn phù hợp hơn: [Lựa chọn dữ liệu ngoài cho bài toán SOH](lua-chon-du-lieu-ngoai.md). Đã đọc mẫu CSV NMC LG Chem E71A có đủ loại tín hiệu và dung lượng, nhưng là dữ liệu lab 69,5 Ah, chưa kiểm thử mô hình SDU trực tiếp.
