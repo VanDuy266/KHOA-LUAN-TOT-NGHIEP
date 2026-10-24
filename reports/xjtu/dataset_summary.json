@@ -1,0 +1,22 @@
+{
+  "dataset": "XJTU Batch-1/2",
+  "source": "https://zenodo.org/records/10963339",
+  "license": "cc-by-4.0",
+  "batteries": 23,
+  "available_source_batteries": 55,
+  "selected_batches": [
+    1,
+    2
+  ],
+  "raw_points": 46215511,
+  "source_cycles": 6961,
+  "valid_cycles": 6961,
+  "excluded_cycles": 0,
+  "nominal_capacity_ah": 2.0,
+  "soh_definition": "summary.discharge_capacity_Ah / 2.0 * 100; no clipping",
+  "window_seconds": 120,
+  "time_policy": "system_time; duplicate seconds averaged only in derived window",
+  "duplicate_window_seconds_aggregated": 59,
+  "features_sha256": "c20caab44f6efee49750d16bb0e2f85f8fa804ce059c01db90f64cbbf37a1188",
+  "scope": "Laboratory Lishen 18650 NCM; fixed-protocol Batch-1/2 selected before evaluation. Not vehicle BMS. Raw MAT preserved."
+}

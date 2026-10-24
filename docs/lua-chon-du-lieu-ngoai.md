@@ -1,6 +1,6 @@
 # Lựa chọn dữ liệu ngoài cho bài toán SOH
 
-Khảo sát ngày 24/10/2026. Giữ nguyên SDU và mô hình hiện tại; chưa ghép dữ liệu ngoài, chưa huấn luyện lại.
+Khảo sát ngày 24/10/2026. SDU tiếp tục là dữ liệu chính. Cập nhật: đã triển khai thực nghiệm XJTU Batch-1/2, kể cả kiểm thử RF đa nguồn; xem [kết quả XJTU](thuc-nghiem-xjtu.md). Các nhận định nguồn khác bên dưới là nhật ký khảo sát trước đó.
 
 Cập nhật: Đã tìm thấy XJTU (Lishen NCM 18650, 2 Ah) gần SDU hơn LG Chem 69,5 Ah và đã đọc một file đầy đủ. Ưu tiên nguồn này để khảo sát tương đồng; xem [Dữ liệu tương đồng XJTU](du-lieu-tuong-dong-xjtu.md). Các nhận định LG Chem bên dưới được giữ lại như kết quả khảo sát trước đó.
 

@@ -26,6 +26,10 @@ def main():
         ["scripts/build_results_notebook.py"],
         ["scripts/build_documents.py"],
     ]
+    if (ROOT / "reports/xjtu/features.csv").exists():
+        index = next(i for i, command in enumerate(commands) if command[0] == "-m")
+        commands[index:index] = [["scripts/evaluate_xjtu.py"], ["scripts/analyze_xjtu.py"], ["scripts/check_xjtu.py"], ["scripts/build_xjtu_documents.py"]]
+        commands.append(["scripts/build_midterm.py"])
     for args in commands:
         print("\nĐang chạy: " + " ".join(args), flush=True)
         subprocess.run([sys.executable, *args], cwd=ROOT, env=env, check=True)

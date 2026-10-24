@@ -328,6 +328,11 @@ def slides(summary, temporal):
             None,
         ),
     )
+    xjtu_scores = ROOT / "reports/xjtu/metrics_summary.csv"
+    if xjtu_scores.exists():
+        x_scores = pd.read_csv(xjtu_scores)
+        x_rf = x_scores[(x_scores.design == "XJTU held-out") & (x_scores.model == "Random Forest")].iloc[0]
+        sections.insert(-2, ("Thực nghiệm nguồn XJTU độc lập", ["23 pin Lishen NCM 2 Ah; Batch-1/2, giữ riêng pin", f"RF: MAE {x_rf.mae:.3f}; RMSE {x_rf.rmse:.3f}; R² {x_rf.r2:.3f}", "So sánh RF đa nguồn và chuyển miền SDU → XJTU", "Dữ liệu phòng lab; chưa kiểm chứng BMS trên xe"], None))
     prs = Presentation()
     prs.core_properties.author = "Nguyễn Văn Duy"
     prs.slide_width = Inches(13.333)
@@ -526,6 +531,9 @@ def main():
     else:
         raise ValueError("Chưa có kết quả kiểm thử")
     text = (ROOT / "docs/bao-cao-template.md").read_text()
+    extra = ROOT / "reports/xjtu/report_section.md"
+    if extra.exists():
+        text = text.replace("# Chương 5. Xây dựng sản phẩm Vincent D", extra.read_text() + "\n# Chương 5. Xây dựng sản phẩm Vincent D")
     for key, value in replacements.items():
         text = text.replace("{{" + key + "}}", value)
     if "{{" in text:
@@ -579,7 +587,7 @@ def main():
     elif pdf.exists():
         pdf.unlink()
         print("Chưa xuất PDF mới: máy không có LibreOffice; bản Word đã cập nhật.")
-    print("Đã tạo báo cáo Word/Markdown và 20 slide từ kết quả SDU.")
+    print("Đã tạo báo cáo Word/Markdown và slide từ các bảng kết quả thực nghiệm.")
 
 
 if __name__ == "__main__":

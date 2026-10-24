@@ -23,3 +23,14 @@ Nguồn gốc đầy đủ, giấy phép CC BY 4.0 và checksum được ghi tro
 Tên trường, thông tin sinh viên và GVHD theo phiếu đăng ký. Quy định về biểu mẫu, chữ ký, số lượng bản in, số trang và thủ tục nộp cuối cùng do khoa/giảng viên xác nhận.
 
 Giám sát xu hướng: `src/battery_soh/anomaly.py`, `scripts/analyze_anomalies.py`, `reports/anomaly_*.csv`, `reports/anomaly_metadata.json`, `artifacts/anomaly_iforest.joblib`. Kế hoạch BMS: `docs/kiem-chung-bms.md`; chưa có thực nghiệm BMS trên xe.
+
+## XJTU và bộ giữa kỳ 10/11/2026
+
+- Báo cáo tiến độ Word/PDF: docs/bao-cao-giua-ky-10-11-2026.
+- Slide giữa kỳ PPTX/PDF: docs/slide-giua-ky-10-11-2026; 12 trang, PPTX có ghi chú trình bày.
+- Phần thực nghiệm: docs/thuc-nghiem-xjtu.md, reports/xjtu và notebooks/03_thuc_nghiem_xjtu.ipynb.
+- Dữ liệu dẫn xuất: data/xjtu/processed; nguồn và cách tải: data/xjtu/README.md, source_manifest.json.
+- Mô hình ứng dụng: artifacts/xjtu/random_forest.joblib và multi_source_forest.joblib trong gói sản phẩm; có thể refit từ bảng nhỏ bằng scripts/save_xjtu_models.py.
+- MAT gốc không kèm ZIP ứng dụng. Tải 23 file Batch-1/2 bằng scripts/download_xjtu.py; không cần tải lại hoặc huấn luyện để xem kết quả đóng gói.
+
+Bản giữa kỳ là hồ sơ tiến độ. Mẫu nộp và yêu cầu nghiệm thu cuối kỳ cần theo giảng viên/trường; chưa có kiểm chứng BMS trên xe hoặc mô hình RUL.

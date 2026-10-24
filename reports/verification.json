@@ -1,8 +1,8 @@
 {
   "dataset": "SDU",
-  "utc": "2026-10-24T14:59:06.551746+00:00",
+  "utc": "2026-10-24T16:48:09.563597+00:00",
   "pytest": {
-    "tests": 74,
+    "tests": 82,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -28,5 +28,39 @@
     "held_out_battery_folds": 5
   },
   "hybrid_evaluation": "Same 5 battery folds; fixed parameters; no claim of statistically significant improvement",
-  "preserved_remote_update": "3cb933d"
+  "preserved_remote_update": "3cb933d",
+  "xjtu": {
+    "status": "passed",
+    "batteries": 23,
+    "source_cycles": 6961,
+    "model_cycles": 6938,
+    "group_folds": 5,
+    "held_out_models": 7,
+    "macro_metrics_recomputed": true,
+    "label_ratio_verified": true,
+    "sdu_inputs_hash_unchanged": true,
+    "scope": "Prepared tables, stored folds and all saved predictions checked; does not certify absence of sensor noise or vehicle validity.",
+    "browser_mat_upload": {
+      "file": "2C_battery-1.mat",
+      "bytes": 44388077,
+      "forecast_rendered": true,
+      "exceptions": 0,
+      "refit_member_notice_shown": true
+    },
+    "mobile": {
+      "viewport": 390,
+      "document_width": 390,
+      "exceptions": 0
+    },
+    "executed_notebook_code_cells": 6,
+    "source_protocol_summaries_checked": 23
+  },
+  "midterm": {
+    "presentation_date": "2026-11-10",
+    "slides": 12,
+    "word": true,
+    "pdf": true,
+    "pptx_notes": true,
+    "status": "progress report, not final academic acceptance"
+  }
 }

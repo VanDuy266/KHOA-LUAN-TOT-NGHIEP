@@ -45,3 +45,11 @@ Phần giải thích phân rã dự đoán theo đường đi trong cây; mốc 
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p test_demo.py -v
 .\.venv\Scripts\python.exe -m unittest discover -s tests -p test_history_store.py -v
 ```
+
+## Thực nghiệm XJTU
+
+Trang XJTU có ba mục: Kết quả kiểm thử, Dự đoán XJTU, Nguồn và chất lượng. Kết quả chia theo pin, chuyển SDU sang XJTU và giữ riêng batch được hiển thị tách biệt. Các đồ thị kiểm thử sử dụng dự đoán pin giữ riêng.
+
+Dự đoán XJTU nhận dữ liệu pin có sẵn hoặc MAT nguyên gốc Batch-1/2 tối đa 128 MiB. Chọn đúng batch nguồn; không tải MAT vào trang CSV SDU. Hai mô hình có sẵn là RF riêng XJTU và RF đa nguồn. Trang xuất CSV kèm SOH tham chiếu và cờ ngoài miền; nhãn tham chiếu không được đưa vào mô hình.
+
+Pin từ bộ dữ liệu refit chỉ dùng minh họa chức năng. Điểm đánh giá độc lập ở mục Kết quả kiểm thử. Cả hai nguồn là dữ liệu lab, chưa chứng minh dự đoán trên xe thực tế.

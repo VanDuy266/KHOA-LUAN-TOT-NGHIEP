@@ -2,7 +2,7 @@
 
 ## Lựa chọn
 
-Trong các nguồn đã khảo sát, XJTU là ứng viên gần SDU hơn bộ LG Chem 69,5 Ah hoặc BMS LFP 160 Ah. Ưu tiên XJTU cho khảo sát và thực nghiệm SOH ngoài nguồn; chưa thay SDU, chưa trộn hai bộ và chưa chạy mô hình trên XJTU.
+Trong các nguồn đã khảo sát, XJTU là ứng viên gần SDU hơn bộ LG Chem 69,5 Ah hoặc BMS LFP 160 Ah. XJTU đã được triển khai bổ sung với 23 pin Batch-1/2, giữ nguyên SDU làm nguồn chính. Đã kiểm thử theo pin và thử RF đa nguồn, chuyển miền; xem [Thực nghiệm XJTU](thuc-nghiem-xjtu.md). Các mô tả mẫu bên dưới là bước khảo sát ban đầu.
 
 Nguồn gốc: https://zenodo.org/records/10963339 (DOI 10.5281/zenodo.10963339), công bố 12/04/2024, giấy phép CC BY 4.0. Tác giả bộ dữ liệu: Fujin Wang, Xi'an Jiaotong University. Bài báo: Wang, F., Zhai, Z., Zhao, Z. et al. Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis. Nature Communications 15, 4332 (2024). https://doi.org/10.1038/s41467-024-48779-z.
 
@@ -49,4 +49,4 @@ XJTU phù hợp nghiên cứu phân tích suy giảm và xây dựng mô hình S
 
 Không dùng kết quả XJTU để ghi “đã kiểm chứng BMS trên xe”. Kết luận phù hợp là “kiểm thử bổ sung trên một bộ dữ liệu tế bào pin độc lập” nếu thực nghiệm đó thực sự được thực hiện và báo cáo đầy đủ.
 
-Bằng chứng kiểm tra mẫu: `reports/xjtu_source_check.json`. Dữ liệu gốc được giữ riêng tại môi trường làm việc, chưa thêm vào ứng dụng hoặc bộ cài.
+Bằng chứng kiểm tra mẫu: `reports/xjtu_source_check.json`. MAT gốc được giữ riêng và tải lại bằng script; bảng dẫn xuất, kết quả, notebook và mô hình ứng dụng được đưa vào bộ cài.

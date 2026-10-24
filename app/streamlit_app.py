@@ -22,6 +22,7 @@ from screens import (
     anomalies,
     demo,
     input_check,
+    xjtu,
 )
 
 st.set_page_config(
@@ -47,6 +48,7 @@ with st.sidebar:
             "Tổng quan",
             "Tra cứu pin",
             "Đánh giá mô hình",
+            "Thực nghiệm XJTU",
             "Dự đoán SOH",
             "Xu hướng bất thường",
             "Lịch sử dự đoán",
@@ -88,6 +90,7 @@ if dataset.get("dataset") != "SDU":
     st.stop()
 
 screens = {
+    "Thực nghiệm XJTU": xjtu.render,
     "Xu hướng bất thường": anomalies.render,
     "Kiểm tra file đầu vào": input_check.render,
     "Demo pin giữ riêng": demo.render,

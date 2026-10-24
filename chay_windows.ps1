@@ -44,5 +44,9 @@ if (-not (Test-Path "data\clean\cells\primary_SDU_01.parquet")) {
     & $Python scripts\prepare_data.py
     KiemTraLenh "Xu ly SDU"
 }
+if ((Test-Path "reports\xjtu\features.csv") -and (-not (Test-Path "artifacts\xjtu\random_forest.joblib"))) {
+    & $Python scripts\save_xjtu_models.py
+    KiemTraLenh "Tao mo hinh ung dung XJTU"
+}
 & $Python -m streamlit run app\streamlit_app.py
 KiemTraLenh "Chay ung dung"
