@@ -1,0 +1,175 @@
+{
+  "source": "https://zenodo.org/records/10963339",
+  "doi": "10.5281/zenodo.10963339",
+  "license": "cc-by-4.0",
+  "source_archive_bytes": 2438769934,
+  "source_archive_checksum": "md5:a635cef9678e0de21f9d5c1f78a4342c",
+  "selected_batches": [
+    1,
+    2
+  ],
+  "selection_reason": "Fixed full charge/discharge protocol; 1C discharge after initial 0.2C capacity test. Other batches have variable/random/partial/satellite protocols.",
+  "files": [
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-1.mat",
+      "path": "Batch-1/2C_battery-1.mat",
+      "bytes": 44388077,
+      "zip_crc32": "e0240944",
+      "sha256": "336a0c25c9d6e4c18a231c0b4004edfb44fbd7808533490cddf4d073ce854dbb"
+    },
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-2.mat",
+      "path": "Batch-1/2C_battery-2.mat",
+      "bytes": 46247857,
+      "zip_crc32": "e34c9a52",
+      "sha256": "55da58e12c472b4c447698770a9b4dbd9f56f96a64b89c4b9b07ac191ecc1201"
+    },
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-3.mat",
+      "path": "Batch-1/2C_battery-3.mat",
+      "bytes": 44350323,
+      "zip_crc32": "dc79b9e3",
+      "sha256": "5fe79f7fb1d7848ccec49845203d46ba4b1f9c551f6603f54a917bd06d57c59c"
+    },
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-4.mat",
+      "path": "Batch-1/2C_battery-4.mat",
+      "bytes": 45003278,
+      "zip_crc32": "39f5f27c",
+      "sha256": "333a202e89686e7bafe4c28bb46d0a0a95f2e4699de9cebc58fa98b680bbf577"
+    },
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-5.mat",
+      "path": "Batch-1/2C_battery-5.mat",
+      "bytes": 45819718,
+      "zip_crc32": "b8055251",
+      "sha256": "eb4ba517f8d1593e9e08697be1fb0a52e6f95be50311fcca1a0b10fc316b9cd8"
+    },
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-6.mat",
+      "path": "Batch-1/2C_battery-6.mat",
+      "bytes": 46401249,
+      "zip_crc32": "abfd1e47",
+      "sha256": "8aa9ccbba5e0bcd58a3d8371cd9f6336d62ccd86554d6ba4c92e9a6efa6d8bee"
+    },
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-7.mat",
+      "path": "Batch-1/2C_battery-7.mat",
+      "bytes": 45614404,
+      "zip_crc32": "f8cb53d9",
+      "sha256": "35608e4781253e48c22729ad3bf15114a2d41c89e664f38e74977ee566975246"
+    },
+    {
+      "member": "Battery Dataset/Batch-1/2C_battery-8.mat",
+      "path": "Batch-1/2C_battery-8.mat",
+      "bytes": 47859917,
+      "zip_crc32": "ef6a671c",
+      "sha256": "c3186b4f06e7a3d80a2a172739ab31611d7514203ec9fea653a1c630b0e2f636"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-1.mat",
+      "path": "Batch-2/3C_battery-1.mat",
+      "bytes": 30837529,
+      "zip_crc32": "f78aa14f",
+      "sha256": "1113afe4045da763c5a5c0d70459fc539dd3bd63d43dbd509b2e67fc0a36bc2a"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-10.mat",
+      "path": "Batch-2/3C_battery-10.mat",
+      "bytes": 17345769,
+      "zip_crc32": "5cb80852",
+      "sha256": "d53020fecd245869707bf895b67fc390bec58e17980d4c4beca9e58860e6540f"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-11.mat",
+      "path": "Batch-2/3C_battery-11.mat",
+      "bytes": 13865487,
+      "zip_crc32": "0e606ece",
+      "sha256": "4eabe4b1fc002933b8baf6ba13c042219adff83bd65efaf1f1ef62c26e6676b3"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-12.mat",
+      "path": "Batch-2/3C_battery-12.mat",
+      "bytes": 22237179,
+      "zip_crc32": "bc28a0cf",
+      "sha256": "dc8653c43e4e41685160aff8a665aa01fd98d872ed968dcd65134039d26ea1e4"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-13.mat",
+      "path": "Batch-2/3C_battery-13.mat",
+      "bytes": 23735057,
+      "zip_crc32": "5027c630",
+      "sha256": "1a31b0fa07e89553cb68b7e70dcdd8531b2fe4019c72aed4b1c723c31a1ee50f"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-14.mat",
+      "path": "Batch-2/3C_battery-14.mat",
+      "bytes": 15490867,
+      "zip_crc32": "1c074e1c",
+      "sha256": "d3b22335d7897dcb7e1ccc9d3f1f33a041a9b4e5547aefff0b3809ee149ed766"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-15.mat",
+      "path": "Batch-2/3C_battery-15.mat",
+      "bytes": 17584209,
+      "zip_crc32": "f8aba977",
+      "sha256": "2f1ee5357eece8650459489e39b39a0079e453f689f30c83893584cb4ea3a414"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-2.mat",
+      "path": "Batch-2/3C_battery-2.mat",
+      "bytes": 30892649,
+      "zip_crc32": "9ecf2a6b",
+      "sha256": "9eb4f3b460233517c6282752b7e82ea94125e5ca46cfbcd68d061bb6133950c0"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-3.mat",
+      "path": "Batch-2/3C_battery-3.mat",
+      "bytes": 29869736,
+      "zip_crc32": "b15d8be1",
+      "sha256": "adab52411a81117a3667e12970ccbef7b1df203825f4eef032c24aa45bbde4aa"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-4.mat",
+      "path": "Batch-2/3C_battery-4.mat",
+      "bytes": 33294040,
+      "zip_crc32": "eded1cce",
+      "sha256": "215cbb928f5b96c51eadff261b7d9999e80f5f9451b6f605a3f0e5240948ef79"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-5.mat",
+      "path": "Batch-2/3C_battery-5.mat",
+      "bytes": 30902715,
+      "zip_crc32": "0e6b1787",
+      "sha256": "fc231a8fb49b98f75c890b3dc9015735924cca95792baacc63c9c308ae2b86bc"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-6.mat",
+      "path": "Batch-2/3C_battery-6.mat",
+      "bytes": 33738699,
+      "zip_crc32": "2d7d028b",
+      "sha256": "6fb0d9c903a08f4d63b1f072b59bb3e524e51ce4c820be8fd4499484171cb2b7"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-7.mat",
+      "path": "Batch-2/3C_battery-7.mat",
+      "bytes": 32989248,
+      "zip_crc32": "4055728f",
+      "sha256": "dc25f1fb18d3998dc841b10c74f39de8748a49f63a4e2b1e6a2f8a7b53a0dc83"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-8.mat",
+      "path": "Batch-2/3C_battery-8.mat",
+      "bytes": 28310628,
+      "zip_crc32": "fd19850a",
+      "sha256": "9092219045c704cc4478939b5e3f1b473211e6272ed2d367e07f91f30e28b0c8"
+    },
+    {
+      "member": "Battery Dataset/Batch-2/3C_battery-9.mat",
+      "path": "Batch-2/3C_battery-9.mat",
+      "bytes": 29609109,
+      "zip_crc32": "bc0351e6",
+      "sha256": "e2945d8099fcb33ae1818d823a85b74fe5a1e9ffde58679dccdcfeb2613614f3"
+    }
+  ]
+}

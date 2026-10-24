@@ -4,7 +4,7 @@
 
 Trường Đại học Nguyễn Tất Thành · GVHD: ThS. Vương Xuân Chí
 
-Tôi sử dụng dữ liệu SDU công bố năm 2025 để phân tích dung lượng và ước lượng SOH từ 120 giây đầu xả. Ứng dụng **Vincent D** cung cấp tra cứu hai giai đoạn sử dụng pin, so sánh chu kỳ, đánh giá mô hình và dự đoán từ CSV.
+Tôi sử dụng dữ liệu SDU công bố năm 2025 để phân tích dung lượng và ước lượng SOH từ 120 giây đầu xả. Ứng dụng **Vincent D** cung cấp tra cứu hai giai đoạn sử dụng pin, so sánh chu kỳ, đánh giá mô hình và dự đoán từ CSV. Phần thực nghiệm bổ sung dùng XJTU 2024 để kiểm tra trên nguồn pin độc lập, với trang kết quả và dự đoán MAT riêng.
 
 ## Tải sản phẩm và dữ liệu
 
@@ -130,3 +130,28 @@ Cờ không phải xác nhận lỗi hoặc cảnh báo an toàn. Chưa có nhã
 **Ridge–RF hiệu chỉnh phần dư**: Ridge dự đoán nền, RF học phần dư trên tập học. Cùng 12 đặc trưng và 5 nhóm pin; không lấy nhãn test để hiệu chỉnh. Chạy riêng bằng `python scripts/evaluate_hybrid.py`. Mã mô hình ở `src/battery_soh/hybrid.py`, kết quả `reports/hybrid_*.csv`, mô hình bàn giao `artifacts/ridge_residual_forest.joblib`.
 
 MAE 1,612 so với RF 1,619; RMSE 2,160 so với 2,157. Kết quả gần nhau, chưa đủ kết luận vượt trội. Đây là phương án kết hợp thuật toán có sẵn, không khẳng định thuật toán mới trong nghiên cứu. Chọn được trên trang Dự đoán SOH, mặc định vẫn là RF.
+
+## Thực nghiệm bổ sung XJTU và báo cáo giữa kỳ
+
+Nguồn [XJTU 2024](https://zenodo.org/records/10963339): Lishen 18650 NCM, 2 Ah, CC BY 4.0. Triển khai **23 pin Batch-1/2** trong tổng 55 pin của nguồn; các nhóm còn lại có quy trình khác nên chưa đưa vào thực nghiệm này. Đã tải nguyên gốc và kiểm tra nguồn của 23 MAT; xử lý 46.215.511 điểm đo, tạo 6.961 chu kỳ hợp lệ. Đánh giá chính dùng **6.938 chu kỳ**, không dùng 23 chu kỳ đầu xả 0,2C để tránh trộn với các chu kỳ xả 1C.
+
+Ứng dụng có mục **Thực nghiệm XJTU**: so sánh mô hình giữ riêng pin, kiểm thử chuyển miền/batch, biểu đồ theo pin, nguồn và dự đoán MAT riêng. Không đưa MAT XJTU vào bộ đọc CSV SDU. Mô hình XJTU dùng dòng chuẩn hóa theo 2 Ah và không dùng dung lượng đo/SOH làm đầu vào.
+
+| Cấu hình trên pin XJTU giữ riêng | MAE (điểm % SOH) | RMSE |
+| --- | ---: | ---: |
+| Ridge | 0,971 | 1,205 |
+| Random Forest | 0,577 | 0,764 |
+| LightGBM | 0,596 | 0,787 |
+| GRU | 1,240 | 1,543 |
+| Ridge–RF phần dư | 0,666 | 0,828 |
+| RF đa nguồn SDU + XJTU | 0,623 | 0,867 |
+
+Năm vòng chia theo mã pin, cấu hình cố định. RF đa nguồn chưa cải thiện so với RF riêng XJTU trong cấu hình này. Chuyển mô hình chỉ học từ SDU sang XJTU có sai số lớn; ba đặc trưng chung nằm hoàn toàn ngoài khoảng SDU. Không suy rộng kết quả sang xe thực tế hoặc xem chênh lệch điểm giữa hai bộ là cải thiện trên cùng tập kiểm thử.
+
+- [Thực nghiệm XJTU và cách chạy riêng](docs/thuc-nghiem-xjtu.md).
+- [Dữ liệu, nguồn và cách tải lại](data/xjtu/README.md).
+- [Notebook XJTU đã chạy](notebooks/03_thuc_nghiem_xjtu.ipynb).
+- [Báo cáo giữa kỳ 10/11/2026 — Word](docs/bao-cao-giua-ky-10-11-2026.docx).
+- [Slide giữa kỳ — 12 trang, có ghi chú trình bày](docs/slide-giua-ky-10-11-2026.pptx).
+
+Gói sản phẩm kèm bảng dẫn xuất và mô hình đã huấn luyện; không kèm 722 MiB MAT gốc. Không cần tải MAT hoặc cài PyTorch để xem ứng dụng. Tải nguồn và chạy lại thực nghiệm đầy đủ bằng các script XJTU khi cần. Cả SDU và XJTU đều là dữ liệu tế bào trong phòng lab; BMS trên xe và RUL chưa được triển khai.

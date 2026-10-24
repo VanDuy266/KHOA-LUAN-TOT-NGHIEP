@@ -1,0 +1,29 @@
+{
+  "source": "https://zenodo.org/records/19387650",
+  "title": "Five ageing datasets for NMC lithium-ion pouch cells",
+  "publication_date": "2026-04-02",
+  "license": "cc-by-4.0",
+  "file": "rc06_reduced.csv",
+  "full_file_bytes": 562576401,
+  "full_file_checksum_expected": "md5:072462cd5cd257d916b12e364e2b9452",
+  "download_scope": "First 65536 original bytes via HTTP Range, not the entire CSV",
+  "sample_sha256": "16a045ee3b77c3c3fa7e0884061e09848d0285083885ce004d1e0568ea821e17",
+  "complete_sample_rows": 560,
+  "columns": [
+    "Time (h)",
+    "Date_Time",
+    "Step Index",
+    "Cycle Number",
+    "Current (A)",
+    "Voltage (V)",
+    "Charge Capacity (Ah)",
+    "Discharge Capacity (Ah)",
+    "Temperature (ºC)"
+  ],
+  "temperature_missing_in_sample": 1,
+  "nominal_capacity_ah": 69.5,
+  "chemistry": "NMC",
+  "level": "Laboratory cell cycling, not on-vehicle BMS",
+  "sdu_direct_inference_approved": false,
+  "reason": "Different capacity, current, cycling protocol and data schema. Requires independent preprocessing, label definition, training/transfer evaluation; sample is not a full quality audit."
+}

@@ -1,0 +1,12 @@
+{
+  "status": "passed",
+  "batteries": 23,
+  "source_cycles": 6961,
+  "model_cycles": 6938,
+  "group_folds": 5,
+  "held_out_models": 7,
+  "macro_metrics_recomputed": true,
+  "label_ratio_verified": true,
+  "sdu_inputs_hash_unchanged": true,
+  "scope": "Prepared tables, stored folds and all saved predictions checked; does not certify absence of sensor noise or vehicle validity."
+}

@@ -93,3 +93,26 @@ MAE 1,619 nghĩa là sai số trung bình 1,619 điểm phần trăm SOH trong t
 ## 9. Ridge–RF hiệu chỉnh phần dư
 
 `src/battery_soh/hybrid.py` có lớp `RidgeResidualForest`. `fit()` chuẩn hóa và học Ridge trên train, tạo phần dư train rồi học RF từ cùng đặc trưng. `predict()` cộng hai dự đoán. Không đưa y hoặc phần dư làm cột đầu vào khi suy luận. `scripts/evaluate_hybrid.py` dùng đúng phân hoạch pin cũ, lưu dự đoán giữ riêng, so sánh cặp theo pin và mô hình học lại toàn bộ. Đây là phương án kết hợp để kiểm chứng, không phải tuyên bố thuật toán mới.
+
+## Phần thực nghiệm XJTU
+
+| File | Công việc |
+| --- | --- |
+| scripts/download_xjtu.py | Tải đúng 23 MAT Batch-1/2 từ ZIP tác giả, kiểm CRC và ghi SHA-256; không sửa nguồn |
+| src/battery_soh/xjtu.py | Đọc MAT theo chu kỳ; dùng system_time, tách 120 giây đầu xả, kiểm dung lượng; tính SOH theo 2 Ah |
+| scripts/prepare_xjtu.py | Xử lý lần lượt từng pin; lưu đặc trưng, chuỗi GRU và nhật ký kiểm tra riêng |
+| scripts/evaluate_xjtu.py | Chia 5 nhóm pin; chạy bốn mô hình, mốc trung bình và hai phương án kết hợp; kiểm tra chuyển nguồn/batch |
+| scripts/analyze_xjtu.py | Tìm đặc trưng ngoài khoảng SDU, phân tích sai số theo batch và so sánh cặp theo pin |
+| scripts/check_xjtu.py | Đối chiếu nhãn, khóa, nhóm pin và tính lại MAE/RMSE từ dự đoán lưu |
+| scripts/save_xjtu_models.py | Refit hai RF cho ứng dụng; không thay các điểm kiểm thử đã lưu |
+| app/screens/xjtu.py | Hiển thị thực nghiệm, nguồn, biểu đồ và dự đoán XJTU riêng |
+| notebooks/03_thuc_nghiem_xjtu.ipynb | Xem phân tích và chạy lại một vòng RF ngoài Streamlit |
+| scripts/build_midterm.py | Sinh báo cáo tiến độ và 12 slide giữa kỳ 10/11/2026 |
+
+XJTU có 6.961 chu kỳ hợp lệ. Chu kỳ đầu của mỗi pin đo ở 0,2C; 23 chu kỳ này được giữ trong bảng để đối chiếu nhưng không dùng cho đánh giá chính xả 1C. Có 6.938 chu kỳ trong kiểm thử mô hình.
+
+`normalized_features` lấy 11 đặc trưng, bỏ giai đoạn, chia hai thống kê dòng điện cho dung lượng danh định (SDU 2,4 Ah; XJTU 2 Ah). Không chia cho dung lượng đo của chu kỳ vì đó là thông tin tạo nhãn. Các thống kê điện áp/nhiệt độ và số chu kỳ được giữ.
+
+RF đa nguồn: trong mỗi vòng, tập học gồm SDU và các pin XJTU thuộc train; mỗi nguồn có tổng trọng số 0,5 để nguồn nhiều dòng không lấn hoàn toàn nguồn ít dòng. Tất cả pin XJTU test vẫn được giữ riêng. Cấu hình này có MAE 0,623, lớn hơn RF riêng XJTU 0,577 trong lần chạy; không kết luận thêm dữ liệu luôn tốt hơn.
+
+Mô hình SDU chuyển trực tiếp sang XJTU sai số lớn. Dòng xả chuẩn hóa, độ lệch chuẩn và độ dốc điện áp XJTU đều ngoài khoảng SDU trong kiểm tra hiện tại. RF SDU 11 đặc trưng còn bỏ phase_code, nên so sánh với RF SDU nguyên bản không tách riêng tác dụng chuẩn hóa dòng. Điểm XJTU và SDU không được so sánh như cùng một bộ test.

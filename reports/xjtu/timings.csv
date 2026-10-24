@@ -1,0 +1,36 @@
+design,model,fold,fit_predict_seconds
+XJTU held-out,Mean baseline,1,0.1504410959314555
+XJTU held-out,Ridge,1,0.0059347080532461405
+XJTU held-out,Random Forest,1,1.007408412056975
+XJTU held-out,LightGBM,1,0.08334232808556408
+XJTU held-out,Ridge-RF residual,1,1.1189876020653173
+XJTU held-out,RF multi-source,1,6.328656386001967
+XJTU held-out,GRU,1,4.852372013032436
+XJTU held-out,Mean baseline,2,0.002546186908148229
+XJTU held-out,Ridge,2,0.005172675009816885
+XJTU held-out,Random Forest,2,0.9864998430712149
+XJTU held-out,LightGBM,2,0.06873203802388161
+XJTU held-out,Ridge-RF residual,2,1.1088629990117624
+XJTU held-out,RF multi-source,2,6.333439872018062
+XJTU held-out,GRU,2,4.019217589055188
+XJTU held-out,Mean baseline,3,0.002156417933292687
+XJTU held-out,Ridge,3,0.004313476965762675
+XJTU held-out,Random Forest,3,0.9760784049285576
+XJTU held-out,LightGBM,3,0.08583803300280124
+XJTU held-out,Ridge-RF residual,3,1.1890481829177588
+XJTU held-out,RF multi-source,3,6.503162711043842
+XJTU held-out,GRU,3,4.430640163947828
+XJTU held-out,Mean baseline,4,0.00235976604744792
+XJTU held-out,Ridge,4,0.004731380031444132
+XJTU held-out,Random Forest,4,1.1456541599472985
+XJTU held-out,LightGBM,4,0.07620017800945789
+XJTU held-out,Ridge-RF residual,4,1.1997879950795323
+XJTU held-out,RF multi-source,4,6.524234300013632
+XJTU held-out,GRU,4,4.821574813919142
+XJTU held-out,Mean baseline,5,0.002462561009451747
+XJTU held-out,Ridge,5,0.004624357912689447
+XJTU held-out,Random Forest,5,1.128440683009103
+XJTU held-out,LightGBM,5,0.08392617700155824
+XJTU held-out,Ridge-RF residual,5,1.3145166509784758
+XJTU held-out,RF multi-source,5,6.411931826965883
+XJTU held-out,GRU,5,4.647084709955379

@@ -1,0 +1,12 @@
+{
+  "comparison": "RF multi-source minus XJTU-only RF MAE; positive means worse",
+  "paired_cells": 23,
+  "mean_difference_pp": 0.046604944759070184,
+  "cell_bootstrap_95pct_interval_pp": [
+    -0.003536928282564481,
+    0.13682988108718747
+  ],
+  "interpretation": "Exploratory paired comparison on the same 23 held-out cells, not independent confirmation or correction for multiple comparisons.",
+  "transfer_caution": "RF original SDU uses 12 raw features. RF normalized also removes phase_code; this comparison does not isolate the effect of current normalization.",
+  "between_dataset_caution": "Do not interpret lower XJTU MAE than SDU MAE as improvement on an identical test set; sources and target ranges differ."
+}

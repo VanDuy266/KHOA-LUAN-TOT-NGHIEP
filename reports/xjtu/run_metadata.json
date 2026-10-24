@@ -1,0 +1,104 @@
+{
+  "seed": 42,
+  "folds": 5,
+  "model_cycles": 6938,
+  "initial_reference_cycles_not_used": 23,
+  "features": [
+    "cycle",
+    "voltage_mean",
+    "voltage_min",
+    "voltage_max",
+    "voltage_std",
+    "voltage_slope",
+    "current_mean",
+    "current_std",
+    "temperature_mean",
+    "temperature_max",
+    "temperature_slope"
+  ],
+  "features_sha256": "c20caab44f6efee49750d16bb0e2f85f8fa804ce059c01db90f64cbbf37a1188",
+  "sdu_features_sha256": "b686d3cb9af5e1dc22369c50ef53199f2284e1dfe90eee64592fc914ac50a008",
+  "normalization": "current_mean and current_std divided by source nominal Ah, not measured capacity; phase_code removed",
+  "soh_definition": "XJTU discharge_capacity_Ah / nominal 2.0 Ah * 100; SDU / nominal 2.4 Ah * 100",
+  "evaluation": "5-fold grouped by physical XJTU cell, shuffled seed 42; macro unweighted across 23 cells; fixed settings, no hyperparameter tuning",
+  "multi_source": "All SDU + XJTU train cells only per fold; total sample weights 0.5 per source. Test XJTU labels not used in training.",
+  "transfer": "Frozen original SDU RF and independently refit RF on SDU normalized features; no XJTU labels used for fit",
+  "gru": {
+    "included": true,
+    "hidden": 24,
+    "epochs": 20,
+    "sequence_positions": 25,
+    "training_scalers_only": true
+  },
+  "parameters": {
+    "Mean baseline": {
+      "constant": null,
+      "quantile": null,
+      "strategy": "mean"
+    },
+    "Ridge": {
+      "memory": null,
+      "steps": [
+        [
+          "standardscaler",
+          "StandardScaler()"
+        ],
+        [
+          "ridge",
+          "Ridge(alpha=10.0)"
+        ]
+      ],
+      "transform_input": null,
+      "verbose": false
+    },
+    "Random Forest": {
+      "bootstrap": true,
+      "ccp_alpha": 0.0,
+      "criterion": "squared_error",
+      "max_depth": 16,
+      "max_features": 1.0,
+      "max_leaf_nodes": null,
+      "max_samples": 0.7,
+      "min_impurity_decrease": 0.0,
+      "min_samples_leaf": 5,
+      "min_samples_split": 2,
+      "min_weight_fraction_leaf": 0.0,
+      "monotonic_cst": null,
+      "n_estimators": 100,
+      "n_jobs": 2,
+      "oob_score": false,
+      "random_state": 42,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "LightGBM": {
+      "boosting_type": "gbdt",
+      "class_weight": null,
+      "colsample_bytree": 1.0,
+      "importance_type": "split",
+      "learning_rate": 0.05,
+      "max_depth": -1,
+      "min_child_samples": 20,
+      "min_child_weight": 0.001,
+      "min_split_gain": 0.0,
+      "n_estimators": 150,
+      "n_jobs": 2,
+      "num_leaves": 15,
+      "objective": null,
+      "random_state": 42,
+      "reg_alpha": 0.0,
+      "reg_lambda": 1.0,
+      "subsample": 1.0,
+      "subsample_for_bin": 200000,
+      "subsample_freq": 0,
+      "verbosity": -1
+    },
+    "Ridge-RF residual": {
+      "alpha": 10.0,
+      "n_estimators": 100,
+      "n_jobs": 2,
+      "random_state": 42
+    }
+  },
+  "limitations": "Exploratory multi-source and source-transfer experiments. No real-vehicle BMS, no RUL, no claim of universal performance. App artifacts refit on all training-source cells and are not held-out validation."
+}

@@ -147,6 +147,8 @@ Giao diện đọc bảng nhỏ cho thống kê và chỉ đọc dữ liệu chu
 Tổng quan trình bày quy mô dữ liệu, sai số và đường SOH theo giai đoạn. Tra cứu cho phép lọc pin, giai đoạn, khoảng chu kỳ, xem tín hiệu và so sánh hai chu kỳ. Đánh giá mô hình hiển thị chỉ số, dự đoán giữ riêng, sai số, thời gian và thử nghiệm bỏ đặc trưng.
 Dự đoán nhận CSV hoặc CSV.GZ tới 512 MiB cho một chu kỳ hoặc tối đa 2.000 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
 Lịch sử được giữ trong phiên; khi người dùng chọn lưu, kết quả và tên nguồn được ghi vào SQLite cục bộ trên máy chủ, không lưu nội dung CSV tải lên. Kho này dùng chung trên máy chủ, chưa có phân quyền tài khoản. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang Xu hướng bất thường hiển thị chuỗi SOH, nền quá khứ, cờ của quy tắc/Isolation Forest và lý do; dữ liệu có thể xuất CSV. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu. Các trang kiểm tra đầu vào và demo trên pin giữ riêng được giữ lại. Phần phân rã dự đoán dùng hệ số Ridge và đường đi trong cây phù hợp với mô hình đang chọn, không gọi là SHAP hoặc quan hệ nhân quả.
+Mục Thực nghiệm XJTU bổ sung bảng kiểm thử nguồn độc lập, biểu đồ theo pin, nguồn và dự đoán MAT riêng. RF riêng XJTU và RF đa nguồn dùng dòng chuẩn hóa theo dung lượng danh định; điểm refit ứng dụng được phân biệt với kiểm thử pin giữ riêng.
+
 ## 5.3. Mô hình ứng dụng
 Random Forest là mô hình triển khai được quy định trước cho bản ứng dụng. Mô hình này được học lại trên toàn bộ 20.823 mẫu để phục vụ ước lượng; không lấy sai số trên chính dữ liệu học lại để báo cáo chất lượng. Điểm thực nghiệm luôn đọc từ các dự đoán giữ riêng đã lưu.
 Ứng dụng hiển thị cảnh báo khi đặc trưng nằm ngoài khoảng quan sát của dữ liệu huấn luyện. Kiểm tra khoảng riêng từng biến chưa đủ phát hiện mọi trường hợp ngoài phân phối. Dự đoán không bị ép vào một khoảng đẹp hơn và không được dùng như chứng nhận an toàn pin.
@@ -171,6 +173,9 @@ Hướng phát triển gồm dữ liệu vận hành độc lập, mở rộng �
 [6] Cho, K., et al. (2014). Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation. EMNLP. https://arxiv.org/abs/1406.1078.
 [7] Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825–2830. https://jmlr.org/papers/v12/pedregosa11a.html.
 [8] Liu, F. T., Ting, K. M., & Zhou, Z.-H. (2008). Isolation Forest. IEEE ICDM, 413–422. https://doi.org/10.1109/ICDM.2008.17.
+
+[9] Wang, F. (2024). XJTU Battery Dataset [Data set]. Zenodo. https://doi.org/10.5281/zenodo.10963339. CC BY 4.0.
+[10] Wang, F., Zhai, Z., Zhao, Z., et al. (2024). Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis. Nature Communications, 15, 4332. https://doi.org/10.1038/s41467-024-48779-z.
 
 # Phụ lục A. Kết quả Random Forest theo pin
 Bảng lấy từ dự đoán kiểm thử pin giữ riêng. Chi tiết mọi mô hình được lưu trong reports/metrics_by_battery.csv và reports/predictions.csv.

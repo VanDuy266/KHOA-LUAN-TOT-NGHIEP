@@ -193,6 +193,35 @@ Tôi kiểm chứng cách kết hợp hai thuật toán có sẵn [3,4]: Ridge h
 Phương án phần dư đạt MAE khoảng 1,612 điểm phần trăm SOH so với 1,619 của RF; RMSE khoảng 2,160 so với 2,157. Cải thiện MAE nhỏ và RMSE hơi tăng, chưa chứng minh ưu thế rõ ràng. Kết quả theo từng pin, cả trường hợp tăng và giảm sai số, được giữ trong reports/hybrid_paired_comparison.csv. Chưa khảo sát nhiều seed hoặc bộ dữ liệu độc lập nên không khẳng định cải tiến có ý nghĩa thống kê hoặc tổng quát.
 Đây là phương án kết hợp được triển khai và đánh giá trong khóa luận, không tuyên bố là thuật toán hoàn toàn mới hoặc công bố đầu tiên. Mô hình học lại toàn bộ được lưu riêng và có thể chọn trên trang dự đoán; kết quả này tách khỏi các dự đoán giữ riêng dùng đánh giá. Random Forest vẫn là lựa chọn mặc định của ứng dụng, không dùng chênh lệch nhỏ trên test để tuyên bố đổi mô hình tốt nhất.
 
+## 4.11. Thực nghiệm bổ sung trên nguồn XJTU
+
+Chọn 23 pin thuộc Batch-1/2 trong 55 pin XJTU. Đã tải và kiểm tra CRC/SHA-256 của 23 thành viên MAT nguyên gốc từ ZIP tác giả. Tổng 46.215.511 điểm đo. 6.961 phần tử chu kỳ; 6.961 chu kỳ đạt kiểm tra đầu vào. 0 chu kỳ bị loại. 59 phép đo trùng giây được gộp trung bình trong cửa sổ dẫn xuất.
+
+Không dùng 23 chu kỳ đầu 0,2C trong đánh giá chính; còn 6,938 chu kỳ xả 1C. Dùng SOH theo 2 Ah và 11 đặc trưng chung, chuẩn hóa dòng theo dung lượng danh định; không sửa dữ liệu nguồn. Giữ riêng 23 mã pin qua 5 vòng, seed 42, cấu hình cố định.
+
+| model | mae | rmse | r2 |
+| --- | --- | --- | --- |
+| Mean baseline | 3.759 | 4.720 | -0.057 |
+| Ridge | 0.971 | 1.205 | 0.920 |
+| Random Forest | 0.577 | 0.764 | 0.965 |
+| LightGBM | 0.596 | 0.787 | 0.964 |
+| Ridge-RF residual | 0.666 | 0.828 | 0.960 |
+| RF multi-source | 0.623 | 0.867 | 0.945 |
+| GRU | 1.240 | 1.543 | 0.856 |
+
+Random Forest riêng XJTU đạt MAE 0.577, RMSE 0.764, R² 0.965. RF đa nguồn đạt MAE 0.623, RMSE 0.867, R² 0.945. MAE tăng 0.047 điểm phần trăm SOH khi thêm nguồn SDU trong cấu hình đã cố định. Đây là thực nghiệm thăm dò trên cùng phân hoạch, chưa phải bằng chứng ưu thế thống kê hoặc cải thiện trên mọi điều kiện.
+
+![Dự đoán RF trên hai pin XJTU giữ riêng](../reports/xjtu/held_out_predictions.png)
+
+Chuyển miền chỉ học trên SDU, không dùng nhãn XJTU:
+
+| model | mae | rmse | r2 |
+| --- | --- | --- | --- |
+| RF normalized | 42.654 | 42.910 | -89.595 |
+| RF original SDU | 12.836 | 13.649 | -8.045 |
+
+Các phép kiểm tra batch và bảng theo từng pin nằm trong reports/xjtu và docs/thuc-nghiem-xjtu.md. Kết quả vẫn thuộc tế bào trong phòng thí nghiệm; chưa là bằng chứng mô hình dùng được trên xe.
+
 # Chương 5. Xây dựng sản phẩm Vincent D
 ## 5.1. Kiến trúc phần mềm
 Quy trình gồm tầng nguồn CSV gzip, tầng chuyển đổi Parquet, tầng đặc trưng và huấn luyện, tầng báo cáo kết quả và tầng giao diện. Thư mục src/battery_soh chứa hàm đặc trưng dùng chung; scripts chứa các bước có thể chạy lại; app/screens chia từng màn hình; reports lưu bằng chứng thực nghiệm; artifacts lưu mô hình tin cậy do dự án tạo.
@@ -201,6 +230,8 @@ Giao diện đọc bảng nhỏ cho thống kê và chỉ đọc dữ liệu chu
 Tổng quan trình bày quy mô dữ liệu, sai số và đường SOH theo giai đoạn. Tra cứu cho phép lọc pin, giai đoạn, khoảng chu kỳ, xem tín hiệu và so sánh hai chu kỳ. Đánh giá mô hình hiển thị chỉ số, dự đoán giữ riêng, sai số, thời gian và thử nghiệm bỏ đặc trưng.
 Dự đoán nhận CSV hoặc CSV.GZ tới 512 MiB cho một chu kỳ hoặc tối đa 2.000 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
 Lịch sử được giữ trong phiên; khi người dùng chọn lưu, kết quả và tên nguồn được ghi vào SQLite cục bộ trên máy chủ, không lưu nội dung CSV tải lên. Kho này dùng chung trên máy chủ, chưa có phân quyền tài khoản. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang Xu hướng bất thường hiển thị chuỗi SOH, nền quá khứ, cờ của quy tắc/Isolation Forest và lý do; dữ liệu có thể xuất CSV. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu. Các trang kiểm tra đầu vào và demo trên pin giữ riêng được giữ lại. Phần phân rã dự đoán dùng hệ số Ridge và đường đi trong cây phù hợp với mô hình đang chọn, không gọi là SHAP hoặc quan hệ nhân quả.
+Mục Thực nghiệm XJTU bổ sung bảng kiểm thử nguồn độc lập, biểu đồ theo pin, nguồn và dự đoán MAT riêng. RF riêng XJTU và RF đa nguồn dùng dòng chuẩn hóa theo dung lượng danh định; điểm refit ứng dụng được phân biệt với kiểm thử pin giữ riêng.
+
 ![Hình 5.1. Tổng quan Vincent D với dữ liệu SDU](images/vincent_d_sdu_overview.png)
 
 ## 5.3. Mô hình ứng dụng
@@ -208,7 +239,7 @@ Random Forest là mô hình triển khai được quy định trước cho bản
 Ứng dụng hiển thị cảnh báo khi đặc trưng nằm ngoài khoảng quan sát của dữ liệu huấn luyện. Kiểm tra khoảng riêng từng biến chưa đủ phát hiện mọi trường hợp ngoài phân phối. Dự đoán không bị ép vào một khoảng đẹp hơn và không được dùng như chứng nhận an toàn pin.
 ## 5.4. Kiểm tra sản phẩm
 Các kiểm thử bao gồm tính độc lập của đặc trưng với tín hiệu sau 120 giây và nhãn, tính đúng định nghĩa SOH, khóa pin/giai đoạn/chu kỳ, phân hoạch không trùng pin, đối chiếu chỉ số với dự đoán đã lưu và kiểm thử các màn hình Streamlit. Dự đoán mẫu, dự đoán theo lô, lịch sử phiên và lỗi CSV cũng được kiểm tra.
-Lần kiểm thử lưu trong reports/pytest-results.xml gồm 74 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
+Lần kiểm thử lưu trong reports/pytest-results.xml gồm 82 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
 ## 5.5. Lưu trữ và bàn giao
 Gói sản phẩm chứa mã nguồn, thư viện được khóa phiên bản, dữ liệu Parquet phục vụ tra cứu, bảng đặc trưng, mô hình, notebook đã chạy, kết quả thực nghiệm và báo cáo/slide. Bộ dữ liệu nguồn được nộp riêng dưới dạng source_rows với hai giai đoạn, các bảng chu kỳ và hồ sơ kiểm tra, trích dẫn. Không cần giải nén từng file CSV gzip để chương trình đọc.
 Các file nguồn lớn không được đưa vào bộ nhớ cùng lúc. Môi trường .venv không đóng gói vì phụ thuộc hệ điều hành; môi trường được tạo lại bằng danh sách thư viện. Dữ liệu nguồn không thuộc quyền sở hữu riêng của tác giả khóa luận và được sử dụng theo giấy phép CC BY 4.0.
@@ -227,6 +258,9 @@ Hướng phát triển gồm dữ liệu vận hành độc lập, mở rộng �
 [6] Cho, K., et al. (2014). Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation. EMNLP. https://arxiv.org/abs/1406.1078.
 [7] Pedregosa, F., et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825–2830. https://jmlr.org/papers/v12/pedregosa11a.html.
 [8] Liu, F. T., Ting, K. M., & Zhou, Z.-H. (2008). Isolation Forest. IEEE ICDM, 413–422. https://doi.org/10.1109/ICDM.2008.17.
+
+[9] Wang, F. (2024). XJTU Battery Dataset [Data set]. Zenodo. https://doi.org/10.5281/zenodo.10963339. CC BY 4.0.
+[10] Wang, F., Zhai, Z., Zhao, Z., et al. (2024). Physics-informed neural network for lithium-ion battery degradation stable modeling and prognosis. Nature Communications, 15, 4332. https://doi.org/10.1038/s41467-024-48779-z.
 
 # Phụ lục A. Kết quả Random Forest theo pin
 Bảng lấy từ dự đoán kiểm thử pin giữ riêng. Chi tiết mọi mô hình được lưu trong reports/metrics_by_battery.csv và reports/predictions.csv.

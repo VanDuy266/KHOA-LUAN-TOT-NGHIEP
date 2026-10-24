@@ -1,0 +1,34 @@
+{
+  "source": "https://zenodo.org/records/10963339",
+  "paper": "https://doi.org/10.1038/s41467-024-48779-z",
+  "publication_date": "2024-04-12",
+  "license": "CC BY 4.0",
+  "source_cells": 55,
+  "nominal_capacity_ah": 2.0,
+  "manufacturer": "LISHEN",
+  "cathode_formula": "LiNi0.5Co0.2Mn0.3O2",
+  "sample_archive_member": "Battery Dataset/Batch-1/2C_battery-1.mat",
+  "sample_bytes": 44388077,
+  "sample_sha256": "336a0c25c9d6e4c18a231c0b4004edfb44fbd7808533490cddf4d073ce854dbb",
+  "sample_zip_crc_verified": true,
+  "sample_cycles": 390,
+  "sample_measurement_rows": 2702101,
+  "sample_fields": [
+    "system_time",
+    "relative_time_min",
+    "voltage_V",
+    "current_A",
+    "capacity_Ah",
+    "power_Wh",
+    "temperature_C",
+    "description"
+  ],
+  "nonfinite_counts": {
+    "relative_time_min": 0,
+    "voltage_V": 0,
+    "current_A": 0,
+    "capacity_Ah": 0,
+    "temperature_C": 0
+  },
+  "scope": "One complete cell file read; not a full 55-cell quality audit, no model inference performed. Different current and capacity from SDU. Laboratory data, not vehicle BMS."
+}

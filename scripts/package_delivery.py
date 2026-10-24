@@ -48,6 +48,8 @@ def product_files():
         elif rel.parts[0] == "data":
             if len(rel.parts) == 2 and path.suffix in {".md", ".json"}:
                 yield path
+            elif rel.parts[1] == "xjtu" and len(rel.parts) > 2 and rel.parts[2] != "raw":
+                yield path
             elif rel.parts[1] == "provenance":
                 yield path
             elif rel.parts[1] == "clean" and (
@@ -81,6 +83,9 @@ def main():
     manifest = dict(
         dataset="SDU", rows=10505065, cycles=20823, batteries=86, files=files
     )
+    extra = ROOT / "reports/xjtu/dataset_summary.json"
+    if extra.exists():
+        manifest["supplementary_datasets"] = [json.loads(extra.read_text())]
     (staging / "MANIFEST_SHA256.json").write_text(json.dumps(manifest, indent=2) + "\n")
     output = destination / "VincentD_SDU.zip"
     with zipfile.ZipFile(output, "w", zipfile.ZIP_DEFLATED, compresslevel=6) as archive:
