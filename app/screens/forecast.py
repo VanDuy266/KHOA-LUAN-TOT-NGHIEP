@@ -13,6 +13,9 @@ from result_report import add_history, current_time, html_report
 
 def render():
     heading("", "Dự đoán tình trạng sức khỏe pin", "")
+    selected_model = st.selectbox(
+        "Mô hình SOH", ["Random Forest", "Ridge–RF phần dư"], key="soh_model"
+    )
     mode = st.radio(
         "Chế độ dự đoán",
         ["Một chu kỳ", "Theo lô"],
@@ -111,6 +114,7 @@ def render():
         )
     content = uploaded.getvalue() if uploaded is not None else None
     input_key = (
+        selected_model,
         phase_code,
         content,
         use_example,
@@ -137,7 +141,7 @@ def render():
                     raise ValueError(
                         "File không có chu kỳ xả đã chọn. Kiểm tra số chu kỳ hoặc chọn Theo lô."
                     )
-            artifact = model()
+            artifact = model(selected_model)
             features, outside = None, []
             if mode == "Một chu kỳ":
                 estimate, features, outside = predict(frame, cycle, artifact)
@@ -162,6 +166,7 @@ def render():
                 )
             else:
                 rows = predict_batch(frame, artifact)
+            rows["model"] = selected_model
             created = current_time()
             source = (
                 uploaded.name
@@ -174,7 +179,7 @@ def render():
                     if content is not None
                     else sample.to_csv(index=False).encode()
                 )
-                + str((cycle, phase_code, mode, source)).encode()
+                + str((cycle, phase_code, mode, source, selected_model)).encode()
             ).hexdigest()
             st.session_state["prediction_history"] = add_history(
                 st.session_state.get("prediction_history", []),
@@ -230,7 +235,7 @@ def render():
 
             st.altair_chart(soh_trend(chart), width="stretch", theme=None)
         st.caption(source + " · SOH theo dung lượng danh định 2,4 Ah")
-    export = rows.assign(model="Random Forest", window_seconds=120)
+    export = rows.assign(window_seconds=120)
     a, b = st.columns(2)
     with a:
         csv_download(

@@ -98,7 +98,7 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 
 | Thư mục | Nội dung |
 | --- | --- |
-| `app/` | 7 trang Streamlit, dự đoán CSV, biểu đồ, lịch sử phiên |
+| `app/` | 8 trang Streamlit, dự đoán CSV, biểu đồ, lịch sử phiên |
 | `src/battery_soh/` | Hàm đặc trưng và kiểm nhãn dùng chung |
 | `scripts/` | Nhận dữ liệu, chuyển đổi, huấn luyện, đánh giá, tạo tài liệu |
 | `data/clean/` | Parquet theo pin/giai đoạn, mẫu CSV, bảng đặc trưng và nhãn |
@@ -106,7 +106,7 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 | `artifacts/` | Mô hình bảng, trọng số GRU và thông số chuẩn hóa |
 | `reports/` | Dự đoán kiểm thử, chỉ số, phân hoạch, thời gian và biểu đồ |
 | `notebooks/01_eda.ipynb` | Notebook phân tích đã chạy |
-| `docs/` | Báo cáo Word/Markdown/PDF, 18 slide, tài liệu kỹ thuật |
+| `docs/` | Báo cáo Word/Markdown/PDF, 20 slide, tài liệu kỹ thuật |
 | `tests/` | Kiểm thử dữ liệu, mô hình, CSV và giao diện |
 
 [Giải thích mã nguồn](docs/giai-thich-code.md) · [Nội dung trình bày](docs/noi-dung-trinh-bay.md) · [Danh mục bàn giao](docs/danh-muc-ban-giao.md)
@@ -114,3 +114,19 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 Bản báo cáo dùng thông tin trường và GVHD theo phiếu đăng ký. Mẫu trình bày, số trang và thủ tục nộp cuối cùng phụ thuộc quy định khoa và xác nhận của giảng viên.
 
 CSV đầu vào: tối đa 512 MiB, hỗ trợ `.csv` và `.csv.gz`, gồm tên cột gốc SDU. Chọn đúng giai đoạn sử dụng; chế độ Theo lô xử lý tới 2.000 chu kỳ. File lớn nhất của bộ hiện tại khoảng 82,8 MiB sau giải nén.
+
+## Giám sát xu hướng bất thường
+
+Trang **Xu hướng bất thường** hiển thị SOH tham chiếu, xu hướng từ lịch sử, điểm gắn cờ và lý do. Isolation Forest được kiểm thử giữ riêng pin; ngưỡng chỉ học từ train. Quy tắc nền dùng tối đa 8 khoảng quan sát trước đó. Chạy riêng:
+
+```powershell
+.\.venv\Scripts\python.exe scripts\analyze_anomalies.py
+```
+
+Cờ không phải xác nhận lỗi hoặc cảnh báo an toàn. Chưa có nhãn lỗi thực để tính precision/recall. Chưa có dữ liệu BMS trên xe nên **chưa kiểm chứng thực tế**; xem `docs/kiem-chung-bms.md`. Chức năng dùng SOH tham chiếu sau đo dung lượng, tách khỏi mô hình dự đoán 120 giây đầu.
+
+## Phương án kết hợp trong khóa luận
+
+**Ridge–RF hiệu chỉnh phần dư**: Ridge dự đoán nền, RF học phần dư trên tập học. Cùng 12 đặc trưng và 5 nhóm pin; không lấy nhãn test để hiệu chỉnh. Chạy riêng bằng `python scripts/evaluate_hybrid.py`. Mã mô hình ở `src/battery_soh/hybrid.py`, kết quả `reports/hybrid_*.csv`, mô hình bàn giao `artifacts/ridge_residual_forest.joblib`.
+
+MAE 1,612 so với RF 1,619; RMSE 2,160 so với 2,157. Kết quả gần nhau, chưa đủ kết luận vượt trội. Đây là phương án kết hợp thuật toán có sẵn, không khẳng định thuật toán mới trong nghiên cứu. Chọn được trên trang Dự đoán SOH, mặc định vẫn là RF.

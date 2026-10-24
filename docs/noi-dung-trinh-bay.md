@@ -12,7 +12,7 @@ Tôi nghiên cứu ước lượng SOH từ 120 giây đầu chu kỳ xả. SOH 
 | Đánh giá | Giữ riêng pin qua cả hai giai đoạn, 5 vòng | Slide 9, split_assignments.csv |
 | Kết quả | MAE, RMSE, R²; sai số theo pin và giai đoạn | Slide 10–14, reports/ |
 | Sản phẩm | Tra cứu, so sánh, dự đoán và xuất kết quả | Slide 15–16, trình duyệt |
-| Kết luận | Kết quả trong phạm vi thí nghiệm và hướng mở rộng | Slide 17–18 |
+| Kết luận | Kết quả trong phạm vi thí nghiệm và hướng mở rộng | Slide 19–20 |
 
 ## Trình tự demo
 
@@ -27,3 +27,7 @@ Tôi mở Vincent D, chọn một giai đoạn ở Tổng quan và xem SOH theo 
 10.505.065 dòng là số điểm đo; mô hình bảng có 20.823 mẫu chu kỳ và 86 pin độc lập theo mã vật lý. Hai giai đoạn không tạo thành 172 pin độc lập. Giảm mật độ điểm sau 120 giây là lấy thưa, không phải kết luận tất cả điểm bị bỏ là nhiễu.
 
 Random Forest đạt MAE 1,619 điểm phần trăm SOH trong cấu hình đã thử. GRU phức tạp hơn nhưng chưa tốt hơn trên bộ chọn này. Nguồn là thí nghiệm pin tại Trung Quốc, không phải xe đang vận hành tại Việt Nam. Bài hiện tại chưa dự báo RUL và chưa chứng nhận an toàn pin.
+
+Phần giám sát xu hướng dùng slide 17: quy tắc lịch sử và Isolation Forest, 74 và 135 cờ xem xét theo hai giai đoạn. Không gọi các cờ là lỗi pin xác nhận. Chưa có dữ liệu BMS để kiểm chứng trên xe.
+
+Slide 18: Ridge–RF phần dư, cách học trên train, kết quả MAE gần RF và RMSE hơi tăng. Không khẳng định mô hình hoàn toàn mới hoặc hiệu quả vượt trội.

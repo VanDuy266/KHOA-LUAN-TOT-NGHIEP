@@ -21,3 +21,5 @@ Bộ dữ liệu ZIP gồm `source_rows/Primary_use_phase/` và `source_rows/Sec
 Nguồn gốc đầy đủ, giấy phép CC BY 4.0 và checksum được ghi trong hồ sơ. Gói sản phẩm chứa bản Parquet dẫn xuất để chạy nhanh, không thay thế việc lưu trữ nguồn và trích dẫn.
 
 Tên trường, thông tin sinh viên và GVHD theo phiếu đăng ký. Quy định về biểu mẫu, chữ ký, số lượng bản in, số trang và thủ tục nộp cuối cùng do khoa/giảng viên xác nhận.
+
+Giám sát xu hướng: `src/battery_soh/anomaly.py`, `scripts/analyze_anomalies.py`, `reports/anomaly_*.csv`, `reports/anomaly_metadata.json`, `artifacts/anomaly_iforest.joblib`. Kế hoạch BMS: `docs/kiem-chung-bms.md`; chưa có thực nghiệm BMS trên xe.

@@ -11,7 +11,16 @@ ROOT = APP.parent
 sys.path.insert(0, str(APP))
 sys.path.insert(0, str(ROOT / "src"))
 
-from screens import overview, explorer, evaluation, forecast, profile, history, quality
+from screens import (
+    overview,
+    explorer,
+    evaluation,
+    forecast,
+    profile,
+    history,
+    quality,
+    anomalies,
+)
 
 st.set_page_config(
     page_title="Vincent D · Sức khỏe pin",
@@ -37,6 +46,7 @@ with st.sidebar:
             "Tra cứu pin",
             "Đánh giá mô hình",
             "Dự đoán SOH",
+            "Xu hướng bất thường",
             "Lịch sử dự đoán",
             "Chất lượng dữ liệu",
             "Thông tin",
@@ -74,6 +84,7 @@ if dataset.get("dataset") != "SDU":
     st.stop()
 
 screens = {
+    "Xu hướng bất thường": anomalies.render,
     "Chất lượng dữ liệu": quality.render,
     "Tổng quan": overview.render,
     "Tra cứu pin": explorer.render,

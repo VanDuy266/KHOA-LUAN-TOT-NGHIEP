@@ -1,0 +1,23 @@
+{
+  "method": "Past-window robust trend + Isolation Forest",
+  "window": 8,
+  "min_history": 5,
+  "rule_z": 4.5,
+  "rule_innovation_pp": 1.0,
+  "scale_floor_soh_pp_percycle": 0.01,
+  "iforest_threshold": "99th percentile training scores; strict greater-than",
+  "seed": 42,
+  "validation": "Same 5 physical-battery folds; threshold fitted on training pins only",
+  "target": "Observed reference SOH sequence, not predicted SOH or raw BMS signals",
+  "features": [
+    "rate_per100",
+    "innovation_pp",
+    "robust_z",
+    "prior_rate_per100"
+  ],
+  "source_sha256": "b686d3cb9af5e1dc22369c50ef53199f2284e1dfe90eee64592fc914ac50a008",
+  "ground_truth_fault_labels": false,
+  "precision_recall_available": false,
+  "bms_vehicle_validation": false,
+  "limitations": "Flags for review only; no sensitivity/specificity, fault diagnosis, RUL or vehicle safety claim. Within a held-out pin, previous observations are available to monitoring."
+}

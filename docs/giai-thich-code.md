@@ -81,3 +81,15 @@ MAE 1,619 nghĩa là sai số trung bình 1,619 điểm phần trăm SOH trong t
 `check_dataset.py` đọc toàn bộ 10.505.065 dòng theo từng lô để kiểm số dòng, tín hiệu, nhãn và khóa. Các bài pytest kiểm rò rỉ đặc trưng tương lai, phân hoạch pin, đối chiếu chỉ số từ dự đoán đã lưu, CSV và các màn hình.
 
 `reproduce.py` điều phối lần lượt các bước và dừng khi có lỗi. `build_notebook.py` thực thi notebook trước khi lưu. `build_documents.py` lấy số liệu thực từ CSV để tạo báo cáo và slide, không ghi cứng kết quả trong nội dung báo cáo.
+
+## 8. Giám sát xu hướng SOH
+
+`src/battery_soh/anomaly.py` tạo đặc trưng theo từng pin và giai đoạn, dùng các khoảng quan sát trước đó. `rate_per100` là biến thiên SOH trên 100 số chu kỳ; `innovation_pp` là chênh lệch so với dự kiến từ tốc độ trung vị quá khứ. Nền và MAD không dùng các điểm tương lai.
+
+`scripts/analyze_anomalies.py` chạy Isolation Forest với cùng 5 nhóm pin. Ngưỡng của mỗi vòng lấy từ phân vị 99% điểm train. Quy tắc bổ sung yêu cầu độ lệch chuẩn hóa >4,5 và độ lệch tuyệt đối ≥1 điểm phần trăm SOH. Tổ hợp là cờ theo một trong hai phương pháp. Không tự xóa hoặc sửa dữ liệu được gắn cờ.
+
+Đây là giám sát chuỗi SOH tham chiếu đã quan sát, không phải dự đoán từ BMS trực tuyến. `reports/anomaly_predictions.csv` ghi từng chu kỳ và lý do; `anomaly_summary.csv` ghi số cờ; `anomaly_metadata.json` ghi phương pháp và giới hạn; `artifacts/anomaly_iforest.joblib` là mô hình học lại toàn bộ để bàn giao. Không có nhãn lỗi thực nên không gọi tỷ lệ gắn cờ là độ chính xác.
+
+## 9. Ridge–RF hiệu chỉnh phần dư
+
+`src/battery_soh/hybrid.py` có lớp `RidgeResidualForest`. `fit()` chuẩn hóa và học Ridge trên train, tạo phần dư train rồi học RF từ cùng đặc trưng. `predict()` cộng hai dự đoán. Không đưa y hoặc phần dư làm cột đầu vào khi suy luận. `scripts/evaluate_hybrid.py` dùng đúng phân hoạch pin cũ, lưu dự đoán giữ riêng, so sánh cặp theo pin và mô hình học lại toàn bộ. Đây là phương án kết hợp để kiểm chứng, không phải tuyên bố thuật toán mới.

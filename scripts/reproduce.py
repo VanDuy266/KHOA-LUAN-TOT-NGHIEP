@@ -18,6 +18,8 @@ def main():
         ["scripts/train_gru.py"],
         ["scripts/analyze_results.py"],
         ["scripts/save_models.py"],
+        ["scripts/analyze_anomalies.py"],
+        ["scripts/evaluate_hybrid.py"],
         ["-m", "pytest", "-q", "--junitxml=reports/pytest-results.xml"],
         ["scripts/build_notebook.py"],
         ["scripts/build_documents.py"],
