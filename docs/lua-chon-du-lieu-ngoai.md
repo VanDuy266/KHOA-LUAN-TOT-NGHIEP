@@ -2,6 +2,8 @@
 
 Khảo sát ngày 24/10/2026. Giữ nguyên SDU và mô hình hiện tại; chưa ghép dữ liệu ngoài, chưa huấn luyện lại.
 
+Cập nhật: Đã tìm thấy XJTU (Lishen NCM 18650, 2 Ah) gần SDU hơn LG Chem 69,5 Ah và đã đọc một file đầy đủ. Ưu tiên nguồn này để khảo sát tương đồng; xem [Dữ liệu tương đồng XJTU](du-lieu-tuong-dong-xjtu.md). Các nhận định LG Chem bên dưới được giữ lại như kết quả khảo sát trước đó.
+
 ## Kết luận
 
 Chưa xác minh được bộ BMS trên xe công khai đồng thời có chuỗi điện áp tế bào/dòng điện/nhiệt độ, mốc chu kỳ và dung lượng tham chiếu để kiểm thử trực tiếp mô hình SDU. Cùng tên NMC không bảo đảm cùng phân phối dữ liệu. Không đổi điện áp bộ pin thành điện áp tế bào bằng giả định và không dùng SOH do BMS ước tính như nhãn dung lượng đo độc lập.
