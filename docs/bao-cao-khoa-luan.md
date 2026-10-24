@@ -200,7 +200,7 @@ Giao diện đọc bảng nhỏ cho thống kê và chỉ đọc dữ liệu chu
 ## 5.2. Các chức năng
 Tổng quan trình bày quy mô dữ liệu, sai số và đường SOH theo giai đoạn. Tra cứu cho phép lọc pin, giai đoạn, khoảng chu kỳ, xem tín hiệu và so sánh hai chu kỳ. Đánh giá mô hình hiển thị chỉ số, dự đoán giữ riêng, sai số, thời gian và thử nghiệm bỏ đặc trưng.
 Dự đoán nhận CSV hoặc CSV.GZ tới 512 MiB cho một chu kỳ hoặc tối đa 2.000 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
-Lịch sử chỉ lưu trong phiên làm việc, không phải cơ sở dữ liệu người dùng. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang Xu hướng bất thường hiển thị chuỗi SOH, nền quá khứ, cờ của quy tắc/Isolation Forest và lý do; dữ liệu có thể xuất CSV. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu.
+Lịch sử được giữ trong phiên; khi người dùng chọn lưu, kết quả và tên nguồn được ghi vào SQLite cục bộ trên máy chủ, không lưu nội dung CSV tải lên. Kho này dùng chung trên máy chủ, chưa có phân quyền tài khoản. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang Xu hướng bất thường hiển thị chuỗi SOH, nền quá khứ, cờ của quy tắc/Isolation Forest và lý do; dữ liệu có thể xuất CSV. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu. Các trang kiểm tra đầu vào và demo trên pin giữ riêng được giữ lại. Phần phân rã dự đoán dùng hệ số Ridge và đường đi trong cây phù hợp với mô hình đang chọn, không gọi là SHAP hoặc quan hệ nhân quả.
 ![Hình 5.1. Tổng quan Vincent D với dữ liệu SDU](images/vincent_d_sdu_overview.png)
 
 ## 5.3. Mô hình ứng dụng
@@ -208,7 +208,7 @@ Random Forest là mô hình triển khai được quy định trước cho bản
 Ứng dụng hiển thị cảnh báo khi đặc trưng nằm ngoài khoảng quan sát của dữ liệu huấn luyện. Kiểm tra khoảng riêng từng biến chưa đủ phát hiện mọi trường hợp ngoài phân phối. Dự đoán không bị ép vào một khoảng đẹp hơn và không được dùng như chứng nhận an toàn pin.
 ## 5.4. Kiểm tra sản phẩm
 Các kiểm thử bao gồm tính độc lập của đặc trưng với tín hiệu sau 120 giây và nhãn, tính đúng định nghĩa SOH, khóa pin/giai đoạn/chu kỳ, phân hoạch không trùng pin, đối chiếu chỉ số với dự đoán đã lưu và kiểm thử các màn hình Streamlit. Dự đoán mẫu, dự đoán theo lô, lịch sử phiên và lỗi CSV cũng được kiểm tra.
-Lần kiểm thử lưu trong reports/pytest-results.xml gồm 58 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
+Lần kiểm thử lưu trong reports/pytest-results.xml gồm 74 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
 ## 5.5. Lưu trữ và bàn giao
 Gói sản phẩm chứa mã nguồn, thư viện được khóa phiên bản, dữ liệu Parquet phục vụ tra cứu, bảng đặc trưng, mô hình, notebook đã chạy, kết quả thực nghiệm và báo cáo/slide. Bộ dữ liệu nguồn được nộp riêng dưới dạng source_rows với hai giai đoạn, các bảng chu kỳ và hồ sơ kiểm tra, trích dẫn. Không cần giải nén từng file CSV gzip để chương trình đọc.
 Các file nguồn lớn không được đưa vào bộ nhớ cùng lúc. Môi trường .venv không đóng gói vì phụ thuộc hệ điều hành; môi trường được tạo lại bằng danh sách thư viện. Dữ liệu nguồn không thuộc quyền sở hữu riêng của tác giả khóa luận và được sử dụng theo giấy phép CC BY 4.0.

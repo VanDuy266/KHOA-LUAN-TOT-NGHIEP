@@ -46,3 +46,17 @@ def test_saved_hybrid_is_usable():
     data = pd.read_csv(ROOT / "reports/features.csv").head()
     assert artifact["dataset"] == "SDU" and artifact["features"] == FEATURES
     assert np.isfinite(artifact["model"].predict(data[FEATURES])).all()
+
+
+def test_hybrid_explanation_reconstructs_its_own_prediction():
+    sys.path.insert(0, str(ROOT / "app"))
+    from explanation import prediction_contributions
+
+    artifact = joblib.load(ROOT / "artifacts/ridge_residual_forest.joblib")
+    data = pd.read_csv(ROOT / "reports/features.csv")
+    for _, part in data.groupby("phase"):
+        x = part.iloc[[0]][FEATURES]
+        baseline, effects, _ = prediction_contributions(artifact["model"], x)
+        assert baseline + effects.contribution.sum() == pytest.approx(
+            artifact["model"].predict(x)[0], abs=1e-8
+        )

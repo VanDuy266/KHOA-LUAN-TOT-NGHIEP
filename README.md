@@ -98,7 +98,7 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 
 | Thư mục | Nội dung |
 | --- | --- |
-| `app/` | 8 trang Streamlit, dự đoán CSV, biểu đồ, lịch sử phiên |
+| `app/` | 10 trang Streamlit, dự đoán CSV, biểu đồ, lịch sử phiên và lưu kết quả tùy chọn trên máy chủ |
 | `src/battery_soh/` | Hàm đặc trưng và kiểm nhãn dùng chung |
 | `scripts/` | Nhận dữ liệu, chuyển đổi, huấn luyện, đánh giá, tạo tài liệu |
 | `data/clean/` | Parquet theo pin/giai đoạn, mẫu CSV, bảng đặc trưng và nhãn |

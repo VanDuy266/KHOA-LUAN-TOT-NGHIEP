@@ -1,8 +1,8 @@
 {
   "dataset": "SDU",
-  "utc": "2026-10-24T14:52:45.755601+00:00",
+  "utc": "2026-10-24T14:59:06.551746+00:00",
   "pytest": {
-    "tests": 58,
+    "tests": 74,
     "failures": 0,
     "errors": 0,
     "skipped": 0
@@ -27,5 +27,6 @@
     "bms_vehicle_validation": false,
     "held_out_battery_folds": 5
   },
-  "hybrid_evaluation": "Same 5 battery folds; fixed parameters; no claim of statistically significant improvement"
+  "hybrid_evaluation": "Same 5 battery folds; fixed parameters; no claim of statistically significant improvement",
+  "preserved_remote_update": "3cb933d"
 }

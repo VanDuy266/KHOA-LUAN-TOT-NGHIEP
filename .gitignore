@@ -6,6 +6,7 @@ data/raw/
 data/mat/
 data/clean/
 artifacts/
+data/local/
 *.log
 
 data/hust/

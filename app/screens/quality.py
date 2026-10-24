@@ -54,7 +54,7 @@ def render():
                 st.write(title)
                 st.caption(text)
     st.write(
-        "Giữ nguyên giá trị các dòng được chọn từ nguồn. Không tạo thêm dữ liệu, không nội suy và không tự sửa các điểm nghi vấn. Bộ chọn không chứa toàn bộ các trạng thái sạc, nghỉ hoặc mọi chế độ xả của nguồn."
+        "Dữ liệu gồm các chu kỳ xả tham chiếu. Giá trị đo được giữ nguyên; phần sau cửa sổ đầu xả được lấy thưa."
     )
     section("02", "Các kiểm tra đã thực hiện")
     st.dataframe(
@@ -68,7 +68,7 @@ def render():
     with st.expander("Điểm nghi vấn còn giữ lại", expanded=False):
         points = table("reports/suspected_measurements.csv")
         st.caption(
-            "Đánh dấu theo biến thiên tín hiệu; chưa đủ căn cứ kết luận là lỗi cảm biến. Không tự xóa hoặc sửa."
+            "Các điểm có biến thiên tín hiệu lớn, được giữ lại để đối chiếu."
         )
         st.dataframe(vietnamese_table(points), hide_index=True, width="stretch")
         csv_download("Tải danh sách điểm nghi vấn", points, "diem_can_kiem_tra.csv")
@@ -85,5 +85,5 @@ def render():
         width="stretch",
     )
     st.caption(
-        "SOH = dung lượng xả toàn chu kỳ / 2,4 Ah × 100. Không ép SOH về 100%; không dùng dung lượng, SOH hay thời lượng toàn chu kỳ làm đặc trưng."
+        "Nhãn SOH (%) = dung lượng xả / 2,4 Ah × 100. Đặc trưng lấy từ 120 giây đầu xả."
     )

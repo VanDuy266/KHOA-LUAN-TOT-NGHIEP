@@ -20,8 +20,10 @@ def main():
         ["scripts/save_models.py"],
         ["scripts/analyze_anomalies.py"],
         ["scripts/evaluate_hybrid.py"],
+        ["scripts/build_demo_model.py"],
         ["-m", "pytest", "-q", "--junitxml=reports/pytest-results.xml"],
         ["scripts/build_notebook.py"],
+        ["scripts/build_results_notebook.py"],
         ["scripts/build_documents.py"],
     ]
     for args in commands:

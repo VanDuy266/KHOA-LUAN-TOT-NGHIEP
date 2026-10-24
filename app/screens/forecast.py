@@ -1,6 +1,7 @@
 """Dự đoán một chu kỳ hoặc theo lô, lưu kết quả trong phiên."""
 
 import hashlib
+import sqlite3
 import pandas as pd
 import streamlit as st
 from app_data import table, model
@@ -113,6 +114,45 @@ def render():
             "Cửa sổ 0–120 giây: ít nhất 5 mẫu, bắt đầu ≤20 giây, kết thúc ≥90 giây; ít nhất 3 mẫu xả trải dài ≥30 giây. Tối đa 2.000 chu kỳ/lô. CSV gốc SDU được đọc theo khối, chỉ giữ cửa sổ đầu xả."
         )
     content = uploaded.getvalue() if uploaded is not None else None
+    persist = st.checkbox(
+        "Lưu kết quả vào kho trên máy này",
+        help="Kho chung trên máy chủ, lưu kết quả và tên nguồn.",
+        key="persist_predictions",
+    )
+    if uploaded is not None:
+        with st.expander("Kiểm tra file trước khi dự đoán"):
+            if st.button("Kiểm tra dữ liệu", icon=":material/fact_check:"):
+                try:
+                    with st.spinner("Đang kiểm tra dữ liệu..."):
+                        checked = read_csv(content, phase_code=phase_code)
+                        checks = predict_batch(checked, model(selected_model))
+                    valid = checks.status.eq("Thành công")
+                    st.write(
+                        f"{len(checked):,} điểm đo · {len(checks)} chu kỳ · {int(valid.sum())} hợp lệ · {int((~valid).sum())} lỗi"
+                    )
+                    st.dataframe(
+                        vietnamese_table(
+                            checks.drop(columns=["predicted_soh_pct"], errors="ignore")
+                        ),
+                        hide_index=True,
+                        width="stretch",
+                    )
+                    if mode == "Một chu kỳ" and (
+                        len(checks) != 1 or not checks.cycle.eq(cycle).all()
+                    ):
+                        st.warning(
+                            "File chứa nhiều chu kỳ hoặc không khớp chu kỳ đã nhập. Chọn Theo lô hoặc kiểm tra lại chu kỳ."
+                        )
+                except (
+                    ValueError,
+                    TypeError,
+                    KeyError,
+                    UnicodeDecodeError,
+                    pd.errors.ParserError,
+                    OSError,
+                    EOFError,
+                ) as error:
+                    st.error(str(error))
     input_key = (
         selected_model,
         phase_code,
@@ -197,6 +237,16 @@ def render():
                 created,
                 source,
             )
+            if persist:
+                from history_store import save_results
+
+                try:
+                    save_results(rows, request_id, source, created)
+                    st.success("Đã lưu kết quả vào kho trên máy này.")
+                except (OSError, sqlite3.Error) as error:
+                    st.warning(
+                        f"Kết quả đã có trong phiên nhưng chưa lưu được vào kho: {error}"
+                    )
         except (
             ValueError,
             TypeError,
@@ -225,6 +275,38 @@ def render():
                 st.metric(label, value)
         st.dataframe(vietnamese_table(rows).round(3), hide_index=True, width="stretch")
         if valid.any():
+            good = rows[valid]
+            with st.container(border=True):
+                st.write("Tổng hợp các chu kỳ hợp lệ")
+                for column, label, value in zip(
+                    st.columns(3),
+                    ["SOH trung bình", "SOH thấp nhất", "Ngoài miền huấn luyện"],
+                    [
+                        f"{good.predicted_soh_pct.mean():.2f}%",
+                        f"{good.predicted_soh_pct.min():.2f}%",
+                        str(int(good.outside_count.gt(0).sum())),
+                    ],
+                ):
+                    with column:
+                        st.metric(label, value)
+                threshold = st.number_input(
+                    "Ngưỡng SOH cần rà soát (%)",
+                    min_value=0.0,
+                    max_value=150.0,
+                    value=80.0,
+                    step=1.0,
+                )
+                below = good[good.predicted_soh_pct < threshold]
+                st.caption("Ngưỡng lọc SOH, không dùng để đánh giá an toàn pin.")
+                if not below.empty:
+                    st.write(f"{len(below)} chu kỳ có SOH dưới {threshold:g}%")
+                    st.dataframe(
+                        vietnamese_table(below).round(3),
+                        hide_index=True,
+                        width="stretch",
+                    )
+                else:
+                    st.caption("Không có chu kỳ dưới ngưỡng đã chọn.")
             chart = rows[valid].rename(columns={"predicted_soh_pct": "soh_pct"})
             chart["battery"] = (
                 chart.battery
@@ -265,8 +347,6 @@ def single_result(rows, features, outside, frame, source):
             st.warning(
                 "Ngoài miền huấn luyện: " + ", ".join(COLUMNS[name] for name in outside)
             )
-        else:
-            st.caption("Các đặc trưng nằm trong khoảng giá trị của tập huấn luyện.")
     preview = frame[pd.to_numeric(frame.time) <= 120]
     for column, name, label, color in zip(
         st.columns(3),
@@ -283,3 +363,6 @@ def single_result(rows, features, outside, frame, source):
         st.dataframe(
             vietnamese_table(features).T.rename(columns={0: "Giá trị"}), width="stretch"
         )
+    from explanation import render_explanation
+
+    render_explanation(model(str(rows.model.iloc[0])), features)
