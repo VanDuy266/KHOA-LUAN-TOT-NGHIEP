@@ -1,0 +1,37 @@
+{
+  "source": "https://zenodo.org/records/22643868",
+  "license": "CC BY 4.0",
+  "sha256": "31d6797ecd928692e8ddcb025b8600db7a2cd930abf0afddcd0ecb5604ec16cc",
+  "rows": 3171,
+  "columns": [
+    "date_of_test",
+    "odo_km",
+    "rok_registrace",
+    "nájezd_kat",
+    "datum_registrace",
+    "Aviloo_SoH",
+    "BMS_SoH",
+    "typ_pohonu",
+    "stáří_vozidla_k_datu_testu_ve_dnech",
+    "najezd_kat2",
+    "diff_AVILOO_BMS",
+    "stari_kategorie",
+    "SoH_Aviloo_minus_SoH_BMS",
+    "baterka_BEV",
+    "baterka_PHEV"
+  ],
+  "powertrain_counts": {
+    "BEV": 2742,
+    "PHEV": 429
+  },
+  "test_date_min": "2024-07-12",
+  "test_date_max": "2026-03-04",
+  "valid_soh_pairs_0_to_120_pct": 3170,
+  "excluded_soh_pairs": 1,
+  "bms_minus_aviloo_mean_pp": -0.4088012618296531,
+  "bms_vs_aviloo_mae_pp": 2.09794952681388,
+  "bms_vs_aviloo_rmse_pp": 2.892613785323061,
+  "compatible_with_sdu_features": false,
+  "reason": "Không có chuỗi thời gian điện áp, dòng điện, nhiệt độ và chu kỳ xả để tạo 12 đặc trưng SDU.",
+  "scope": "Đối chiếu hai nguồn SOH được công bố; không phải sai số mô hình SDU. Aviloo không được mặc định là phép đo dung lượng độc lập. Không suy ra RUL từ bảng này."
+}

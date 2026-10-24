@@ -29,3 +29,7 @@ SOH ước tính sẵn từ BMS không tự trở thành nhãn SOH đo độc l�
 5. Với phát hiện bất thường, chỉ tính precision/recall khi có nhãn xác nhận và quy tắc đối chiếu thời điểm rõ ràng. Nếu chưa có nhãn, chỉ báo cáo cờ xem xét.
 
 Mô hình hiện tại dùng tế bào 2,4 Ah và cửa sổ xả tham chiếu SDU. Không đưa trực tiếp điện áp bộ pin hoặc nhãn có mẫu số khác vào mô hình đó. Kiểm chứng xe có thể cần mô hình được huấn luyện hoặc hiệu chỉnh lại; chưa có bằng chứng chuyển giao trực tiếp.
+
+## Khảo sát nguồn công khai
+
+Đã tải và kiểm tra bảng SOH trên xe thực tế tại Zenodo 22643868: 3.171 bản ghi, 15 cột. Bảng không có chuỗi điện áp/dòng điện/nhiệt độ để kiểm thử trực tiếp mô hình SDU. Đã khảo sát thêm dữ liệu BMS LFP năm 2024 tại Zenodo 13715694; chưa tải toàn bộ và chưa kiểm chứng mô hình trên bộ này. Chi tiết phạm vi, nguồn và kết quả kiểm tra: [Phạm vi và dữ liệu kiểm thử bổ sung](pham-vi-va-du-lieu-kiem-thu.md).
