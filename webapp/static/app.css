@@ -31,3 +31,12 @@
 .assessment-card,.assessment-limit,.assessment-advice,.comparison-settings,.panel>.sub{overflow-wrap:anywhere}
 
 #form-result,#demo-result{scroll-margin-top:85px}
+
+/* Plain-language BMS conclusions and provenance. */
+.assessment-reading{font-size:1.08rem;line-height:1.75;max-width:100ch}
+.assessment-conclusions{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:22px 0}
+.assessment-conclusions>div,.assessment-origin{padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+.assessment-conclusions strong,.assessment-origin strong{display:block;font-size:1.08rem}
+.assessment-conclusions p,.assessment-origin p{margin:8px 0;line-height:1.65}
+.assessment-conclusions span{display:block;line-height:1.6}
+@media(max-width:760px){.assessment-conclusions{grid-template-columns:1fr}.assessment-origin{overflow-wrap:anywhere}}

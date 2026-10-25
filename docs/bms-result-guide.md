@@ -23,3 +23,7 @@ Tải bảng CSV hoặc báo cáo HTML mở độc lập. Mở HTML và chọn I
 ## Demo pin giữ riêng
 
 Random Forest học trên 85 pin; SDU_01 bị loại khỏi tập học ở cả hai giai đoạn. Chọn giai đoạn và chu kỳ → Chạy dự đoán → Hiện SOH tham chiếu và sai số. Đầu vào chỉ có 12 đặc trưng đã quy định, không có SOH tham chiếu/dung lượng nhãn. Có bảng đặc trưng, đóng góp theo đường đi cây và kết quả toàn giai đoạn. Mô hình demo tách khỏi mô hình bàn giao học lại toàn bộ dữ liệu.
+
+## Diễn giải dễ đọc
+
+Phần đầu phân biệt dung lượng còn lại (SOH), mức điện hiện tại (SOC), kết quả so sánh tiêu chí và khả năng kết luận lỗi/an toàn. Bảng thông tin cần bổ sung ghi rõ trạng thái, lý do và cách bổ sung: giới hạn vận hành, mã lỗi/trạng thái bảo vệ, tín hiệu từng cell, phép đo dung lượng độc lập và lịch sử. Dữ liệu mẫu đã tham gia học được ghi rõ là minh họa, không phải kết quả kiểm thử trên xe chưa từng học.

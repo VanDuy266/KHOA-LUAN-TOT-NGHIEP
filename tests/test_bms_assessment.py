@@ -36,7 +36,7 @@ class AssessmentTests(unittest.TestCase):
         a=self.assessment(window=hot)
         self.assertEqual(a['metrics']['temperature_max_c'],80)
         self.assertTrue(all(x['status']=='unset' for x in a['indicators']))
-        self.assertIn('Chưa có ngưỡng',a['comparison'])
+        self.assertIn('chưa có tiêu chí',a['comparison'])
 
     def test_user_criteria_are_explicit_and_boundary_safe(self):
         equal=self.assessment(limits={'limit_temperature_max':'41','limit_cell_spread_mv':'19','limit_soh_min':'91.87','limit_source':'Tiêu chí thử nghiệm'})
