@@ -34,6 +34,19 @@ def cycle_measurements(battery, cycle, phase):
     return pd.read_parquet(ROOT / "data/clean/cells" / f"{phase}_{battery}.parquet", filters=[("cycle", "=", int(cycle))])
 
 
+@lru_cache(maxsize=1)
+def evaluation_metrics():
+    """Small summary only: homepage must not load all held-out predictions."""
+    frames=[table("reports/metrics_summary.csv")]
+    if (ROOT / "reports/hybrid_comparison.csv").exists():
+        extra=table("reports/hybrid_comparison.csv")
+        frames.append(extra[extra.model=="Ridge-RF residual"])
+    if (ROOT / "reports/boosting/metadata.json").exists():
+        frames.append(table("reports/boosting/metrics_summary.csv"))
+    return pd.concat(frames,ignore_index=True).drop_duplicates("model",keep="last")
+
+
+@lru_cache(maxsize=1)
 def evaluation_results():
     """Unify saved held-out results without changing source reports or refitting."""
     import numpy as np

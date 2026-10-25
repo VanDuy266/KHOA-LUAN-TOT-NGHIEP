@@ -18,7 +18,7 @@ import numpy as np
 import pandas as pd
 from flask import Flask, jsonify, render_template, request, send_file, abort
 from werkzeug.exceptions import HTTPException
-from webapp.data import table, metadata, artifact, cycle_measurements, PHASES, MODELS, evaluation_results
+from webapp.data import table, metadata, artifact, cycle_measurements, PHASES, MODELS, evaluation_results, evaluation_metrics
 from webapp.bms_assessment import assess as assess_bms, read_limits
 from prediction import read_csv, predict_batch, predict
 from input_audit import audit_frame
@@ -169,7 +169,7 @@ def overview():
     phase = stage()
     selected = data[data.phase == phase]
     stats = selected.groupby("battery").agg(cycles=("cycle", "count"), soh_min=("soh_pct", "min"), soh_max=("soh_pct", "max")).reset_index()
-    metrics = evaluation_results()[0]
+    metrics = evaluation_metrics()
     best = metrics.sort_values("mae").iloc[0]
     return reply(dataset=metadata("reports/dataset_summary.json"), phase=phase, phases=PHASES,
         batteries=sorted(selected.battery.unique()), stats=stats,

@@ -10,10 +10,24 @@ Object.assign(labels,{created_at:"Thời điểm chạy",model:"Mô hình",datas
 let active="overview", version=0, controller=new AbortController(), exports=new Map(), exportId=0;
 const selections={};
 function state(page=active){return selections[page] ||= {phase:"primary"};}
+// Cache only public read-only JSON; predictions/uploads always reach the server.
+const readCacheKey="vincent-public-cache:"+document.querySelector('script[src*="app.js"]')?.getAttribute("src");
+let readCache=[];
+try{readCache=JSON.parse(sessionStorage.getItem(readCacheKey)||"[]").filter(x=>Date.now()-x.at<120000).slice(-12);}catch(e){readCache=[];}
 async function api(url, options={}){
+  const cacheable=(!options.method||options.method.toUpperCase()==="GET")&&!options.body&&/^\/api\/(overview|trends|evaluation|thesis-audit|explorer|quality|bms|profile)(\?|$)/.test(url);
+  const cached=cacheable&&readCache.find(x=>x.url===url&&Date.now()-x.at<120000);
+  if(cached)return structuredClone(cached.data);
   const response=await fetch(url,{...options,signal:controller.signal,headers:{Accept:"application/json",...(options.headers||{})}});
   let data;try{data=await response.json();}catch(e){throw new Error("Máy chủ chưa trả về dữ liệu. Hãy thử lại sau ít phút.");}
   if(!response.ok)throw new Error(data.error||`Lỗi HTTP ${response.status}`);
+  if(cacheable){
+    const item={url,at:Date.now(),data};
+    if(JSON.stringify(item).length<100000){
+      readCache=readCache.filter(x=>x.url!==url&&Date.now()-x.at<120000).slice(-11);readCache.push(item);
+      try{sessionStorage.setItem(readCacheKey,JSON.stringify(readCache));}catch(e){}
+    }
+  }
   return data;
 }
 function header(title,subtitle,eyebrow=""){return `<div class="welcome${eyebrow==="ĐỀ TÀI KHÓA LUẬN"?" thesis-heading":""}">${eyebrow?`<div class="eyebrow">${esc(eyebrow)}</div>`:""}<h1>${esc(title)}</h1><p>${esc(subtitle)}</p></div>`;}
@@ -85,7 +99,7 @@ function modelVerdict(rows,dataset){
     table(ranked,`xep_hang_${dataset.toLowerCase()}`)+`<p class="sub">Xếp hạng theo MAE macro (trung bình đều theo pin/xe). Mức giảm sai số không phải độ chính xác phần trăm. MAE/RMSE càng thấp càng tốt; R² càng cao càng tốt.</p>`);
 }
 async function evaluation(token){
-  const s=state(),q=new URLSearchParams({...s.model?{model:s.model}:{},...s.battery?{battery:s.battery}:{}}),d=await api("/api/evaluation?"+q),audit=await api("/api/thesis-audit");
+  const s=state(),q=new URLSearchParams({...s.model?{model:s.model}:{},...s.battery?{battery:s.battery}:{}}),[d,audit]=await Promise.all([api("/api/evaluation?"+q),api("/api/thesis-audit")]);
   if(!put(header("Đánh giá mô hình","Kiểm thử 5 vòng theo mã pin vật lý; hai giai đoạn của một pin luôn cùng phía.")+modelVerdict(audit.sdu,"SDU")+modelVerdict(audit.bms,"BMS")+panel("Nguồn SOH tham chiếu và tính công bằng","Hai bộ dữ liệu được đánh giá riêng.",`<p><strong>SDU:</strong> dung lượng xả từ dữ liệu nguồn / 2,4 Ah × 100. Đầu vào chỉ dùng tín hiệu 120 giây đầu xả và thông tin giai đoạn/chu kỳ.</p><p><strong>BMS:</strong> tích phân dòng sạc / độ tăng SOC ở phần sau 120 giây; lấy trung vị theo xe–tháng rồi chia 145 Ah × 100. Nhãn phụ thuộc cảm biến và SOC, chưa có đo dung lượng độc lập; nhiều phiên chung nhãn tháng. Đây là đánh giá hồi cứu, không chứng minh dự báo tương lai.</p><p><strong>Cùng tập kiểm thử:</strong> mỗi pin/xe chỉ thuộc một fold, không trùng với tập học. CatBoost/XGBoost có tinh chỉnh bằng validation bên trong tập học; baseline dùng cấu hình cố định và GRU dùng biểu diễn khác, nên ngân sách tinh chỉnh chưa hoàn toàn ngang nhau. Không so trực tiếp MAE giữa SDU và BMS.</p>`)+panel("Kết quả đã kiểm chứng","Tính lại từ dự đoán kiểm thử đã lưu; không phải lượt huấn luyện lại.",`<p>Đã kiểm tra đủ mẫu, không trùng mẫu, đúng nhóm pin/xe và khớp chỉ số công bố.</p><div class="actions"><a class="button primary" href="/api/download/thesis-audit?kind=report">Tải phần kết quả khóa luận</a><a class="button" href="/api/download/thesis-audit?kind=defense">Tải báo cáo & dàn ý bảo vệ</a><a class="button" href="/api/download/thesis-audit?kind=sdu">CSV SDU</a><a class="button" href="/api/download/thesis-audit?kind=bms">CSV BMS</a></div><details><summary>Xem kiểm chứng và giới hạn</summary><h3>SDU · 86 pin · 5 vòng kiểm thử</h3>${table(audit.sdu,"kiem_chung_sdu")}<h3>BMS · 20 xe · 5 vòng kiểm thử</h3>${table(audit.bms,"kiem_chung_bms")}<p>MAE/RMSE có đơn vị điểm % SOH. R² không phải tỷ lệ dự đoán đúng. Macro là trung bình đều theo pin/xe; pooled là tính gộp tất cả mẫu.</p><p>Ridge–RF chỉ hơn Random Forest rất ít trên SDU; chưa kết luận vượt trội. Nhãn BMS suy ra từ dòng điện/SOC, chưa đối chiếu dung lượng đo độc lập. Kết quả không chẩn đoán pin hỏng hoặc xác nhận an toàn.</p><a class="button" href="/api/download/thesis-audit?kind=paired">Tải so sánh theo pin/xe</a><a class="button" href="/api/download/thesis-audit?kind=verification">Tải dấu vết kiểm chứng</a></details>`)+panel("So sánh kết quả","MAE/RMSE nhỏ hơn là tốt hơn. Điểm được lấy trung bình đều theo pin; MAE không phải độ chính xác phần trăm.",table(d.metrics,"so_sanh_mo_hinh"))+panel("Dự đoán trên pin giữ riêng","Mỗi đường dùng kết quả ngoài tập huấn luyện.",`<div class="controls">${select("model","Mô hình",d.models,d.model)}${select("eval-battery","Pin kiểm thử",d.batteries,d.battery)}</div><div id="evaluation-plot" class="plot"></div>`)+`<div class="grid-equal">${panel("Theo giai đoạn","",table(d.phases,"chi_so_giai_doan"))}${panel("Theo pin","",table(d.by_battery,"chi_so_theo_pin"))}</div>`+panel("Thời gian thực nghiệm","Thời gian học và dự đoán theo từng vòng kiểm thử.",table(d.timings,"thoi_gian_mo_hinh")),token))return;
   change("#model","model");change("#eval-battery","battery");chart("evaluation-plot",d.series.flatMap(l=>[series(l.name+" · tham chiếu",l.points,"cycle","actual_soh"),series(l.name+" · dự đoán",l.points,"cycle","predicted_soh")]));
 }
