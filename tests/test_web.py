@@ -87,6 +87,15 @@ class WebTests(unittest.TestCase):
             self.assertTrue({'time','terminal_voltage','terminal_current','temperature','cycle','phase_code'}<=set(frame))
             self.assertLessEqual(frame.time.max(),120)
 
+    def test_single_cycle_csv_uses_the_entered_cycle(self):
+        frame=table('data/clean/sample_measurements.csv')
+        frame=frame[(frame.battery=='SDU_01')&(frame.phase_code==0)&(frame.cycle==1)&(frame.time<=120)].drop(columns='cycle')
+        response=self.client.post('/api/forecast',data={'cycle':'10','phase_code':'0','model':'Random Forest',
+            'file':(io.BytesIO(frame.to_csv(index=False).encode()),'single.csv')},content_type='multipart/form-data')
+        self.assertEqual(response.status_code,200,response.json)
+        self.assertEqual(response.json['results'][0]['cycle'],10)
+        self.assertEqual(response.json['results'][0]['status'],'Thành công')
+
     def test_demo_uses_an_unseen_battery(self):
         response=self.client.get('/api/demo')
         self.assertEqual(response.status_code,200,response.json)
