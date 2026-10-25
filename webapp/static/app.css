@@ -5,3 +5,16 @@
 @media(max-width:1100px){.app-shell{grid-template-columns:210px minmax(0,1fr)}main{padding:23px 20px}.topbar{padding:0 20px}.grid-main{grid-template-columns:1fr}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.brand b{font-size:23px}}
 @media(max-width:740px){.app-shell{display:block}.sidebar{position:static;height:auto;padding:12px 14px;border-right:0;border-bottom:1px solid var(--line)}.brand{padding-bottom:10px}.brand img{width:38px;height:38px}.brand b{font-size:23px}.nav-caption,.student,.nav-divider{display:none}nav{display:flex;gap:4px;padding-bottom:5px}nav a{flex:0 0 auto;margin:0;padding:9px;font-size:13px;white-space:nowrap}nav img{width:16px;height:16px}.topbar{height:55px;padding:0 15px}.topbar span{font-size:12px;margin-left:10px;padding-left:10px}main{padding:20px 14px}.grid-equal{grid-template-columns:1fr}.panel{padding:16px}.kpis{gap:9px}.kpi{padding:14px}.kpi-value{font-size:25px}.kpi-label{font-size:12px}h1{font-size:25px}.field{min-width:120px}.plot{min-height:220px}th,td{padding:9px;font-size:12px}.controls{gap:9px}.profile{gap:14px}.profile h2{font-size:23px}}
 @media(prefers-reduced-motion:reduce){*,*:before{animation:none!important;transition:none!important}}
+
+/* Electricity is restricted to the small brand avatar; no animation loop in JS. */
+.avatar-electric{position:relative;display:inline-flex;width:48px;height:48px;flex:0 0 48px;isolation:isolate}
+.avatar-electric>img{position:relative;z-index:1;width:100%;height:100%;border-radius:13px;box-shadow:0 0 0 1px #d2b9ff,0 0 9px #ae70e66b}
+.avatar-electric:before{content:"";position:absolute;inset:-5px;border:1px solid #c59afa88;border-radius:17px;box-shadow:0 0 6px #c18efb77,0 0 14px #b66af23b;opacity:.65;animation:avatar-halo 6s ease-in-out infinite;pointer-events:none}
+.avatar-arcs{position:absolute;inset:-13px;width:74px;height:74px;z-index:2;overflow:visible;pointer-events:none;fill:none;stroke:#f9eaff;stroke-width:1.2;stroke-linejoin:round;stroke-linecap:round;filter:drop-shadow(0 0 1px #fff) drop-shadow(0 0 3px #b762ed)}
+.avatar-arcs .arc-a{animation:avatar-arc-a 6.4s ease-in-out infinite}
+.avatar-arcs .arc-b{stroke:#e3bbff;stroke-width:.9;animation:avatar-arc-b 7.6s ease-in-out infinite}
+@keyframes avatar-halo{0%,100%{opacity:.45;transform:scale(.98)}50%{opacity:.9;transform:scale(1.035)}}
+@keyframes avatar-arc-a{0%,55%,100%{opacity:.22}58%,64%{opacity:1}61%{opacity:.3}69%{opacity:.85}75%{opacity:.25}}
+@keyframes avatar-arc-b{0%,33%,75%,100%{opacity:.08}37%,44%{opacity:.9}40%{opacity:.2}49%{opacity:.6}54%{opacity:.12}}
+@media(max-width:740px){.avatar-electric{width:38px;height:38px;flex-basis:38px}.avatar-arcs{inset:-10px;width:58px;height:58px}.avatar-electric:before{inset:-4px;border-radius:15px}}
+@media(prefers-reduced-motion:reduce){.avatar-electric:before,.avatar-arcs g{animation:none!important}.avatar-arcs .arc-a{opacity:.5}.avatar-arcs .arc-b{opacity:.15}}

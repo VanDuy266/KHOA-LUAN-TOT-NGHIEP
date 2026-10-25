@@ -140,7 +140,7 @@ def errors(error):
 
 @app.get("/")
 def home():
-    return render_template("index.html", title=TITLE, version=str(int((ROOT / "webapp/static/app.js").stat().st_mtime)))
+    return render_template("index.html", title=TITLE, version=hashlib.sha256(b"".join((ROOT / name).read_bytes() for name in ("webapp/static/app.js", "webapp/static/app.css", "webapp/templates/index.html"))).hexdigest()[:12])
 
 
 @app.get("/healthz")
