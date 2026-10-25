@@ -4,7 +4,7 @@
 
 ## Dịch vụ đã có
 
-Giữ dịch vụ và tên miền hiện tại. Nhánh: `main`. Root Directory: để trống.
+Dịch vụ chính: `khoaluantotnghiep-vincentd`. Web: https://khoaluantotnghiep-vincentd.onrender.com/. Nhánh: `main`. Root Directory: để trống.
 
 - Build Command: `python -m pip install -r requirements-render.txt && python scripts/check_hosting.py`
 - Start Command: `python scripts/start_render.py`

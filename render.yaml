@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: vincent-d-battery
+    name: khoaluantotnghiep-vincentd
     runtime: python
     plan: free
     buildCommand: python -m pip install -r requirements-render.txt && python scripts/check_hosting.py
