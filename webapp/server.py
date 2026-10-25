@@ -19,6 +19,7 @@ import pandas as pd
 from flask import Flask, jsonify, render_template, request, send_file, abort
 from werkzeug.exceptions import HTTPException
 from webapp.data import table, metadata, artifact, cycle_measurements, PHASES, MODELS, evaluation_results
+from webapp.bms_assessment import assess as assess_bms, read_limits
 from prediction import read_csv, predict_batch, predict
 from input_audit import audit_frame
 from explanation import prediction_contributions
@@ -270,6 +271,32 @@ def demo():
         mae=float(selected.absolute_error.mean()),results=selected[["battery","phase","cycle","soh_pct","predicted_soh_pct","absolute_error"]])
 
 
+@app.post("/api/demo/predict")
+def demo_predict():
+    phase=request.form.get("phase","primary")
+    if phase not in PHASES:
+        raise ValueError("Giai đoạn không hợp lệ.")
+    cycle=integer("cycle",1)
+    with INFERENCE:
+        fitted=artifact("random_forest_demo.joblib")
+        pin=fitted["held_out_battery"]
+        if pin in fitted["batteries"] or fitted["data_sha256"]!=feature_hash():
+            raise ValueError("Mô hình hoặc dữ liệu demo không khớp thiết kế giữ riêng pin.")
+        data=table("reports/features.csv")
+        row=data[(data.battery==pin)&(data.phase==phase)&(data.cycle==cycle)]
+        if len(row)!=1:
+            raise ValueError("Chu kỳ không có trong pin demo và giai đoạn đã chọn.")
+        features=row[FEATURES].copy()
+        estimate=float(fitted["model"].predict(features)[0])
+        baseline,effects,method=prediction_contributions(fitted["model"],features)
+    reference=float(row.soh_pct.iloc[0])
+    raw=cycle_measurements(pin,cycle,phase)
+    return reply(battery=pin,phase=phase,cycle=cycle,prediction=estimate,reference=reference,
+        absolute_error=abs(estimate-reference),train_batteries=len(fitted["batteries"]),
+        features=features,baseline=baseline,effects=effects,method=method,
+        signals=downsample(raw[raw.time<=120],300))
+
+
 @lru_cache(maxsize=1)
 def feature_hash():
     return hashlib.sha256((ROOT/"reports/features.csv").read_bytes()).hexdigest()
@@ -321,17 +348,54 @@ def bms():
         timings=display(table("reports/bms/timings.csv")).round(5))
 
 
+def bms_signal_preview(window, limit=300):
+    # Retain alert-relevant extremes even when a dense upload needs downsampling.
+    indexes=set(np.linspace(0,len(window)-1,min(limit,len(window))).astype(int).tolist())
+    for signal in (window.max_temperature, window.min_temperature, window.max_cell_voltage-window.min_cell_voltage):
+        values=signal.to_numpy()
+        indexes.update([int(np.argmax(values)),int(np.argmin(values))])
+    return window.iloc[sorted(indexes)]
+
+
 @app.post("/api/bms/predict")
 def bms_predict():
     name=request.form.get("model","Random Forest")
     if name not in ("Random Forest","Ridge-RF residual"):
         raise ValueError("Mô hình BMS không hợp lệ.")
+    limits=read_limits(request.form)
+    source=dict(kind="upload",label="CSV tải lên")
+    history=None
     if request.form.get("sample")=="1":
-        window=table("data/bms/processed/01_example.csv.gz").copy()
+        vehicle=request.form.get("sample_vehicle")
+        sid=request.form.get("sample_session")
+        if vehicle or sid:
+            if not vehicle or not sid:
+                raise ValueError("Cần chọn đủ xe và phiên minh họa.")
+            sid=integer("sample_session",1)
+            candidates=table("reports/bms/features.csv")
+            selected=candidates[(candidates.vehicle==vehicle)&(candidates.session==sid)]
+            if len(selected)!=1:
+                raise ValueError("Phiên minh họa không thuộc xe đã chọn.")
+            record=selected.iloc[0]
+            window=pd.read_parquet(ROOT/"data/bms/processed/windows.parquet",filters=[("vehicle","=",vehicle),("session","=",sid)])
+            source=dict(kind="example",label="Phiên minh họa đã tham gia học lại mô hình",vehicle=vehicle,session=sid,start=str(record.start))
+            reference=table("reports/bms/monthly_reference.csv")
+            past=reference[(reference.vehicle==vehicle)&(reference.month.astype(str)<str(record.month))].sort_values("month").copy()
+            past["soh_pct"]=past.reference_capacity_ah/145*100
+            history=dict(points=clean(past[["month","soh_pct","reference_sessions"]]),
+                message="Chỉ hiển thị các tháng trước tháng của phiên đang chọn; đây là nhãn suy ra từ vận hành.",
+                delta_soh_pp=float(past.soh_pct.iloc[-1]-past.soh_pct.iloc[0]) if len(past)>=2 else None)
+        else:
+            window=table("data/bms/processed/01_example.csv.gz").copy()
+            source=dict(kind="example",label="Phiên mẫu 01 đã tham gia học lại mô hình")
     else:
         if request.form.get("configuration")!="BAIC EU500 145Ah":
             raise ValueError("Cần xác nhận đúng cấu hình BAIC EU500, bộ pin 145 Ah.")
         window=pd.read_csv(io.BytesIO(uploaded()))
+        upload=request.files.get("file")
+        if upload and upload.filename:
+            filename=upload.filename.replace("\\","/").split("/")[-1][:120]
+            source.update(label="CSV tải lên · "+filename, filename=filename)
     required=['time_s','soc','pack_voltage','charge_current','max_cell_voltage','min_cell_voltage','max_temperature','min_temperature']
     if set(required)-set(window):
         raise ValueError("CSV thiếu cột: "+", ".join(sorted(set(required)-set(window))))
@@ -357,7 +421,12 @@ def bms_predict():
         features=pd.DataFrame([charging_features(window)])[BMS_FEATURES]
         outside=((features.iloc[0]<pd.Series(fitted['training_min']))|(features.iloc[0]>pd.Series(fitted['training_max'])))
         estimate=float(fitted['model'].predict(features)[0])
-    return reply(model=name,prediction=estimate,outside=outside[outside].index.tolist(),sample=request.form.get("sample")=="1")
+    outside_names=outside[outside].index.tolist()
+    assessment=assess_bms(window,estimate,outside_names,limits,source,history)
+    assessment["report_rows"].insert(0,{"Hạng mục":"Mô hình","Giá trị":name,"Đơn vị":"","Diễn giải":assessment["scope"]})
+    assessment["report_rows"].insert(1,{"Hạng mục":"Nguồn đầu vào","Giá trị":source["label"],"Đơn vị":"","Diễn giải":str(source.get("vehicle",""))+" · "+str(source.get("session",""))})
+    return reply(model=name,prediction=estimate,outside=outside_names,sample=request.form.get("sample")=="1",
+        assessment=assessment,signals=bms_signal_preview(window))
 
 
 @app.get("/api/download/sample")
