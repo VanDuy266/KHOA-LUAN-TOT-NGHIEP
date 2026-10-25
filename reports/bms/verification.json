@@ -1,0 +1,130 @@
+{
+  "checks": "7 unittest checks passed; all 11 app pages render without exceptions or errors",
+  "source_archives_verified": 20,
+  "raw_rows": 16100728,
+  "vehicles": 20,
+  "sessions": 27205,
+  "monthly_labels": 569,
+  "files": [
+    {
+      "path": "reports\\bms\\dataset_summary.json",
+      "sha256": "da307038aa05757a8d8b010966668b03aa94cb2692d695324e02364b2b26578b"
+    },
+    {
+      "path": "reports\\bms\\features.csv",
+      "sha256": "3966e100b054f2d0daf5f3cff622d98744ca08b2f9f0100f24767810da3b77f4"
+    },
+    {
+      "path": "reports\\bms\\metrics_by_vehicle.csv",
+      "sha256": "9836c31efebaff0e38f960f20bf9ace727ac5c7348bf43cd6c4bf8678cdeb96e"
+    },
+    {
+      "path": "reports\\bms\\metrics_summary.csv",
+      "sha256": "877eab1a0ffedb38eaa58fa1001eb42a75aa5cd3e72e3920d565e41627085630"
+    },
+    {
+      "path": "reports\\bms\\monthly_reference.csv",
+      "sha256": "164f4c69e0c9dc1e08ef782754f094baab032fc8676fc83c153df51d1067e67b"
+    },
+    {
+      "path": "reports\\bms\\predictions.csv",
+      "sha256": "92713f5555fd50035b65a48c327693e8bbdf57ad1b85522650f1c3d12f545182"
+    },
+    {
+      "path": "reports\\bms\\timings.csv",
+      "sha256": "f0738647d033efa0086b0b9f7f10a10b047c27ad790e8ac830f6df7982674a4a"
+    },
+    {
+      "path": "artifacts\\bms\\random_forest.joblib",
+      "sha256": "b70dc58e56369389fca20d184b53a0f2aa1fafa9dae123b24d70695b3ba37a47"
+    },
+    {
+      "path": "artifacts\\bms\\ridge_residual_forest.joblib",
+      "sha256": "a45c2d6291f8dc5e8079a40c6b63f4fba9840a2f44f948bb1a9c3157dd4b7af0"
+    },
+    {
+      "path": "data\\bms\\processed\\01_example.csv.gz",
+      "sha256": "327cf980bde61a21fd253ac1cd9c2c173918ca4d65c083bda74ff52be71f687c"
+    },
+    {
+      "path": "data\\bms\\processed\\02_example.csv.gz",
+      "sha256": "e9b0fb8aea7ceff1265aa7f8a54cb54566bbcd4c28b98957d2657b15ddef98d5"
+    },
+    {
+      "path": "data\\bms\\processed\\03_example.csv.gz",
+      "sha256": "34d4f582b28ddfd5b3ff0a6585bd364e94448d4aad9bf18c340d126375b66319"
+    },
+    {
+      "path": "data\\bms\\processed\\04_example.csv.gz",
+      "sha256": "d616af9880c6d572408c0d21702d7ccb3cf697c1d1a5ace14781897c2563977f"
+    },
+    {
+      "path": "data\\bms\\processed\\05_example.csv.gz",
+      "sha256": "307a28398cd405531897fddbf332a1485b08b6f612c53cf86d2712466f1500c7"
+    },
+    {
+      "path": "data\\bms\\processed\\06_example.csv.gz",
+      "sha256": "69938b1f395e5ded27c9c979bbd5dbb11d181fa847b11a44d2bbede173853461"
+    },
+    {
+      "path": "data\\bms\\processed\\07_example.csv.gz",
+      "sha256": "d7e76f606ea2ae0352c85d1d198993cfdc86ed30c4f4e25287c40e5d304c7af0"
+    },
+    {
+      "path": "data\\bms\\processed\\08_example.csv.gz",
+      "sha256": "fec0b0f4ee3654445207322939f7c156d6c1ed2eaec1509be11b7e42b1e478f2"
+    },
+    {
+      "path": "data\\bms\\processed\\09_example.csv.gz",
+      "sha256": "e2180c3f0f32ebe14d318e0cf11477bb2a692c69cafee927b9a2af1036bc33b4"
+    },
+    {
+      "path": "data\\bms\\processed\\10_example.csv.gz",
+      "sha256": "eb39c4816d6cb6f51e86a2adba99193cc13ac3073c04cab14fce7dac90d2bbee"
+    },
+    {
+      "path": "data\\bms\\processed\\11_example.csv.gz",
+      "sha256": "697f20f0106d1bfca4e09289f7ac51206390fa7390601eea7a1543e2756c5eeb"
+    },
+    {
+      "path": "data\\bms\\processed\\12_example.csv.gz",
+      "sha256": "ae5bc484fde640a405c7b1cb1325a40cfcf5ff677847eb056e5df1889d64e39d"
+    },
+    {
+      "path": "data\\bms\\processed\\13_example.csv.gz",
+      "sha256": "9f34c480394e27f89afb8dcd0eb4d5df12673035344116c43771c58448ea21db"
+    },
+    {
+      "path": "data\\bms\\processed\\14_example.csv.gz",
+      "sha256": "c1062513a79c5584ed52f952eb3aa708ac7c34290aed3c5096660ff1fb4969de"
+    },
+    {
+      "path": "data\\bms\\processed\\15_example.csv.gz",
+      "sha256": "f64e3422706b8cd3043923ba55d1c15836b083e43f58716c514d820134d5b4df"
+    },
+    {
+      "path": "data\\bms\\processed\\16_example.csv.gz",
+      "sha256": "c95483ea320af6167d6978d91be1440efec3b4994253d1bd0e84ebfe74e60380"
+    },
+    {
+      "path": "data\\bms\\processed\\17_example.csv.gz",
+      "sha256": "21c152afdd30073ca1c8162272fb1ae852ad16e80aa2a575ac5997e7f809a0db"
+    },
+    {
+      "path": "data\\bms\\processed\\18_example.csv.gz",
+      "sha256": "b14ccf404f381d57c3ea1691b5b63ed03339c7ae7a31da77f5ec2fb3d8a6cd40"
+    },
+    {
+      "path": "data\\bms\\processed\\19_example.csv.gz",
+      "sha256": "38eece7db2ded95e7f5828cecfb053bbab3ce28d555e312145081573dc9387de"
+    },
+    {
+      "path": "data\\bms\\processed\\20_example.csv.gz",
+      "sha256": "22bf5a877214eacbaaed37f5a4783e96763b95e1daa362076894846a47a5f98e"
+    },
+    {
+      "path": "data\\bms\\processed\\windows.parquet",
+      "sha256": "ea8076f6b491743704fdcde8fbd62e65ad686896ed36ae57fb083c61d2ee4e41"
+    }
+  ]
+}

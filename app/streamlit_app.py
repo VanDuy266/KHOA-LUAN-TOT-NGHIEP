@@ -2,6 +2,7 @@
 
 import sys
 import json
+from html import escape
 from pathlib import Path
 import streamlit as st
 
@@ -10,6 +11,8 @@ ROOT = APP.parent
 # Cho phép chạy từ thư mục bất kỳ bằng streamlit run app/streamlit_app.py.
 sys.path.insert(0, str(APP))
 sys.path.insert(0, str(ROOT / "src"))
+
+from components import logo_image, brand_wordmark
 
 from screens import (
     overview,
@@ -22,12 +25,12 @@ from screens import (
     anomalies,
     demo,
     input_check,
-    xjtu,
+    bms,
 )
 
 st.set_page_config(
     page_title="Vincent D · Sức khỏe pin",
-    page_icon=":material/battery_charging_full:",
+    page_icon=str(APP / "assets" / "vincent-d-logo-avatar.png"),
     layout="wide",
     initial_sidebar_state="auto",
 )
@@ -38,33 +41,44 @@ st.markdown(
 
 with st.sidebar:
     st.markdown(
-        '<div class="brand"><div class="brand-mark">VD</div><div><div class="brand-name">Vincent D</div>'
-        '<div class="brand-sub">Phân tích sức khỏe pin</div></div></div><div class="sidebar-heading">Không gian làm việc</div>',
+        f'<div class="brand"><div class="brand-mark brand-logo">{logo_image()}</div><div><div class="brand-name">{brand_wordmark()}</div>'
+        '<div class="brand-sub">Phân tích sức khỏe pin</div></div></div><div class="sidebar-heading">KHÔNG GIAN LÀM VIỆC</div>',
         unsafe_allow_html=True,
     )
     page = st.radio(
         "Điều hướng",
         [
-            "Tổng quan",
-            "Tra cứu pin",
-            "Đánh giá mô hình",
-            "Thực nghiệm XJTU",
-            "Dự đoán SOH",
-            "Xu hướng bất thường",
-            "Lịch sử dự đoán",
-            "Chất lượng dữ liệu",
-            "Thông tin",
-            "Demo pin giữ riêng",
-            "Kiểm tra file đầu vào",
+            "Tổng quan", "Tra cứu pin", "Kiểm tra file đầu vào", "Dự đoán SOH",
+            "Lịch sử dự đoán", "Xu hướng bất thường", "Đánh giá mô hình",
+            "Demo pin giữ riêng", "BMS trên xe", "Chất lượng dữ liệu", "Thông tin",
         ],
         label_visibility="collapsed",
         key="navigation",
+        format_func=lambda name: f":material/{dict(zip(
+            ["Tổng quan", "Tra cứu pin", "Kiểm tra file đầu vào", "Dự đoán SOH",
+             "Lịch sử dự đoán", "Xu hướng bất thường", "Đánh giá mô hình",
+             "Demo pin giữ riêng", "BMS trên xe", "Chất lượng dữ liệu", "Thông tin"],
+            ["dashboard", "battery_full", "fact_check", "online_prediction",
+             "history", "monitoring", "analytics", "play_circle", "science",
+             "verified", "info"]
+        ))[name]}:  {name}",
     )
     st.markdown(
-        '<div class="sidebar-person">Nguyễn Văn Duy<small>MSSV 2311553949<br>Khoa Học Dữ Liệu</small></div>',
+        f'<div class="sidebar-person"><div class="avatar-orbit avatar-logo">{logo_image()}</div><div><strong>Nguyễn Văn Duy</strong><small>MSSV 2311553949<br>Khoa Học Dữ Liệu</small></div></div>',
         unsafe_allow_html=True,
     )
 
+    st.toggle("Giao diện tối", key="dashboard_dark")
+
+# Theme variables are presentation only; native controls retain their behavior.
+dark = st.session_state.get("dashboard_dark", False)
+colors = ("#111b29", "#1b2838", "#e5edf5", "#9aabc0", "#2c3b4d", "#211f32", "#75d69e", "#ff7a84", "#34304d") if dark else ("#f4f7fb", "#ffffff", "#243b5c", "#788499", "#e0e6ef", "#f1f2f7", "#157347", "#b4232f", "#e2e0ee")
+keys = ("bg", "surface", "text", "muted", "line", "sidebar", "green", "red", "active")
+st.markdown("<style>:root{" + ";".join(f"--dash-{key}:{value}" for key, value in zip(keys, colors)) + "}</style>", unsafe_allow_html=True)
+st.markdown(
+    f'<div class="dashboard-topbar"><div><span class="top-brand">Vincent D</span><span class="top-separator">/</span><span class="top-page">{escape(page)}</span></div><span class="top-context">Phân tích sức khỏe pin</span></div>',
+    unsafe_allow_html=True,
+)
 
 required = [
     "reports/features.csv",
@@ -90,7 +104,7 @@ if dataset.get("dataset") != "SDU":
     st.stop()
 
 screens = {
-    "Thực nghiệm XJTU": xjtu.render,
+    "BMS trên xe": bms.render,
     "Xu hướng bất thường": anomalies.render,
     "Kiểm tra file đầu vào": input_check.render,
     "Demo pin giữ riêng": demo.render,

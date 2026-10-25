@@ -2,7 +2,7 @@
 
 import streamlit as st
 from app_data import ROOT, table, metadata
-from components import heading, section, csv_download
+from components import heading, section, csv_download, logo_image
 from labels import vietnamese_table
 
 
@@ -11,7 +11,7 @@ def render():
     left, right = st.columns([1, 1.45], gap="large")
     with left:
         st.markdown(
-            '<div class="profile-card"><div class="author-monogram">VD</div><h2>Nguyễn Văn Duy</h2><dl><dt>MSSV</dt><dd>2311553949</dd><dt>Chuyên ngành</dt><dd>Khoa Học Dữ Liệu</dd></dl></div>',
+            f'<div class="profile-card"><div class="author-monogram avatar-logo">{logo_image()}</div><h2>Nguyễn Văn Duy</h2><dl><dt>MSSV</dt><dd>2311553949</dd><dt>Chuyên ngành</dt><dd>Khoa Học Dữ Liệu</dd></dl></div>',
             unsafe_allow_html=True,
         )
     with right:
@@ -48,7 +48,7 @@ def render():
             "Đầu vào gồm số chu kỳ, giai đoạn, điện áp, dòng điện và nhiệt độ trong 120 giây đầu xả. Dung lượng cuối chu kỳ chỉ tạo nhãn, không đưa vào đặc trưng."
         )
         st.write(
-            "SOH khác mức sạc SOC. Kết quả chưa phải chứng nhận an toàn, chưa dự báo tuổi thọ còn lại RUL và chưa được kiểm chứng trên bộ pin xe điện thực tế."
+            "SOH khác mức sạc SOC. Kết quả chưa phải chứng nhận an toàn, chưa dự báo tuổi thọ còn lại RUL và phần BMS bổ sung dùng dữ liệu sạc trên xe với nhãn suy ra; chưa có phép đo dung lượng độc lập để kiểm chứng SOH vật lý."
         )
         st.write(
             "Bộ 10.505.065 dòng giữ đủ các chu kỳ đã chọn, nhưng giảm mật độ điểm đo sau cửa sổ đầu xả. Những chu kỳ sạc, nghỉ hoặc điều kiện xả khác không thuộc bộ chọn này."

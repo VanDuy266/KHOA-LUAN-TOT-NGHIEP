@@ -35,6 +35,15 @@ def tree_contributions(estimator, features):
 
 
 def prediction_contributions(estimator, features):
+    library = type(estimator).__module__.split(".")[0]
+    if library == "catboost":
+        from catboost import Pool
+        values = np.asarray(estimator.get_feature_importance(Pool(features), type="ShapValues", thread_count=2))[0]
+        return float(values[-1]), pd.DataFrame({"feature":features.columns,"contribution":values[:-1]}), "Đóng góp SHAP gốc từ CatBoost."
+    if library == "xgboost":
+        from xgboost import DMatrix
+        values = np.asarray(estimator.get_booster().predict(DMatrix(features), pred_contribs=True))[0]
+        return float(values[-1]), pd.DataFrame({"feature":features.columns,"contribution":values[:-1]}), "Đóng góp TreeSHAP gốc từ XGBoost."
     if hasattr(estimator, "baseline_") and hasattr(estimator, "correction_"):
         baseline, effects = tree_contributions(estimator.correction_, features)
         scaler = estimator.baseline_.steps[0][1]
@@ -67,5 +76,6 @@ def render_explanation(artifact, features):
         )
         st.caption(
             method
-            + " Đóng góp dương: tăng SOH; âm: giảm SOH so với mốc. Không phải SHAP hoặc quan hệ nhân quả."
+            + " Đóng góp dương: tăng SOH; âm: giảm SOH so với mốc. "
+            + ("Không phải quan hệ nhân quả." if "SHAP" in method else "Không phải SHAP hoặc quan hệ nhân quả.")
         )

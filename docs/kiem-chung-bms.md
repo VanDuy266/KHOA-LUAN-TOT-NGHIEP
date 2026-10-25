@@ -2,7 +2,7 @@
 
 ## Trạng thái
 
-Chưa có dữ liệu BMS hoặc phép đo đối chiếu từ xe thực tế. Chưa thực hiện kiểm chứng trên xe. Các kết quả SDU là thí nghiệm tế bào pin trong phòng thí nghiệm; không thay thế kiểm chứng này.
+Đã tải dữ liệu BMS sạc của 20 xe BAIC EU500 vận hành thực tế từ nhóm Deng và cộng sự (2023), và triển khai thực nghiệm riêng trong ứng dụng. Nhãn SOH được suy ra từ dòng điện và SOC, không phải dung lượng đo bằng RPT độc lập. Vì vậy chưa được gọi là kiểm chứng SOH vật lý độc lập trên xe. Kết quả SDU vẫn là thí nghiệm cell trong lab. Xem [Thực nghiệm BMS](thuc-nghiem-bms.md) để phân biệt nguồn, nhãn và thiết kế đánh giá.
 
 ## Dữ liệu cần thu thập
 

@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: vincent-d-battery
+    runtime: python
+    plan: free
+    buildCommand: python -m pip install -r requirements-render.txt && python scripts/check_hosting.py
+    startCommand: python scripts/start_render.py
+    healthCheckPath: /_stcore/health
+    envVars:
+      - key: VINCENT_PUBLIC_DEMO
+        value: "1"
+      - key: OMP_NUM_THREADS
+        value: "2"
+      - key: MKL_NUM_THREADS
+        value: "2"
+      - key: OPENBLAS_NUM_THREADS
+        value: "1"

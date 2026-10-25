@@ -1,10 +1,10 @@
 [theme]
 base = "light"
-primaryColor = "#087f70"
-backgroundColor = "#f4f7f5"
+primaryColor = "#756db5"
+backgroundColor = "#f4f7fb"
 secondaryBackgroundColor = "#ffffff"
-textColor = "#183c36"
-font = "Arial"
+textColor = "#243b5c"
+font = "Times New Roman"
 
 [server]
 maxUploadSize = 512

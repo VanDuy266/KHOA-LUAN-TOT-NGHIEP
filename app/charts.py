@@ -34,14 +34,14 @@ def finish(chart, height=300):
             titleColor="#4c6159",
             gridColor="#e9eeea",
             domain=False,
-            labelFont="Arial",
-            titleFont="Arial",
+            labelFont="Times New Roman",
+            titleFont="Times New Roman",
             labelFontSize=11,
             titleFontSize=12,
             titlePadding=12,
         )
         .configure_legend(
-            title=None, labelColor="#52665d", orient="bottom", symbolType="circle"
+            labelFont="Times New Roman", titleFont="Times New Roman", title=None, labelColor="#52665d", orient="bottom", symbolType="circle"
         )
     )
 
@@ -102,7 +102,7 @@ def model_comparison(data, metric):
             color=alt.condition(
                 alt.datum.model == "Random Forest",
                 alt.value("#eb8c5e"),
-                alt.value("#087f70"),
+                alt.Color("model:N", scale=alt.Scale(domain=["Ridge-RF residual", "Mean baseline", "Ridge", "LightGBM", "GRU", "CatBoost", "XGBoost"], range=["#7963c9", "#8d9ca8", "#507e99", "#138b83", "#385e72", "#b88a35", "#bc6272"]), legend=None),
             ),
             tooltip=[
                 alt.Tooltip("model_name:N", title="Mô hình"),

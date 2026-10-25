@@ -1,0 +1,52 @@
+{
+  "checks": "5 unittest checks passed; native contribution sums match predictions; app evaluation and prediction passed for both models",
+  "samples_per_model": 20823,
+  "physical_batteries": 86,
+  "folds": 5,
+  "files": [
+    {
+      "path": "reports\\boosting\\comparison.csv",
+      "sha256": "837b311111f2cc9ddb9d1f1174bdcdff98e46f2ba5914c1239753ce40e707240"
+    },
+    {
+      "path": "reports\\boosting\\metadata.json",
+      "sha256": "5e10c337a6336ce809dc7ade519d0625bc917b1e008156fd4a5d39f6085a62e3"
+    },
+    {
+      "path": "reports\\boosting\\metrics_by_battery.csv",
+      "sha256": "a25f174936e3e9628a85ce2fd67c5a0a32d23171d3370b9a58a3615590198f8d"
+    },
+    {
+      "path": "reports\\boosting\\metrics_summary.csv",
+      "sha256": "e08a518c40006b8801bfe23141d0548c6ec05e712502a26f48959ab8957272bd"
+    },
+    {
+      "path": "reports\\boosting\\paired_comparison.csv",
+      "sha256": "185b40bd2bd8c8f2e1348bda41cbd6c7be4062dff0549523bd0fe6d54a256c2f"
+    },
+    {
+      "path": "reports\\boosting\\predictions.csv",
+      "sha256": "079529ce4ad1e2b0fb0d6a9d8560cb6f82f7d24c9ce01098cc2753f5c8c5dc0e"
+    },
+    {
+      "path": "reports\\boosting\\splits.json",
+      "sha256": "6898e678499b973586411ecbcba86d8c118ae6b6aec96507f39c830ca0411f56"
+    },
+    {
+      "path": "reports\\boosting\\timings.csv",
+      "sha256": "66ff68f2e738bf22f14ba7b327a94e8d9fe6197d45e07a2d4f691be2699d2c88"
+    },
+    {
+      "path": "reports\\boosting\\validation_trials.csv",
+      "sha256": "837f516137a8adfb0bfa334f8129a9fb2fac2eb7a27f1f9f3a27cbcc6468d45b"
+    },
+    {
+      "path": "artifacts\\boosting\\catboost.joblib",
+      "sha256": "9b660e9b32f8d0d11d671badc02b4d458fd025fdd5d23c8a90b2918055a29a4e"
+    },
+    {
+      "path": "artifacts\\boosting\\xgboost.joblib",
+      "sha256": "32a8b56e8173fc98cdf5ffed93ab97c7aad27cc073bd25e8a6fb21c47d6bf009"
+    }
+  ]
+}

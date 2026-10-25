@@ -1,0 +1,66 @@
+{
+  "methods": [
+    "CatBoost",
+    "XGBoost"
+  ],
+  "candidates": {
+    "CatBoost": [
+      {
+        "depth": 4,
+        "l2_leaf_reg": 5
+      },
+      {
+        "depth": 6,
+        "l2_leaf_reg": 5
+      },
+      {
+        "depth": 8,
+        "l2_leaf_reg": 5
+      }
+    ],
+    "XGBoost": [
+      {
+        "max_depth": 3,
+        "min_child_weight": 5,
+        "reg_lambda": 5
+      },
+      {
+        "max_depth": 5,
+        "min_child_weight": 5,
+        "reg_lambda": 5
+      },
+      {
+        "max_depth": 7,
+        "min_child_weight": 5,
+        "reg_lambda": 5
+      }
+    ]
+  },
+  "final_choices": {
+    "CatBoost": {
+      "parameters": {
+        "depth": 8,
+        "l2_leaf_reg": 5
+      },
+      "trees": 471
+    },
+    "XGBoost": {
+      "parameters": {
+        "max_depth": 3,
+        "min_child_weight": 5,
+        "reg_lambda": 5
+      },
+      "trees": 638
+    }
+  },
+  "catboost_version": "1.2.10",
+  "xgboost_version": "3.4.1",
+  "data_sha256": "b686d3cb9af5e1dc22369c50ef53199f2284e1dfe90eee64592fc914ac50a008",
+  "protocol": "Same outer physical-battery folds; one group-held-out inner validation; best iteration via validation RMSE then candidate via validation macro MAE; refit full outer train before one test prediction; no test-driven tuning",
+  "caveat": "Existing baselines use fixed parameters; new methods have a small validation search budget. Differences include both algorithm and tuning budget; no claim of universal superiority.",
+  "final_refit": "Most frequent parameters selected by inner validation across folds; median tree count among matching selections; never selected by outer test MAE",
+  "sources": {
+    "CatBoost": "https://proceedings.neurips.cc/paper/2018/hash/14491b756b3a51daac41c24863285549-Abstract.html",
+    "XGBoost": "https://arxiv.org/abs/1603.02754"
+  }
+}

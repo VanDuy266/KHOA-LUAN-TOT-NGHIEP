@@ -4,7 +4,7 @@
 
 Trường Đại học Nguyễn Tất Thành · GVHD: ThS. Vương Xuân Chí
 
-Tôi sử dụng dữ liệu SDU công bố năm 2025 để phân tích dung lượng và ước lượng SOH từ 120 giây đầu xả. Ứng dụng **Vincent D** cung cấp tra cứu hai giai đoạn sử dụng pin, so sánh chu kỳ, đánh giá mô hình và dự đoán từ CSV. Phần thực nghiệm bổ sung dùng XJTU 2024 để kiểm tra trên nguồn pin độc lập, với trang kết quả và dự đoán MAT riêng.
+Tôi sử dụng dữ liệu SDU công bố năm 2025 để phân tích dung lượng và ước lượng SOH từ 120 giây đầu xả. Ứng dụng **Vincent D** cung cấp tra cứu hai giai đoạn sử dụng pin, so sánh chu kỳ, đánh giá mô hình và dự đoán từ CSV. Phần thực nghiệm bổ sung dùng dữ liệu BMS sạc của 20 xe BAIC EU500: mô hình học riêng, giữ riêng xe khi kiểm thử và ghi rõ nhãn SOH suy ra từ dòng điện/SOC. Xem `docs/thuc-nghiem-bms.md`; chưa có phép đo dung lượng RPT độc lập.
 
 ## Tải sản phẩm và dữ liệu
 
@@ -123,7 +123,7 @@ Trang **Xu hướng bất thường** hiển thị SOH tham chiếu, xu hướng
 .\.venv\Scripts\python.exe scripts\analyze_anomalies.py
 ```
 
-Cờ không phải xác nhận lỗi hoặc cảnh báo an toàn. Chưa có nhãn lỗi thực để tính precision/recall. Chưa có dữ liệu BMS trên xe nên **chưa kiểm chứng thực tế**; xem `docs/kiem-chung-bms.md`. Chức năng dùng SOH tham chiếu sau đo dung lượng, tách khỏi mô hình dự đoán 120 giây đầu.
+Cờ không phải xác nhận lỗi hoặc cảnh báo an toàn. Chưa có nhãn lỗi thực để tính precision/recall. Chức năng này chưa được kiểm chứng bằng nhãn lỗi thực tế trên xe; xem `docs/kiem-chung-bms.md`. Chức năng dùng SOH tham chiếu sau đo dung lượng, tách khỏi mô hình dự đoán 120 giây đầu.
 
 ## Phương án kết hợp trong khóa luận
 
@@ -131,11 +131,11 @@ Cờ không phải xác nhận lỗi hoặc cảnh báo an toàn. Chưa có nhã
 
 MAE 1,612 so với RF 1,619; RMSE 2,160 so với 2,157. Kết quả gần nhau, chưa đủ kết luận vượt trội. Đây là phương án kết hợp thuật toán có sẵn, không khẳng định thuật toán mới trong nghiên cứu. Chọn được trên trang Dự đoán SOH, mặc định vẫn là RF.
 
-## Thực nghiệm bổ sung XJTU và báo cáo giữa kỳ
+## Thực nghiệm bổ sung XJTU và báo cáo giữa kỳ (lưu trữ)
 
 Nguồn [XJTU 2024](https://zenodo.org/records/10963339): Lishen 18650 NCM, 2 Ah, CC BY 4.0. Triển khai **23 pin Batch-1/2** trong tổng 55 pin của nguồn; các nhóm còn lại có quy trình khác nên chưa đưa vào thực nghiệm này. Đã tải nguyên gốc và kiểm tra nguồn của 23 MAT; xử lý 46.215.511 điểm đo, tạo 6.961 chu kỳ hợp lệ. Đánh giá chính dùng **6.938 chu kỳ**, không dùng 23 chu kỳ đầu xả 0,2C để tránh trộn với các chu kỳ xả 1C.
 
-Ứng dụng có mục **Thực nghiệm XJTU**: so sánh mô hình giữ riêng pin, kiểm thử chuyển miền/batch, biểu đồ theo pin, nguồn và dự đoán MAT riêng. Không đưa MAT XJTU vào bộ đọc CSV SDU. Mô hình XJTU dùng dòng chuẩn hóa theo 2 Ah và không dùng dung lượng đo/SOH làm đầu vào.
+Bản thực nghiệm XJTU trước đây (hiện lưu trữ, đã thay bằng **BMS trên xe** trên giao diện): so sánh mô hình giữ riêng pin, kiểm thử chuyển miền/batch, biểu đồ theo pin, nguồn và dự đoán MAT riêng. Không đưa MAT XJTU vào bộ đọc CSV SDU. Mô hình XJTU dùng dòng chuẩn hóa theo 2 Ah và không dùng dung lượng đo/SOH làm đầu vào.
 
 | Cấu hình trên pin XJTU giữ riêng | MAE (điểm % SOH) | RMSE |
 | --- | ---: | ---: |
@@ -154,4 +154,20 @@ Năm vòng chia theo mã pin, cấu hình cố định. RF đa nguồn chưa c�
 - [Báo cáo giữa kỳ 10/11/2026 — Word](docs/bao-cao-giua-ky-10-11-2026.docx).
 - [Slide giữa kỳ — 12 trang, có ghi chú trình bày](docs/slide-giua-ky-10-11-2026.pptx).
 
-Gói sản phẩm kèm bảng dẫn xuất và mô hình đã huấn luyện; không kèm 722 MiB MAT gốc. Không cần tải MAT hoặc cài PyTorch để xem ứng dụng. Tải nguồn và chạy lại thực nghiệm đầy đủ bằng các script XJTU khi cần. Cả SDU và XJTU đều là dữ liệu tế bào trong phòng lab; BMS trên xe và RUL chưa được triển khai.
+Gói sản phẩm kèm bảng dẫn xuất và mô hình đã huấn luyện; không kèm 722 MiB MAT gốc. Không cần tải MAT hoặc cài PyTorch để xem ứng dụng. Tải nguồn và chạy lại thực nghiệm đầy đủ bằng các script XJTU khi cần. Cả SDU và XJTU đều là dữ liệu tế bào trong phòng lab. Phần BMS trên xe đã được bổ sung riêng bên dưới, với nhãn suy ra thay vì RPT độc lập; RUL chưa triển khai.
+
+## Bổ sung BMS trên xe thực tế
+
+Giao diện bổ sung đã chuyển từ XJTU sang **BMS trên xe**: dữ liệu sạc qua CAN của 20 xe BAIC EU500 dùng pin CATL NCM 145 Ah, công bố bởi Deng và cộng sự (Applied Energy 2023, DOI 10.1016/j.apenergy.2023.120954). SDU vẫn là nguồn thực nghiệm chính. Các kết quả XJTU trong tài liệu phía trên thuộc thí nghiệm lab lưu trữ, không được gọi là BMS.
+
+Nhãn BMS là **SOH suy ra từ dòng điện và SOC khi sạc**, không có phép đo dung lượng RPT độc lập. Mô hình BMS được học riêng và kiểm thử giữ riêng xe; không suy rộng thành kiểm chứng SOH vật lý, an toàn xe hoặc ứng dụng ở Việt Nam. Xem phương pháp, điều kiện loại phiên, nguồn và lệnh tái lập tại [Thực nghiệm BMS](docs/thuc-nghiem-bms.md).
+
+
+## Thử nghiệm bổ sung CatBoost và XGBoost
+
+Đã đánh giá bằng thư viện chính thức trên cùng 5 nhóm pin SDU; chọn cấu hình/số cây bằng validation giữ riêng pin trong train rồi refit đầy đủ trước khi test. CatBoost MAE 1,677 và XGBoost 1,692 điểm % SOH; chưa vượt Ridge–RF 1,612 hoặc RF 1,619 trong lần thử này. Giữ mô hình cũ làm mặc định. Có thể xem so sánh và chọn dự đoán hai mô hình bổ sung trong ứng dụng; cần `requirements-boosting.txt` trên máy cài mới. Chưa chạy thử nghiệm này trên BMS. [Nguồn, giao thức, kết quả và tái lập](docs/thuc-nghiem-boosting.md).
+
+
+## Triển khai Render
+
+Dùng [hướng dẫn Render](docs/render-deploy.md), cấu hình `render.yaml` và lệnh `python scripts/start_render.py`. Nhánh triển khai phải có đủ dữ liệu và mô hình; script build sẽ kiểm tra trước khi chạy.

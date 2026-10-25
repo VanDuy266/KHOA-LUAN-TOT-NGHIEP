@@ -1,0 +1,238 @@
+﻿{
+    "files":  [
+                  {
+                      "id":  41076449,
+                      "name":  "battery_dataset1.tar.gz",
+                      "size":  812110847,
+                      "is_link_only":  false,
+                      "download_url":  "https://ndownloader.figshare.com/files/41076449",
+                      "supplied_md5":  "2275beb485c85198cb6b6ff33b5c6816",
+                      "computed_md5":  "2275beb485c85198cb6b6ff33b5c6816",
+                      "mimetype":  "undefined"
+                  },
+                  {
+                      "id":  41076458,
+                      "name":  "battery_dataset3.tar.gz",
+                      "size":  177847087,
+                      "is_link_only":  false,
+                      "download_url":  "https://ndownloader.figshare.com/files/41076458",
+                      "supplied_md5":  "78121cca0132b80efa93098e6cf3d773",
+                      "computed_md5":  "78121cca0132b80efa93098e6cf3d773",
+                      "mimetype":  "application/gzip"
+                  },
+                  {
+                      "id":  41076506,
+                      "name":  "battery_dataset2.tar.gz",
+                      "size":  418251471,
+                      "is_link_only":  false,
+                      "download_url":  "https://ndownloader.figshare.com/files/41076506",
+                      "supplied_md5":  "726fb75958e19d1bfed35a945187deb7",
+                      "computed_md5":  "726fb75958e19d1bfed35a945187deb7",
+                      "mimetype":  "application/gzip"
+                  }
+              ],
+    "folder_structure":  {
+
+                         },
+    "authors":  [
+                    {
+                        "id":  16031063,
+                        "full_name":  "Haowei He",
+                        "first_name":  "Haowei",
+                        "last_name":  "He",
+                        "is_active":  true,
+                        "url_name":  "Haowei_He",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031108,
+                        "full_name":  "Jingzhao Zhang",
+                        "first_name":  "Jingzhao",
+                        "last_name":  "Zhang",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031110,
+                        "full_name":  "Yanan Wang",
+                        "first_name":  "Yanan",
+                        "last_name":  "Wang",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031111,
+                        "full_name":  "Benben Jiang",
+                        "first_name":  "Benben",
+                        "last_name":  "Jiang",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031117,
+                        "full_name":  "Shaobo Huang",
+                        "first_name":  "Shaobo",
+                        "last_name":  "Huang",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031120,
+                        "full_name":  "Chen Wang",
+                        "first_name":  "Chen",
+                        "last_name":  "Wang",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031122,
+                        "full_name":  "Yang Zhang",
+                        "first_name":  "Yang",
+                        "last_name":  "Zhang",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031123,
+                        "full_name":  "Gengang Xiong",
+                        "first_name":  "Gengang",
+                        "last_name":  "Xiong",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031126,
+                        "full_name":  "Xuebing Han",
+                        "first_name":  "Xuebing",
+                        "last_name":  "Han",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031128,
+                        "full_name":  "Dongxu Guo",
+                        "first_name":  "Dongxu",
+                        "last_name":  "Guo",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  13193234,
+                        "full_name":  "Guannan He",
+                        "first_name":  "Guannan",
+                        "last_name":  "He",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    },
+                    {
+                        "id":  16031129,
+                        "full_name":  "Minggao Ouyang",
+                        "first_name":  "Minggao",
+                        "last_name":  "Ouyang",
+                        "is_active":  false,
+                        "url_name":  "_",
+                        "orcid_id":  ""
+                    }
+                ],
+    "custom_fields":  [
+
+                      ],
+    "figshare_url":  "https://figshare.com/articles/dataset/EVBattery_A_Large-Scale_Electric_Vehicle_Dataset_for_Battery_Health_and_Capacity_Estimation/23301881",
+    "download_disabled":  false,
+    "description":  "\u003cp\u003e Electric vehicles (EVs) play an important role in reducing carbon emissions. As EV adoption accelerates, safety issues caused by EV batteries have become an important research topic. In order to benchmark and develop data-driven methods for this task, we introduce a large and comprehensive dataset of EV batteries. Our dataset includes charging records collected from hundreds of EVs from three manufacturers over several years. \u003cbr\u003e\nMeanwhile, our dataset features two types of labels, corresponding to two key tasks - battery health estimation and battery capacity estimation. We hope that this public dataset provides valuable resources for researchers, policymakers, and industry professionals to better understand the dynamics of EV battery aging and support the transition toward a sustainable transportation system.  \u003c/p\u003e",
+    "funding":  null,
+    "funding_list":  [
+
+                     ],
+    "version":  1,
+    "status":  "public",
+    "size":  1408209405,
+    "created_date":  "2023-06-06T14:15:36Z",
+    "modified_date":  "2023-06-06T14:15:37Z",
+    "is_public":  true,
+    "is_confidential":  false,
+    "is_metadata_record":  false,
+    "confidential_reason":  "",
+    "metadata_reason":  "",
+    "license":  {
+                    "value":  1,
+                    "name":  "CC BY 4.0",
+                    "url":  "https://creativecommons.org/licenses/by/4.0/"
+                },
+    "tags":  [
+                 "Electric vehicle battery health",
+                 "Electric vehicle battery capacity",
+                 "anomaly detection,",
+                 "Deep learnig"
+             ],
+    "keywords":  [
+                     "Electric vehicle battery health",
+                     "Electric vehicle battery capacity",
+                     "anomaly detection,",
+                     "Deep learnig"
+                 ],
+    "categories":  [
+                       {
+                           "id":  28864,
+                           "title":  "Artificial intelligence not elsewhere classified",
+                           "parent_id":  28825,
+                           "path":  "/28798/28825/28864",
+                           "source_id":  "460299",
+                           "taxonomy_id":  100
+                       }
+                   ],
+    "references":  [
+                       "https://arxiv.org/abs/arxiv.org/abs/2201.12358"
+                   ],
+    "has_linked_file":  false,
+    "citation":  "He, Haowei; Zhang, Jingzhao; Wang, Yanan; Jiang, Benben; Huang, Shaobo; Wang, Chen; et al. (2023). EVBattery: A Large-Scale Electric Vehicle Dataset for Battery Health and Capacity Estimation. figshare. Dataset. https://doi.org/10.6084/m9.figshare.23301881.v1",
+    "related_materials":  [
+                              {
+                                  "id":  51730112,
+                                  "identifier":  "arxiv.org/abs/2201.12358",
+                                  "title":  "Hypothesis Testing for Unknown Dynamical Systems and System Anomaly Detection via Autoencoders",
+                                  "relation":  "IsNewVersionOf",
+                                  "identifier_type":  "arXiv",
+                                  "is_linkout":  true,
+                                  "link":  "https://arxiv.org/abs/arxiv.org/abs/2201.12358"
+                              }
+                          ],
+    "is_embargoed":  false,
+    "embargo_date":  null,
+    "embargo_type":  null,
+    "embargo_title":  "",
+    "embargo_reason":  "",
+    "embargo_options":  [
+
+                        ],
+    "id":  23301881,
+    "title":  "EVBattery: A Large-Scale Electric Vehicle Dataset for Battery Health and Capacity Estimation",
+    "doi":  "10.6084/m9.figshare.23301881.v1",
+    "handle":  "",
+    "url":  "https://api.figshare.com/v2/articles/23301881",
+    "published_date":  "2023-06-06T14:15:36Z",
+    "thumb":  "",
+    "defined_type":  3,
+    "defined_type_name":  "dataset",
+    "group_id":  null,
+    "url_private_api":  "https://api.figshare.com/v2/account/articles/23301881",
+    "url_public_api":  "https://api.figshare.com/v2/articles/23301881",
+    "url_private_html":  "https://figshare.com/account/articles/23301881",
+    "url_public_html":  "https://figshare.com/articles/dataset/EVBattery_A_Large-Scale_Electric_Vehicle_Dataset_for_Battery_Health_and_Capacity_Estimation/23301881",
+    "timeline":  {
+                     "posted":  "2023-06-06T14:15:36",
+                     "firstOnline":  "2023-06-06"
+                 },
+    "resource_title":  null,
+    "resource_doi":  null
+}

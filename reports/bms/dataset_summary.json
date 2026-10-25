@@ -1,0 +1,333 @@
+{
+  "dataset": "BAIC EU500 BMS",
+  "source_vehicles": 20,
+  "vehicles": 20,
+  "raw_rows": 16100728,
+  "sessions": 27205,
+  "monthly_labels": 569,
+  "nominal_capacity_ah": 145.0,
+  "window_seconds": 120,
+  "label_type": "Field-derived proxy; not independent laboratory capacity",
+  "label_method": "Median of charging-tail integral / SOC gain for vehicle-month; at least 3 sessions; tail starts after 120 seconds; SOC gain >=20 pp",
+  "validation": "5-fold GroupKFold held-out vehicles; macro mean over vehicles; proxy-label agreement only",
+  "exclusions": "No available_capacity, available_energy, timestamps, vehicle IDs or reference labels in feature matrix",
+  "audit": [
+    {
+      "vehicle": "BAIC_01",
+      "raw_rows": 854591,
+      "duplicate_timestamp_rows": 48,
+      "invalid_rows": 0,
+      "sessions": 4235,
+      "eligible_sessions": 1407,
+      "first_time": "2019-07-26T20:02:35",
+      "last_time": "2021-11-15T16:46:40",
+      "excluded": {
+        "short_session": 1791,
+        "insufficient_tail_soc_or_samples": 1026,
+        "not_continuous_charging": 8,
+        "soc_jump": 2,
+        "incomplete_120s_window": 1
+      }
+    },
+    {
+      "vehicle": "BAIC_02",
+      "raw_rows": 841810,
+      "duplicate_timestamp_rows": 3561,
+      "invalid_rows": 4,
+      "sessions": 4586,
+      "eligible_sessions": 1431,
+      "first_time": "2019-07-25T15:14:26",
+      "last_time": "2021-11-15T14:12:56",
+      "excluded": {
+        "short_session": 2065,
+        "insufficient_tail_soc_or_samples": 1064,
+        "not_continuous_charging": 24,
+        "soc_jump": 2
+      }
+    },
+    {
+      "vehicle": "BAIC_03",
+      "raw_rows": 802918,
+      "duplicate_timestamp_rows": 11101,
+      "invalid_rows": 4,
+      "sessions": 4873,
+      "eligible_sessions": 1369,
+      "first_time": "2019-07-26T19:08:05",
+      "last_time": "2021-11-15T22:20:40",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 971,
+        "short_session": 2513,
+        "soc_jump": 2,
+        "not_continuous_charging": 17,
+        "incomplete_120s_window": 1
+      }
+    },
+    {
+      "vehicle": "BAIC_04",
+      "raw_rows": 844537,
+      "duplicate_timestamp_rows": 4381,
+      "invalid_rows": 2,
+      "sessions": 4303,
+      "eligible_sessions": 1428,
+      "first_time": "2019-07-25T15:58:38",
+      "last_time": "2021-11-15T17:57:51",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 1073,
+        "short_session": 1788,
+        "not_continuous_charging": 12,
+        "soc_jump": 1,
+        "incomplete_120s_window": 1
+      }
+    },
+    {
+      "vehicle": "BAIC_05",
+      "raw_rows": 832189,
+      "duplicate_timestamp_rows": 5303,
+      "invalid_rows": 2,
+      "sessions": 4722,
+      "eligible_sessions": 1405,
+      "first_time": "2019-07-26T00:22:51",
+      "last_time": "2021-11-15T17:44:04",
+      "excluded": {
+        "short_session": 2252,
+        "insufficient_tail_soc_or_samples": 1060,
+        "not_continuous_charging": 4,
+        "incomplete_120s_window": 1
+      }
+    },
+    {
+      "vehicle": "BAIC_06",
+      "raw_rows": 815202,
+      "duplicate_timestamp_rows": 6504,
+      "invalid_rows": 3,
+      "sessions": 4273,
+      "eligible_sessions": 1362,
+      "first_time": "2019-07-25T18:35:34",
+      "last_time": "2021-11-15T15:59:52",
+      "excluded": {
+        "short_session": 1919,
+        "insufficient_tail_soc_or_samples": 989,
+        "soc_jump": 1,
+        "not_continuous_charging": 1,
+        "incomplete_120s_window": 1
+      }
+    },
+    {
+      "vehicle": "BAIC_07",
+      "raw_rows": 808770,
+      "duplicate_timestamp_rows": 3723,
+      "invalid_rows": 0,
+      "sessions": 4460,
+      "eligible_sessions": 1350,
+      "first_time": "2019-07-26T09:00:02",
+      "last_time": "2021-11-15T15:54:48",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 1084,
+        "short_session": 2015,
+        "not_continuous_charging": 11
+      }
+    },
+    {
+      "vehicle": "BAIC_08",
+      "raw_rows": 798496,
+      "duplicate_timestamp_rows": 826,
+      "invalid_rows": 4,
+      "sessions": 4733,
+      "eligible_sessions": 1366,
+      "first_time": "2019-07-26T10:26:45",
+      "last_time": "2021-11-15T21:01:06",
+      "excluded": {
+        "short_session": 2366,
+        "insufficient_tail_soc_or_samples": 999,
+        "not_continuous_charging": 2
+      }
+    },
+    {
+      "vehicle": "BAIC_09",
+      "raw_rows": 792060,
+      "duplicate_timestamp_rows": 47,
+      "invalid_rows": 2,
+      "sessions": 4362,
+      "eligible_sessions": 1377,
+      "first_time": "2019-07-23T21:27:55",
+      "last_time": "2021-11-15T19:19:13",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 1071,
+        "short_session": 1780,
+        "soc_jump": 1,
+        "incomplete_120s_window": 2,
+        "not_continuous_charging": 131
+      }
+    },
+    {
+      "vehicle": "BAIC_10",
+      "raw_rows": 728849,
+      "duplicate_timestamp_rows": 26,
+      "invalid_rows": 5,
+      "sessions": 3685,
+      "eligible_sessions": 1174,
+      "first_time": "2019-07-24T23:00:08",
+      "last_time": "2021-11-15T14:07:37",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 944,
+        "short_session": 1567
+      }
+    },
+    {
+      "vehicle": "BAIC_11",
+      "raw_rows": 809470,
+      "duplicate_timestamp_rows": 355,
+      "invalid_rows": 1,
+      "sessions": 4583,
+      "eligible_sessions": 1351,
+      "first_time": "2019-07-26T06:21:45",
+      "last_time": "2021-11-15T22:53:06",
+      "excluded": {
+        "short_session": 2066,
+        "insufficient_tail_soc_or_samples": 1104,
+        "not_continuous_charging": 61,
+        "incomplete_120s_window": 1
+      }
+    },
+    {
+      "vehicle": "BAIC_12",
+      "raw_rows": 825533,
+      "duplicate_timestamp_rows": 2583,
+      "invalid_rows": 5,
+      "sessions": 4493,
+      "eligible_sessions": 1355,
+      "first_time": "2019-07-22T16:35:17",
+      "last_time": "2021-11-16T01:05:42",
+      "excluded": {
+        "short_session": 2081,
+        "insufficient_tail_soc_or_samples": 1049,
+        "soc_jump": 1,
+        "incomplete_120s_window": 1,
+        "not_continuous_charging": 6
+      }
+    },
+    {
+      "vehicle": "BAIC_13",
+      "raw_rows": 818352,
+      "duplicate_timestamp_rows": 729,
+      "invalid_rows": 7,
+      "sessions": 4533,
+      "eligible_sessions": 1333,
+      "first_time": "2019-07-26T11:17:42",
+      "last_time": "2021-11-15T17:47:13",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 1042,
+        "short_session": 2121,
+        "soc_jump": 2,
+        "not_continuous_charging": 35
+      }
+    },
+    {
+      "vehicle": "BAIC_14",
+      "raw_rows": 793132,
+      "duplicate_timestamp_rows": 4746,
+      "invalid_rows": 3,
+      "sessions": 4374,
+      "eligible_sessions": 1410,
+      "first_time": "2019-07-26T01:07:17",
+      "last_time": "2021-11-15T18:58:44",
+      "excluded": {
+        "short_session": 1943,
+        "insufficient_tail_soc_or_samples": 995,
+        "not_continuous_charging": 26
+      }
+    },
+    {
+      "vehicle": "BAIC_15",
+      "raw_rows": 704958,
+      "duplicate_timestamp_rows": 3619,
+      "invalid_rows": 1,
+      "sessions": 3442,
+      "eligible_sessions": 1149,
+      "first_time": "2019-07-25T12:11:45",
+      "last_time": "2021-11-15T21:21:31",
+      "excluded": {
+        "short_session": 1468,
+        "insufficient_tail_soc_or_samples": 823,
+        "not_continuous_charging": 2
+      }
+    },
+    {
+      "vehicle": "BAIC_16",
+      "raw_rows": 819567,
+      "duplicate_timestamp_rows": 123,
+      "invalid_rows": 1,
+      "sessions": 4574,
+      "eligible_sessions": 1447,
+      "first_time": "2019-07-23T08:46:14",
+      "last_time": "2021-11-15T21:24:27",
+      "excluded": {
+        "short_session": 2072,
+        "insufficient_tail_soc_or_samples": 1035,
+        "not_continuous_charging": 20
+      }
+    },
+    {
+      "vehicle": "BAIC_17",
+      "raw_rows": 767868,
+      "duplicate_timestamp_rows": 3412,
+      "invalid_rows": 8,
+      "sessions": 4047,
+      "eligible_sessions": 1289,
+      "first_time": "2019-07-25T21:53:04",
+      "last_time": "2021-11-15T20:03:29",
+      "excluded": {
+        "short_session": 1776,
+        "insufficient_tail_soc_or_samples": 923,
+        "not_continuous_charging": 59
+      }
+    },
+    {
+      "vehicle": "BAIC_18",
+      "raw_rows": 856192,
+      "duplicate_timestamp_rows": 723,
+      "invalid_rows": 7,
+      "sessions": 5030,
+      "eligible_sessions": 1417,
+      "first_time": "2019-07-26T02:53:18",
+      "last_time": "2021-11-15T18:01:41",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 1048,
+        "short_session": 2410,
+        "not_continuous_charging": 155
+      }
+    },
+    {
+      "vehicle": "BAIC_19",
+      "raw_rows": 778745,
+      "duplicate_timestamp_rows": 53,
+      "invalid_rows": 9,
+      "sessions": 4414,
+      "eligible_sessions": 1376,
+      "first_time": "2019-07-24T13:10:55",
+      "last_time": "2021-11-15T22:26:25",
+      "excluded": {
+        "insufficient_tail_soc_or_samples": 1068,
+        "short_session": 1935,
+        "not_continuous_charging": 34,
+        "incomplete_120s_window": 1
+      }
+    },
+    {
+      "vehicle": "BAIC_20",
+      "raw_rows": 807489,
+      "duplicate_timestamp_rows": 131,
+      "invalid_rows": 6,
+      "sessions": 4252,
+      "eligible_sessions": 1413,
+      "first_time": "2019-07-26T11:03:04",
+      "last_time": "2021-11-15T10:20:28",
+      "excluded": {
+        "short_session": 1798,
+        "insufficient_tail_soc_or_samples": 958,
+        "not_continuous_charging": 82,
+        "soc_jump": 1
+      }
+    }
+  ]
+}

@@ -1,20 +1,18 @@
 """Đọc kết quả kiểm thử đã lưu; không huấn luyện hoặc chọn lại mô hình trên test."""
 
 import streamlit as st
-from app_data import ROOT, table, PHASES
+from app_data import ROOT, table, PHASES, evaluation_results
 from charts import model_comparison, held_out, residuals
 from components import heading, section, stat, note, csv_download
 from labels import MODEL_NAMES, vietnamese_table
 
 
 def render():
-    metrics = table("reports/metrics_summary.csv")
-    by_battery = table("reports/metrics_by_battery.csv")
-    predictions = table("reports/predictions.csv")
+    metrics, by_battery, predictions, phases, timings = evaluation_results()
     heading(
         "THỰC NGHIỆM / 02",
         "Đánh giá mô hình",
-        "Kiểm thử giữ riêng pin · 5 vòng theo nhóm pin · 5 cấu hình",
+        f"Kiểm thử giữ riêng pin · 5 vòng theo nhóm pin · {len(metrics)} cấu hình",
     )
     with st.expander("Các mô hình trong thực nghiệm"):
         st.write(
@@ -23,29 +21,28 @@ def render():
         st.caption(
             "GRU dùng 25 vị trí trong 120 giây và hai biến ngữ cảnh; các mô hình bảng dùng 12 thống kê. Mốc trung bình SOH là đối chứng. Khác biệt điểm số gồm cả ảnh hưởng biểu diễn và cấu hình, chưa phải kết luận về mọi cấu hình của thuật toán."
         )
-    if (ROOT / "reports/hybrid_comparison.csv").exists():
-        with st.expander("Phương án khóa luận: Ridge–RF hiệu chỉnh phần dư"):
-            st.write(
-                "Ridge dự đoán xu hướng nền, Random Forest học y_train − Ridge(X_train). Dự đoán cuối là tổng hai thành phần. Cùng 12 đặc trưng và cùng 5 nhóm pin; không học từ nhãn pin kiểm thử."
-            )
-            st.dataframe(
-                vietnamese_table(table("reports/hybrid_comparison.csv")).round(3),
-                hide_index=True,
-                width="stretch",
-            )
-            st.caption(
-                "Kết hợp thuật toán có sẵn để kiểm chứng trong khóa luận; chưa khẳng định thuật toán mới trong nghiên cứu hoặc ưu thế trên mọi bộ dữ liệu."
-            )
-            csv_download(
-                "Tải đối chiếu phương án phần dư",
-                table("reports/hybrid_paired_comparison.csv"),
-                "so_sanh_cap_ridge_rf.csv",
-            )
+    if "Ridge-RF residual" in metrics.model.values:
+        note("Ridge–RF · Phương án khóa luận",
+             "Ridge ước lượng xu hướng nền; Random Forest hiệu chỉnh phần dư. "
+             "Cùng 12 đặc trưng, cùng 5 nhóm pin kiểm thử với các mô hình đối chứng. "
+             "Chọn mô hình bên dưới để xem chỉ số, dự đoán và thời gian huấn luyện.", kind="soft")
+        with st.expander("Cách kết hợp và đối chiếu với Random Forest"):
+            st.latex(r"\widehat{SOH} = Ridge(X) + RF_{phần\ dư}(X)")
+            st.caption("Phương án kết hợp thuật toán có sẵn được kiểm chứng trong khóa luận; không khẳng định là thuật toán mới hoặc tốt hơn trên mọi bộ dữ liệu.")
+            st.dataframe(vietnamese_table(table("reports/hybrid_paired_comparison.csv")).round(3), hide_index=True, width="stretch")
+            csv_download("Tải đối chiếu theo pin", table("reports/hybrid_paired_comparison.csv"), "so_sanh_cap_ridge_rf.csv")
+    if "CatBoost" in metrics.model.values:
+        with st.expander("CatBoost / XGBoost · Cách chọn tham số và nguồn phương pháp"):
+            st.write("Hai thư viện chính thức, cùng 12 đặc trưng và 5 nhóm pin SDU. Mỗi vòng thử 3 cấu hình trên nhóm pin validation bên trong train, chọn số cây rồi học lại train đầy đủ trước khi dự đoán pin test.")
+            st.caption("Mô hình mới có ngân sách chọn tham số, đối chứng cũ dùng cấu hình cố định. Chênh lệch gồm cả ảnh hưởng thuật toán và ngân sách tìm kiếm; không khẳng định mô hình mới tốt hơn trong mọi điều kiện. Thời gian chọn tham số được ghi riêng, ngoài thời gian refit. Các mẫu trong ứng dụng đã tham gia refit.")
+            st.link_button("CatBoost · NeurIPS 2018", "https://proceedings.neurips.cc/paper/2018/hash/14491b756b3a51daac41c24863285549-Abstract.html")
+            st.link_button("XGBoost · KDD 2016", "https://arxiv.org/abs/1603.02754")
     names = metrics.model.tolist()
     model = st.selectbox(
         "Mô hình cần xem",
         names,
-        index=names.index("Random Forest"),
+        index=0,
+        key="evaluation_model",
         format_func=lambda name: MODEL_NAMES[name],
     )
     score = metrics[metrics.model == model].iloc[0]
@@ -108,7 +105,7 @@ def render():
             vietnamese_table(metrics),
             "so_sanh_mo_hinh.csv",
         )
-        st.caption("MAE/RMSE: điểm phần trăm SOH · Màu cam: Random Forest")
+        st.caption("MAE/RMSE: điểm phần trăm SOH · Tím: Ridge–RF · Cam: Random Forest")
     section("02", "Thực tế và dự đoán", "Dự đoán từ pin giữ riêng trong kiểm thử")
     phase = st.selectbox("Giai đoạn kiểm thử", list(PHASES), format_func=PHASES.get)
     battery = st.selectbox("Pin kiểm thử", sorted(predictions.battery.unique()))
@@ -129,15 +126,16 @@ def render():
             "Chỉ số giai đoạn tính gộp các chu kỳ; bảng chính lấy trung bình theo pin. Thời gian đo trên môi trường thực nghiệm, có thể khác máy cá nhân."
         )
         st.dataframe(
-            vietnamese_table(table("reports/metrics_by_phase.csv")).round(3),
+            vietnamese_table(phases[phases.model == model]).round(3),
             hide_index=True,
             width="stretch",
         )
         st.dataframe(
-            vietnamese_table(table("reports/timings.csv")).round(3),
+            vietnamese_table(timings[timings.model == model]).round(3).astype(object).where(timings[timings.model == model].notna().to_numpy(), "Chưa ghi nhận"),
             hide_index=True,
             width="stretch",
         )
+    st.caption("Thời gian dự đoán chưa được lưu cho GRU và Ridge–RF; không quy đổi thành 0 giây.")
     section(
         "03",
         "Sai số ở từng chu kỳ",

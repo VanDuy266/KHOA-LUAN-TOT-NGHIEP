@@ -1,0 +1,47 @@
+﻿<svg class="hero-battery-art" viewBox="0 0 360 380" aria-hidden="true" focusable="false" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+ <linearGradient id="vd-cell-metal" x1="0" x2="1"><stop stop-color="#123b4b"/><stop offset=".28" stop-color="#326779"/><stop offset=".5" stop-color="#1a4557"/><stop offset=".85" stop-color="#0b2337"/><stop offset="1" stop-color="#38657a"/></linearGradient>
+ <linearGradient id="vd-cell-core" x1="0" x2="1"><stop stop-color="#14a595"/><stop offset=".4" stop-color="#8bffcb"/><stop offset=".65" stop-color="#31d9b3"/><stop offset="1" stop-color="#128b8c"/></linearGradient>
+ <linearGradient id="vd-base" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#387d88" stop-opacity=".6"/><stop offset="1" stop-color="#092131"/></linearGradient>
+ <radialGradient id="vd-energy-halo"><stop stop-color="#65ffc7" stop-opacity=".2"/><stop offset=".45" stop-color="#20bfc0" stop-opacity=".08"/><stop offset="1" stop-color="#20bfc0" stop-opacity="0"/></radialGradient>
+</defs>
+<ellipse cx="180" cy="220" rx="172" ry="152" fill="url(#vd-energy-halo)"/>
+<g stroke="#9ae8e6" stroke-opacity=".09" stroke-width=".7"><path d="M10 315 L180 215 L350 315 M10 337 L180 237 L350 337 M10 359 L180 259 L350 359 M10 381 L180 281 L350 381 M26 300 L196 400 M63 278 L233 378 M100 256 L270 356 M137 234 L307 334 M323 300 L153 400 M286 278 L116 378 M249 256 L79 356 M212 234 L42 334"/></g>
+<ellipse cx="183" cy="305" rx="128" ry="50" stroke="#79c5d8" stroke-opacity=".15"/>
+<ellipse cx="183" cy="305" rx="110" ry="40" stroke="#a4ffdd" stroke-opacity=".2" stroke-dasharray="2 9"/>
+<path d="M73 286 L180 226 L292 289 V310 L182 372 L73 309 Z" fill="#0b2535" stroke="#377986" stroke-opacity=".5"/>
+<path d="M73 286 L181 348 L292 289 L180 226 Z" fill="url(#vd-base)" stroke="#8effd2" stroke-opacity=".42"/>
+<path d="M85 287 L181 340 L280 289 L180 236 Z" stroke="#73e3cc" stroke-opacity=".22"/>
+<path d="M181 348 V372" stroke="#7de1d2" stroke-opacity=".3"/>
+<g opacity=".72" transform="translate(-50 -25)">
+ <path d="M171 143 V268 C171 288 227 288 227 268 V143 Z" fill="url(#vd-cell-metal)" stroke="#719da6" stroke-opacity=".5"/>
+ <path d="M177 187 V258 C177 272 221 272 221 258 V187 Z" fill="url(#vd-cell-core)" opacity=".45"/>
+ <ellipse cx="199" cy="143" rx="28" ry="11" fill="#387078" stroke="#9fead9" stroke-opacity=".5"/>
+ <ellipse cx="199" cy="143" rx="13" ry="5" fill="#b6e9dc"/>
+ <path d="M180 158 V247" stroke="#c0fff0" stroke-opacity=".35"/>
+</g>
+<g opacity=".55" transform="translate(49 -39)">
+ <path d="M171 143 V268 C171 288 227 288 227 268 V143 Z" fill="url(#vd-cell-metal)" stroke="#719da6" stroke-opacity=".5"/>
+ <path d="M177 187 V258 C177 272 221 272 221 258 V187 Z" fill="url(#vd-cell-core)" opacity=".4"/>
+ <ellipse cx="199" cy="143" rx="28" ry="11" fill="#387078" stroke="#9fead9" stroke-opacity=".5"/>
+ <ellipse cx="199" cy="143" rx="13" ry="5" fill="#b6e9dc"/>
+</g>
+<g>
+ <path d="M151 154 V286 C151 313 217 313 217 286 V154 Z" fill="url(#vd-cell-metal)" stroke="#80d2ce" stroke-opacity=".6"/>
+ <path class="hero-core-energy" d="M157 203 V280 C157 301 211 301 211 280 V203 Z" fill="url(#vd-cell-core)"/>
+ <ellipse cx="184" cy="203" rx="27" ry="10" fill="#bcffe3" opacity=".55"/>
+ <ellipse cx="184" cy="154" rx="33" ry="13" fill="#356772" stroke="#b8ffe5" stroke-opacity=".7"/>
+ <ellipse cx="184" cy="154" rx="24" ry="8" fill="#123444" stroke="#73b6b5" stroke-opacity=".5"/>
+ <path d="M173 151 V143 C173 137 195 137 195 143 V151 C195 156 173 156 173 151Z" fill="#98d9cf"/>
+ <ellipse cx="184" cy="143" rx="11" ry="4" fill="#d5ffeb"/>
+ <path d="M160 172 V282" stroke="#e3fff2" stroke-opacity=".35" stroke-width="2"/>
+ <path d="M189 220 L175 246 H186 L179 264 L199 237 H188 Z" fill="#f0fff5"/>
+</g>
+<ellipse cx="183" cy="219" rx="142" ry="57" transform="rotate(-24 183 219)" stroke="#85f1d2" stroke-opacity=".18"/>
+<path d="M57 257 A142 57 -24 0 1 232 155" stroke="#b4ffdf" stroke-opacity=".6" stroke-width="1.2"/>
+<circle class="hero-orbit-dot" cx="232" cy="155" r="3" fill="#d2ffe9"/>
+<path d="M278 197 L301 184 H325 M92 198 L66 184 H42 M235 308 L263 324 H304" stroke="#80d1d0" stroke-opacity=".22"/>
+<circle cx="325" cy="184" r="2" fill="#b7abff" opacity=".7"/>
+<circle cx="42" cy="184" r="2" fill="#9ff4d6" opacity=".7"/>
+<path d="M66 117 L91 103 M76 123 L100 109 M279 88 L291 82" stroke="#e5d2ff" stroke-opacity=".3"/>
+</svg>

@@ -1,0 +1,170 @@
+{
+  "dataset": "Deng et al. 2023 BMS BAIC EU500",
+  "source": "https://github.com/BatICM/battery-charging-data-of-on-road-electric-vehicles",
+  "tree_sha": "36fef4bd99f626561e2d138a40ccff3d1f3ddfc2",
+  "doi": "10.1016/j.apenergy.2023.120954",
+  "nominal_capacity_ah": 145,
+  "series_cells": 90,
+  "files": [
+    {
+      "vehicle": "BAIC_01",
+      "file": "data\\bms\\raw\\vehicle_01.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%231.rar",
+      "bytes": 12238871,
+      "sha256": "2e77a7836f441f5f45ae0b2e2116044fa3c4191d67377e89a126562743afc443",
+      "git_blob_sha": "bf5379bf2041c565b37dcc39052d43113e2647ff"
+    },
+    {
+      "vehicle": "BAIC_02",
+      "file": "data\\bms\\raw\\vehicle_02.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%232.rar",
+      "bytes": 12088035,
+      "sha256": "52e008eb067e6072016ac98f580e3230480236d67c211404f0d62f44ce3a9421",
+      "git_blob_sha": "2b54c2ba3fa3b8464dc6382afdecc8a23a29640c"
+    },
+    {
+      "vehicle": "BAIC_03",
+      "file": "data\\bms\\raw\\vehicle_03.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%233.rar",
+      "bytes": 11451253,
+      "sha256": "1cb5d824602929662e09cb0a028a43258fa85055865391e906049df28e9a0ea5",
+      "git_blob_sha": "63afba3010347c9fa3102402bfd6ac248fa59330"
+    },
+    {
+      "vehicle": "BAIC_04",
+      "file": "data\\bms\\raw\\vehicle_04.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%234.rar",
+      "bytes": 12084749,
+      "sha256": "df2aa25c7bd471a97d3f997cc8e17f171940138dc161a4e49dc370aaf1257d7c",
+      "git_blob_sha": "579fba337d8fba4cc29e80b6576e63a90b21b760"
+    },
+    {
+      "vehicle": "BAIC_05",
+      "file": "data\\bms\\raw\\vehicle_05.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%235.rar",
+      "bytes": 11888317,
+      "sha256": "16b67a98bbdcb8df7f1727ccdf36e68b9eabb209d9bf2707ae921db489bad1ac",
+      "git_blob_sha": "3305c82ceb98d0699309e7699de841b9d2d0987d"
+    },
+    {
+      "vehicle": "BAIC_06",
+      "file": "data\\bms\\raw\\vehicle_06.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%236.rar",
+      "bytes": 11663814,
+      "sha256": "847b207bea6d5a60fdd92c208b32c8aff7575257e316de663ea7f9bf63642477",
+      "git_blob_sha": "850f6ad3817655b6950cdb45e2f7932d9629deb5"
+    },
+    {
+      "vehicle": "BAIC_07",
+      "file": "data\\bms\\raw\\vehicle_07.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%237.rar",
+      "bytes": 11606222,
+      "sha256": "3ac79b584d43d54af1d9583c269fd35d1a5a86bb2ef0af64b61dabdb1528baf6",
+      "git_blob_sha": "cd5a174479613426de1901dab912d584b2f64bc2"
+    },
+    {
+      "vehicle": "BAIC_08",
+      "file": "data\\bms\\raw\\vehicle_08.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%238.rar",
+      "bytes": 11507641,
+      "sha256": "4603f6ca0405bb6356401060215ac39bda06eb70b35f0dfe1a88cafe4c7a9b52",
+      "git_blob_sha": "af30017bb77a9ff4cd5622230fa016ee9ecdb72a"
+    },
+    {
+      "vehicle": "BAIC_09",
+      "file": "data\\bms\\raw\\vehicle_09.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%239.rar",
+      "bytes": 11232824,
+      "sha256": "a3392323136fe7e0ff5e8db9f5a874d19b68693fa7865dc0082f522290a8a70f",
+      "git_blob_sha": "0132e1446446669b2952c81abe0de3db6dd8315b"
+    },
+    {
+      "vehicle": "BAIC_10",
+      "file": "data\\bms\\raw\\vehicle_10.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2310.rar",
+      "bytes": 10508142,
+      "sha256": "cc89ed52f23db5322fccd978cb489826796312c8fa999a6f733d9ebd719f919d",
+      "git_blob_sha": "15bb11e80f32ab0715d04713331d9ce26f77ebdc"
+    },
+    {
+      "vehicle": "BAIC_11",
+      "file": "data\\bms\\raw\\vehicle_11.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2311.rar",
+      "bytes": 11539660,
+      "sha256": "658dff42f3ee690dbe55379887cceffb5be667ecc08136ebba80020f4ef66f0a",
+      "git_blob_sha": "c4a15faa17d2fec9c6bce3bfee60637cb2d97574"
+    },
+    {
+      "vehicle": "BAIC_12",
+      "file": "data\\bms\\raw\\vehicle_12.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2312.rar",
+      "bytes": 11883835,
+      "sha256": "f6c8bc2ba4bdc8893cbe2e1a58a6f215ff26aff3f5659bbeb13d9f9e8db1bab4",
+      "git_blob_sha": "20fb986f1abb1cb436e3e0ce96306b723d72baaf"
+    },
+    {
+      "vehicle": "BAIC_13",
+      "file": "data\\bms\\raw\\vehicle_13.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2313.rar",
+      "bytes": 11474175,
+      "sha256": "3ae4e287f051dc718b8c9049b51b5d9ab0debfbe1d8951f02c8aac8795413408",
+      "git_blob_sha": "a0e6ef691823eb0e4530efcdd37e50837efc82a2"
+    },
+    {
+      "vehicle": "BAIC_14",
+      "file": "data\\bms\\raw\\vehicle_14.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2314.rar",
+      "bytes": 11377770,
+      "sha256": "0964797a9574c75f0d93c1c05192a2a406a57330cccbfc88ec0258c1ab70109b",
+      "git_blob_sha": "6085f4cd87dc2f368646599b73d3f50b0888f372"
+    },
+    {
+      "vehicle": "BAIC_15",
+      "file": "data\\bms\\raw\\vehicle_15.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2315.rar",
+      "bytes": 10013220,
+      "sha256": "d8b4468bd9199a6d281513d2fedb699456a8ef62a77530c30f3632ae5fbd6aa3",
+      "git_blob_sha": "5e3d3e7c1506796d03807290b9090e127300b9fa"
+    },
+    {
+      "vehicle": "BAIC_16",
+      "file": "data\\bms\\raw\\vehicle_16.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2316.rar",
+      "bytes": 11805417,
+      "sha256": "156a3650976c60283e5ad83f9bb6f9c3492c4248ade1a8d172097dff03ab9df2",
+      "git_blob_sha": "7ce030c0cc87b3976fd93bc3abd40d64382286ca"
+    },
+    {
+      "vehicle": "BAIC_17",
+      "file": "data\\bms\\raw\\vehicle_17.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2317.rar",
+      "bytes": 10922855,
+      "sha256": "70da9fc2225519cd26025aeb26a58d603ba310165475a8b054847a6afed57ccb",
+      "git_blob_sha": "574c1915a071ebec131326d2ca7dffed30b9b401"
+    },
+    {
+      "vehicle": "BAIC_18",
+      "file": "data\\bms\\raw\\vehicle_18.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2318.rar",
+      "bytes": 12046848,
+      "sha256": "da97555e3e3f0dbb1adb72b2f846a9bb7c99d52bcfcfa2eb7c87645106fba85d",
+      "git_blob_sha": "8dafc01d4b5161d8303d3e90d14fa8a1eace4397"
+    },
+    {
+      "vehicle": "BAIC_19",
+      "file": "data\\bms\\raw\\vehicle_19.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2319.rar",
+      "bytes": 11188518,
+      "sha256": "0527ebd3eb2721bc16a30fbd0731336edd48c49e6ae886ed80289af62f41bd12",
+      "git_blob_sha": "bc2fed81cc66553276638dd785f16037b69531aa"
+    },
+    {
+      "vehicle": "BAIC_20",
+      "file": "data\\bms\\raw\\vehicle_20.rar",
+      "url": "https://raw.githubusercontent.com/BatICM/battery-charging-data-of-on-road-electric-vehicles/36fef4bd99f626561e2d138a40ccff3d1f3ddfc2/%2320.rar",
+      "bytes": 11502515,
+      "sha256": "37b48debf7b89151bd7a01a96e4c870df0c8aafa7ff48d08fcaf42914c239e31",
+      "git_blob_sha": "97b49e7c8586700a375b9ef7d66bd64c9aba4f6c"
+    }
+  ]
+}

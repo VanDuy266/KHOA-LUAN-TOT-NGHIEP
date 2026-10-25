@@ -1,0 +1,26 @@
+{
+  "signal_mean": [
+    4.147010845606044,
+    -0.4799928827945674,
+    24.89051876276776
+  ],
+  "signal_scale": [
+    0.01977454755319804,
+    0.0011035796752726205,
+    0.17633803225722786
+  ],
+  "context_mean": [
+    0.39197041732699417,
+    418.196369399222
+  ],
+  "context_scale": [
+    0.48819013638903147,
+    349.6272398437778
+  ],
+  "target_mean": 82.4833984375,
+  "target_std": 14.67784595489502,
+  "dataset": "SDU",
+  "training_samples": 20823,
+  "scope": "Refit on full data, not held-out validation",
+  "data_sha256": "b686d3cb9af5e1dc22369c50ef53199f2284e1dfe90eee64592fc914ac50a008"
+}

@@ -4,7 +4,7 @@ import hashlib
 import sqlite3
 import pandas as pd
 import streamlit as st
-from app_data import table, model
+from app_data import ROOT, PUBLIC_DEMO, table, model
 from components import heading, section, csv_download
 from labels import COLUMNS, vietnamese_table
 from charts import signal
@@ -14,9 +14,13 @@ from result_report import add_history, current_time, html_report
 
 def render():
     heading("", "Dự đoán tình trạng sức khỏe pin", "")
-    selected_model = st.selectbox(
-        "Mô hình SOH", ["Random Forest", "Ridge–RF phần dư"], key="soh_model"
-    )
+    models = ["Random Forest", "Ridge–RF phần dư"]
+    import importlib.util
+    if (ROOT / "reports/boosting/metadata.json").exists():
+        for name in ("CatBoost", "XGBoost"):
+            if (ROOT / "artifacts/boosting" / (name.lower()+".joblib")).exists() and importlib.util.find_spec(name.lower()):
+                models.append(name)
+    selected_model = st.selectbox("Mô hình SOH", models, key="soh_model")
     mode = st.radio(
         "Chế độ dự đoán",
         ["Một chu kỳ", "Theo lô"],
@@ -114,11 +118,15 @@ def render():
             "Cửa sổ 0–120 giây: ít nhất 5 mẫu, bắt đầu ≤20 giây, kết thúc ≥90 giây; ít nhất 3 mẫu xả trải dài ≥30 giây. Tối đa 2.000 chu kỳ/lô. CSV gốc SDU được đọc theo khối, chỉ giữ cửa sổ đầu xả."
         )
     content = uploaded.getvalue() if uploaded is not None else None
-    persist = st.checkbox(
-        "Lưu kết quả vào kho trên máy này",
-        help="Kho chung trên máy chủ, lưu kết quả và tên nguồn.",
-        key="persist_predictions",
-    )
+    persist = False
+    if not PUBLIC_DEMO:
+        persist = st.checkbox(
+            "Lưu kết quả vào kho trên máy này",
+            help="Kho chung trên máy chủ, lưu kết quả và tên nguồn.",
+            key="persist_predictions",
+        )
+    else:
+        st.caption("Bản web giữ kết quả trong phiên hiện tại; bạn có thể tải phiếu hoặc CSV. File tải lên tối đa 20 MiB.")
     if uploaded is not None:
         with st.expander("Kiểm tra file trước khi dự đoán"):
             if st.button("Kiểm tra dữ liệu", icon=":material/fact_check:"):

@@ -4,6 +4,7 @@ import pandas as pd
 import sqlite3
 import streamlit as st
 from components import heading, csv_download
+from app_data import PUBLIC_DEMO
 from labels import vietnamese_table
 from result_report import html_report, current_time
 
@@ -14,8 +15,8 @@ def render():
         "Lịch sử dự đoán",
         "Tra cứu, lọc và xuất kết quả theo pin, nguồn dữ liệu và thời gian.",
     )
-    scope = st.radio("Nguồn lịch sử", ["Phiên hiện tại", "Kho trên máy"], horizontal=True, key="history_scope")
-    if scope == "Kho trên máy":
+    scope = st.radio("Nguồn lịch sử", ["Phiên hiện tại"] if PUBLIC_DEMO else ["Phiên hiện tại", "Kho trên máy"], horizontal=True, key="history_scope")
+    if scope == "Kho trên máy" and not PUBLIC_DEMO:
         from history_store import load_results
 
         st.caption("Kho chung trên máy chủ · Lưu kết quả và tên nguồn.")

@@ -1,6 +1,8 @@
 """Tên hiển thị tiếng Việt; giữ tên cột gốc trong CSV để chạy lại nghiên cứu."""
 
 MODEL_NAMES = {
+    "CatBoost": "CatBoost",
+    "XGBoost": "XGBoost",
     "Ridge-RF residual": "Ridge–RF hiệu chỉnh phần dư",
     "Mean baseline": "Trung bình SOH — mốc cơ sở",
     "GRU": "Mạng chuỗi thời gian — GRU",
@@ -16,6 +18,9 @@ COLUMNS = {
     "importance": "Mức quan trọng",
     "feature": "Đặc trưng",
     "fit_seconds": "Thời gian học (giây)",
+    "selection_seconds": "Thời gian chọn tham số (giây)",
+    "selected_trees": "Số cây được chọn",
+    "candidate": "Cấu hình được chọn",
     "predict_seconds": "Thời gian dự đoán (giây)",
     "fold": "Vòng kiểm thử",
     "test_fold": "Vòng kiểm thử của pin",
