@@ -1,0 +1,33 @@
+{
+  "status": "passed",
+  "scope": "Audit of saved out-of-fold predictions and training source; not a fresh model-training reproduction",
+  "checks": [
+    "Exact source sample coverage once per model",
+    "Source labels match saved predictions",
+    "Physical group test folds agree",
+    "Published macro metrics recomputed within 1e-8",
+    "Boosting fit/validation/test groups disjoint",
+    "Target and group ID excluded from declared inputs"
+  ],
+  "sha256": {
+    "reports/features.csv": "b686d3cb9af5e1dc22369c50ef53199f2284e1dfe90eee64592fc914ac50a008",
+    "reports/predictions.csv": "4cf48a74c79e07eb0836c58216b22c9a31e18e7308dc7dd1eb5f951a560dcb66",
+    "reports/hybrid_predictions.csv": "9bdf5f5a5bece97995fc0e084fab057cbd7bbb25d104d8ff2fffb129c3b26c30",
+    "reports/boosting/predictions.csv": "079529ce4ad1e2b0fb0d6a9d8560cb6f82f7d24c9ce01098cc2753f5c8c5dc0e",
+    "reports/split_assignments.csv": "4b69a9cf4afb03d3b627248ce46dce5f11bb49ff49512052f7b2cc7287e6e9c3",
+    "reports/bms/features.csv": "3966e100b054f2d0daf5f3cff622d98744ca08b2f9f0100f24767810da3b77f4",
+    "reports/bms/predictions.csv": "92713f5555fd50035b65a48c327693e8bbdf57ad1b85522650f1c3d12f545182",
+    "reports/boosting/splits.json": "6898e678499b973586411ecbcba86d8c118ae6b6aec96507f39c830ca0411f56",
+    "scripts/run_experiment.py": "272a861f13bb83c1fc0abeee50185bdd4ee405b91af55017536a741c28365ce9",
+    "scripts/train_gru.py": "8ac3888ca2d04eb4c4b398ad43072e9246c3692ad176fc357813f800f8ce6b43",
+    "scripts/evaluate_hybrid.py": "d93cc8e99a1295d12596b1ccb1f08d4e60dbade0ef8961e2db4d09793033e422",
+    "scripts/evaluate_boosting.py": "a3bd58436bf06c40e1f3695a4a6a6a5f4d417c4a3c35f71e0225925e55569495",
+    "scripts/build_bms.py": "ef8355fc5d8569ab3e591e3cc7b0043031ed2e48e1ce1fe52ee6b8cb6c64b29a"
+  },
+  "limitations": [
+    "Saved prediction audit alone cannot prove how historical fitted weights were produced.",
+    "No independent BMS capacity measurement or fault labels.",
+    "Group CV does not establish future chronological performance.",
+    "Bootstrap intervals resample physical groups, are descriptive and do not correct for shared CV training or multiple model selection."
+  ]
+}

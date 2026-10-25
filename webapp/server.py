@@ -451,3 +451,21 @@ def cycle_download():
 
 def send_csv(frame,name):
     return send_file(io.BytesIO(frame.to_csv(index=False).encode("utf-8-sig")),mimetype="text/csv; charset=utf-8",as_attachment=True,download_name=name)
+
+
+@app.get("/api/thesis-audit")
+def thesis_audit():
+    return reply(sdu=table("reports/thesis_audit/sdu_summary.csv"),
+                 bms=table("reports/thesis_audit/bms_summary.csv"),
+                 paired=table("reports/thesis_audit/paired_comparisons.csv"),
+                 status=metadata("reports/thesis_audit/verification.json")["status"])
+
+
+@app.get("/api/download/thesis-audit")
+def thesis_audit_download():
+    allowed={"defense":"bao_cao_va_bao_ve.md","report":"ket_qua_va_gioi_han.md","sdu":"sdu_summary.csv","bms":"bms_summary.csv",
+             "paired":"paired_comparisons.csv","verification":"verification.json"}
+    key=request.args.get("kind","report")
+    if key not in allowed:abort(400)
+    path=ROOT/"reports/thesis_audit"/allowed[key]
+    return send_file(path,as_attachment=True,download_name=path.name)
