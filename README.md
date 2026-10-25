@@ -25,13 +25,13 @@ Hoặc chạy từng lệnh tại thư mục gốc dự án:
 
 ```powershell
 py -3.12 -m venv .venv
-.\.venv\Scripts\python.exe -m pip install -r requirements-app.txt
-.\.venv\Scripts\python.exe -m streamlit run app\streamlit_app.py
+.\.venv\Scripts\python.exe -m pip install -r requirements-render.txt
+.\.venv\Scripts\python.exe scripts\start_render.py
 ```
 
 Chờ cài thư viện hoàn tất. Nếu Python báo chưa có bản 3.12, cài bản này trước bằng `py install 3.12` nếu Launcher hỗ trợ, hoặc từ https://www.python.org/downloads/. Không chạy các lệnh `.venv` khi terminal đang ở thư mục `app`; dùng `cd ..` về gốc trước.
 
-Trình duyệt mở địa chỉ Streamlit hiển thị trong terminal. Đổi trang không huấn luyện lại. Đóng các ứng dụng nặng trước khi xử lý lại dữ liệu hoặc huấn luyện; giới hạn 2 luồng CPU không thể bảo đảm máy không chậm nếu RAM đang gần đầy.
+Trình duyệt mở địa chỉ máy chủ hiển thị trong terminal. Đổi trang không huấn luyện lại. Đóng các ứng dụng nặng trước khi xử lý lại dữ liệu hoặc huấn luyện; giới hạn 2 luồng CPU không thể bảo đảm máy không chậm nếu RAM đang gần đầy.
 
 ## Dữ liệu
 
@@ -75,7 +75,7 @@ Kết quả theo giai đoạn, bỏ nhóm đặc trưng và kiểm thử thời 
 Cài thư viện nghiên cứu trong cùng môi trường Python:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
+.\.venv\Scripts\python.exe -m pip install -r requirements-research.txt
 .\.venv\Scripts\python.exe -m pip install -r requirements-deep.txt
 ```
 
@@ -98,7 +98,7 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 
 | Thư mục | Nội dung |
 | --- | --- |
-| `app/` | 10 trang Streamlit, dự đoán CSV, biểu đồ, lịch sử phiên và lưu kết quả tùy chọn trên máy chủ |
+| `app/` | 11 trang web riêng, dự đoán CSV, biểu đồ, lịch sử phiên và lưu kết quả tùy chọn trên máy chủ |
 | `src/battery_soh/` | Hàm đặc trưng và kiểm nhãn dùng chung |
 | `scripts/` | Nhận dữ liệu, chuyển đổi, huấn luyện, đánh giá, tạo tài liệu |
 | `data/clean/` | Parquet theo pin/giai đoạn, mẫu CSV, bảng đặc trưng và nhãn |
@@ -170,4 +170,15 @@ Nhãn BMS là **SOH suy ra từ dòng điện và SOC khi sạc**, không có ph
 
 ## Triển khai Render
 
-Dùng [hướng dẫn Render](docs/render-deploy.md), cấu hình `render.yaml` và lệnh `python scripts/start_render.py`. Nhánh triển khai phải có đủ dữ liệu và mô hình; script build sẽ kiểm tra trước khi chạy.
+Ứng dụng hiện dùng HTML/CSS/JavaScript và Flask; không chạy bằng Streamlit. Dùng [hướng dẫn Render](docs/render-deploy.md), cấu hình `render.yaml` và lệnh `python scripts/start_render.py`. Nhánh triển khai phải có đủ dữ liệu và mô hình; script build sẽ kiểm tra trước khi chạy.
+
+
+## Sửa giao diện web
+
+- `webapp/templates/index.html`: khung trang, tiêu đề tab và bản xem trước link.
+- `webapp/static/app.css`: phông chữ, màu sắc, bố cục, giao diện điện thoại.
+- `webapp/static/app.js`: điều hướng, biểu đồ, form CSV và lịch sử riêng theo tab.
+- `webapp/server.py`: API tra cứu, kiểm tra dữ liệu và dự đoán bằng mô hình Python.
+- `webapp/data.py`: đọc dữ liệu và tổng hợp kết quả kiểm thử đã có.
+
+Sửa trong VS Code, kiểm tra rồi đẩy lên nhánh GitHub mà Render theo dõi. Link Render giữ nguyên sau triển khai. Thư mục `app/` được giữ làm bản tham chiếu và chứa các hàm dự đoán thuần Python; ứng dụng mới không tải trình chạy Streamlit. Thư viện nghiên cứu/báo cáo cài riêng từ `requirements-research.txt`.

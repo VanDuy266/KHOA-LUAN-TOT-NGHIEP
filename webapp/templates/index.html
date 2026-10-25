@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{ title }}</title>
+<meta name="description" content="Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy. Nguyễn Văn Duy · SDU và BMS trên xe.">
+<meta property="og:title" content="{{ title }}"><meta property="og:description" content="Tra cứu pin, đánh giá mô hình và dự đoán SOH từ dữ liệu đo."><meta property="og:type" content="website"><meta property="og:site_name" content="Vincent D">
+<meta name="twitter:card" content="summary"><meta name="twitter:title" content="{{ title }}">
+<link rel="icon" type="image/png" href="/assets/logo.png">
+<link rel="stylesheet" href="{{ url_for('static',filename='app.css') }}?v={{ version }}">
+<script>try{if(localStorage.getItem('vincent-theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
+<script defer src="{{ url_for('static',filename='app.js') }}?v={{ version }}"></script>
+</head>
+<body>
+<a class="skip" href="#content">Đến nội dung chính</a>
+<div class="app-shell">
+<aside class="sidebar" aria-label="Điều hướng chính">
+<a class="brand" href="#overview"><img src="/assets/logo.png" alt="Logo Vincent D" width="48" height="48"><span><b>Vincent D</b><small>Phân tích sức khỏe pin</small></span></a>
+<div class="nav-caption">KHÔNG GIAN LÀM VIỆC</div>
+<nav id="navigation">
+<a href="#overview" data-page="overview"><img src="/static/icons/grid.svg" alt="">Tổng quan</a>
+<a href="#explorer" data-page="explorer"><img src="/static/icons/battery-half.svg" alt="">Tra cứu pin</a>
+<a href="#audit" data-page="audit"><img src="/static/icons/file-earmark-check.svg" alt="">Kiểm tra file đầu vào</a>
+<a href="#forecast" data-page="forecast"><img src="/static/icons/activity.svg" alt="">Dự đoán SOH</a>
+<a href="#history" data-page="history"><img src="/static/icons/clock-history.svg" alt="">Lịch sử dự đoán</a>
+<a href="#anomalies" data-page="anomalies"><img src="/static/icons/graph-up-arrow.svg" alt="">Xu hướng bất thường</a>
+<div class="nav-divider"></div>
+<a href="#evaluation" data-page="evaluation"><img src="/static/icons/bar-chart-line.svg" alt="">Đánh giá mô hình</a>
+<a href="#demo" data-page="demo"><img src="/static/icons/play-circle.svg" alt="">Demo pin giữ riêng</a>
+<a href="#bms" data-page="bms"><img src="/static/icons/car-front.svg" alt="">BMS trên xe</a>
+<a href="#quality" data-page="quality"><img src="/static/icons/shield-check.svg" alt="">Chất lượng dữ liệu</a>
+<a href="#profile" data-page="profile"><img src="/static/icons/person-circle.svg" alt="">Thông tin</a>
+</nav>
+<div class="student"><strong>Nguyễn Văn Duy</strong><span>MSSV 2311553949 · Khoa Học Dữ Liệu</span></div>
+</aside>
+<div class="workspace">
+<header class="topbar"><div><strong>Vincent D</strong><span id="breadcrumb">Tổng quan</span></div><button id="theme" class="icon-button" aria-label="Đổi giao diện sáng tối" title="Đổi giao diện sáng tối"><img src="/static/icons/moon.svg" alt=""></button></header>
+<main id="content" tabindex="-1"><div class="welcome"><h1>Tổng quan sức khỏe pin</h1><p>Tra cứu tín hiệu đo, so sánh mô hình và ước lượng dung lượng còn lại.</p></div><p class="loading" role="status">Đang lấy dữ liệu…</p></main>
+<footer>Vincent D · Nguyễn Văn Duy · Đề tài khóa luận về sức khỏe pin xe điện</footer>
+</div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+</body></html>

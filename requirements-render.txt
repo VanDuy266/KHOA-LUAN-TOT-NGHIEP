@@ -1,2 +1,4 @@
--r requirements-app.txt
--r requirements-boosting.txt
+-r requirements-web.txt
+catboost==1.2.10
+xgboost-cpu==3.4.1; sys_platform == "linux"
+xgboost==3.4.1; sys_platform != "linux"

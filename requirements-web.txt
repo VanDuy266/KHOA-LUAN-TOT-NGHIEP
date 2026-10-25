@@ -1,0 +1,10 @@
+# Standalone web runtime; no Streamlit or notebook/report dependencies.
+Flask==3.1.3
+gunicorn==23.0.0; sys_platform != "win32"
+waitress==3.0.2; sys_platform == "win32"
+numpy==2.3.5
+pandas==2.2.3
+scipy==1.17.0
+scikit-learn==1.8.0
+joblib==1.5.3
+pyarrow==26.0.0

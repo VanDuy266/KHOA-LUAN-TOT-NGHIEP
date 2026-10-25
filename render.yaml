@@ -5,7 +5,7 @@ services:
     plan: free
     buildCommand: python -m pip install -r requirements-render.txt && python scripts/check_hosting.py
     startCommand: python scripts/start_render.py
-    healthCheckPath: /_stcore/health
+    healthCheckPath: /healthz
     envVars:
       - key: VINCENT_PUBLIC_DEMO
         value: "1"
