@@ -40,3 +40,5 @@
 .assessment-conclusions p,.assessment-origin p{margin:8px 0;line-height:1.65}
 .assessment-conclusions span{display:block;line-height:1.6}
 @media(max-width:760px){.assessment-conclusions{grid-template-columns:1fr}.assessment-origin{overflow-wrap:anywhere}}
+
+.page-context{display:inline-block;max-width:100%;font-size:13px;line-height:1.6;color:var(--muted);border-left:3px solid var(--accent);padding:3px 10px;margin:0 0 12px;overflow-wrap:anywhere}.thesis-heading .page-context{color:#d3ece8;border-color:#70c6ab}.sidebar nav .nav-caption{font-size:11px;font-weight:700;letter-spacing:.65px;padding:17px 12px 6px;border-top:1px solid var(--line);margin-top:9px}
