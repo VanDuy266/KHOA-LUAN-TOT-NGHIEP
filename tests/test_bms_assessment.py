@@ -31,6 +31,16 @@ class AssessmentTests(unittest.TestCase):
         self.assertEqual([x['status'] for x in a['indicators']],['unset']*3)
         self.assertIn('Chưa đủ dữ liệu',a['fault_status'])
 
+    def test_capacity_reference_is_scoped_not_a_fault_diagnosis(self):
+        for value,status in [(79.9,'below'),(80,'at_or_above'),(91.8,'at_or_above'),(101,'review')]:
+            a=self.assessment(prediction=value)
+            self.assertEqual(a['capacity_reference']['status'],status)
+            self.assertEqual(a['capacity_reference']['kind'],'research_reference')
+            self.assertIn('Chưa đủ dữ liệu',a['fault_status'])
+        a=self.assessment(prediction=91.8,limits={'limit_soh_min':'95','limit_source':'Mốc nghiên cứu thử'})
+        self.assertEqual(a['capacity_reference']['status'],'below')
+        self.assertEqual(a['capacity_reference']['kind'],'user_criterion')
+
     def test_range_validation_is_not_a_safety_threshold(self):
         hot=self.window.copy();hot['min_temperature']=78;hot['max_temperature']=80
         a=self.assessment(window=hot)

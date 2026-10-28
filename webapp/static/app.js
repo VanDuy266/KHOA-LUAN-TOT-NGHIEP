@@ -128,7 +128,7 @@ function bmsAssessment(d){
   const a=d.assessment;
   if(!a)return kpis([{label:"SOH ước tính",value:d.prediction,unit:"%"}])+notice("Chưa có bản đánh giá chi tiết cho kết quả này.");
   const m=a.metrics,condition={unset:"Chưa có ngưỡng",within:"Chưa vượt tiêu chí đã nhập",exceeded:"Vượt tiêu chí đã nhập"};
-  const checks=a.indicators.map(r=>({"Chỉ số":r.label,"Giá trị":fmt(r.value,2)+" "+r.unit,"Ngưỡng đã nhập":r.threshold==null?"Chưa đặt":fmt(r.threshold,2)+" "+r.unit,"Đối chiếu":condition[r.status],"Diễn giải":r.explanation}));
+  const checks=a.indicators.map(r=>r.code==="capacity"&&r.threshold==null?{"Chỉ số":r.label,"Giá trị":fmt(r.value,2)+" %","Ngưỡng đã nhập":fmt(a.capacity_reference.threshold,1)+"% · tham khảo nghiên cứu (không do người dùng nhập)","Đối chiếu":a.capacity_reference.message,"Diễn giải":a.capacity_reference.scope}:({"Chỉ số":r.label,"Giá trị":fmt(r.value,2)+" "+r.unit,"Ngưỡng đã nhập":r.threshold==null?"Chưa đặt":fmt(r.threshold,2)+" "+r.unit,"Đối chiếu":condition[r.status],"Diễn giải":r.explanation}));
   const signals=[
     {"Tín hiệu":"Nhiệt độ cảm biến","Khoảng quan sát":fmt(m.temperature_min_c,1)+"–"+fmt(m.temperature_max_c,1)+" °C"},
     {"Tín hiệu":"Điện áp bộ pin","Khoảng quan sát":fmt(m.pack_voltage_min_v,2)+"–"+fmt(m.pack_voltage_max_v,2)+" V"},
@@ -143,15 +143,15 @@ function bmsAssessment(d){
   signals.forEach((r,i)=>r["Ý nghĩa và giới hạn"]=meaning[i]);
   const flagged=a.indicators.filter(x=>x.status==="exceeded");
   const capacity=a.indicators.find(x=>x.code==="capacity");
-  const capacityLabel=m.loss_pct==null?"Chưa đánh giá — SOH vượt 100%":capacity.status==="unset"?"Chưa xếp loại — chưa chọn mốc SOH":capacity.status==="exceeded"?"Dưới mức dung lượng yêu cầu":"Đạt mức dung lượng yêu cầu";
+  const reference=a.capacity_reference,capacityLabel=reference.message;
   return `<section class="assessment-card ${a.level==="review"?"review":""}"><div class="eyebrow">KẾT QUẢ SỨC KHỎE PIN · ƯỚC TÍNH</div>`+
     kpis([{label:"Sức khỏe dung lượng (SOH)",value:m.soh_pct,digits:1,unit:"%",detail:"So với dung lượng ban đầu danh định"},{label:"Mức chai ước tính",value:m.loss_pct,digits:1,unit:m.loss_pct==null?"":"%",detail:m.loss_pct==null?"Chưa tính khi SOH vượt 100%":"100 − SOH"},{label:"Dung lượng còn lại ước tính",value:m.capacity_ah,digits:1,unit:"Ah",detail:"Mốc ban đầu: 145 Ah"}])+
-    `<p><strong>Đánh giá dung lượng:</strong> ${esc(capacityLabel)}${capacity.threshold==null?"":` (mốc đối chiếu ${fmt(capacity.threshold,1)}%)`}.</p><p><strong>Tín hiệu cần kiểm tra:</strong> ${flagged.length?esc(flagged.map(x=>x.label.toLowerCase()).join(", ")):a.indicators.some(x=>x.status==="unset")?"Chưa đủ tiêu chí đối chiếu":"Chưa có chỉ số vượt tiêu chí đã nhập"}.</p><p><strong>Tình trạng lỗi:</strong> Chưa xác định. <strong>An toàn sử dụng:</strong> Chưa được xác nhận.</p><p class="sub">SOH (State of Health) là sức khỏe dung lượng, không phải mức điện đang còn (SOC). Mức chai không đồng nghĩa pin hỏng.</p><div class="actions"><button class="button small" id="bms-open-limits" type="button">Thiết lập tiêu chí đối chiếu</button>${capacity.threshold==null?'<button class="button small" id="bms-use-reference" type="button">Dùng mốc dung lượng tham khảo 80%</button>':""}<a class="button small" href="/api/download/bms-evidence">Nguồn tiêu chí và dữ liệu còn thiếu</a></div>${d.sample?'<p class="muted">Mẫu minh họa đã dùng huấn luyện.</p>':""}</section>`+
+    `<p><strong>Kết luận dung lượng:</strong> ${esc(capacityLabel)}</p>${flagged.length?`<p><strong>Vượt tiêu chí đã nhập:</strong> ${esc(flagged.map(x=>x.label.toLowerCase()).join(", "))}.</p>`:""}<p class="sub">${reference.kind==="research_reference"?'Mốc 80% là tham khảo nghiên cứu, không phải giới hạn lỗi/an toàn của hãng.':'Mốc đối chiếu do người dùng cung cấp; nguồn chưa thẩm định.'}</p><p class="sub">Phạm vi kết quả: sức khỏe dung lượng; không xác nhận pin hỏng hoặc an toàn sử dụng.</p><div class="actions"><button class="button small" id="bms-open-limits" type="button">Đổi mốc / tiêu chí đối chiếu</button><a class="button small" href="/api/download/bms-evidence">Căn cứ đánh giá</a></div>${d.sample?'<p class="muted">Mẫu minh họa đã dùng huấn luyện.</p>':""}</section>`+
     kpis([{label:"Nhiệt độ cao nhất",value:m.temperature_max_c,digits:1,unit:"°C",tone:a.indicators.find(x=>x.code==="temperature").status==="exceeded"?"attention":"signal",detail:"Thấp nhất "+fmt(m.temperature_min_c,1)+" °C"},
       {label:"Chênh điện áp cell",value:m.cell_spread_max_mv,digits:1,unit:"mV",detail:"Lớn nhất tại cùng thời điểm"},
       {label:"Mức điện hiện tại (SOC)",value:m.soc_end_pct,digits:1,unit:"%",detail:"Cuối cửa sổ đo · khác độ chai"}])+
     (a.alerts.length?notice(a.alerts.map(r=>r.text).join(" "),"warning"):"")+
-    `<div class="report-actions actions"><button class="button primary" id="bms-report-html">Tải báo cáo</button></div><details class="bms-more"><summary>Xem đối chiếu, biểu đồ và giải thích chi tiết</summary><p>${esc(a.explanation)}</p><p class="sub">${esc(a.scope)} · ${esc(a.source.label)}${a.source.vehicle?" · "+esc(a.source.vehicle)+" / phiên "+esc(a.source.session):""}</p>`+
+    `<div class="report-actions actions"><button class="button primary" id="bms-report-html">Tải báo cáo</button></div><details class="bms-more"><summary>Xem đối chiếu, biểu đồ và giải thích chi tiết</summary><p>${esc(reference.source)} ${esc(reference.scope)}</p><p><strong>Lỗi và an toàn:</strong> bộ dữ liệu BAIC không có mã lỗi, điện áp định danh từng cell và kết quả kiểm định an toàn để xác nhận trên chính xe này.</p><p>${esc(a.explanation)}</p><p class="sub">${esc(a.scope)} · ${esc(a.source.label)}${a.source.vehicle?" · "+esc(a.source.vehicle)+" / phiên "+esc(a.source.session):""}</p>`+
     panel("Đối chiếu từng chỉ số: giá trị thực tế so với tiêu chí",a.limits.source?"Nguồn/ghi chú do người dùng nhập: "+a.limits.source:"Ngưỡng là mốc dùng để so sánh: nhiệt độ và độ lệch cell không quá mốc tối đa; SOH không thấp hơn mốc tối thiểu. Chưa có mốc thì chỉ báo số liệu, chưa xếp loại tốt/xấu.",table(checks,"doi_chieu_bms"))+
     `<div class="grid-equal">${panel("Nhiệt độ đầu phiên sạc","Số đo của cảm biến nhỏ nhất và lớn nhất, không phải nhiệt độ toàn bộ tuổi thọ pin.",'<div id="bms-result-temperature" class="plot"></div>')}${panel("Chênh điện áp cell","Chênh giữa điện áp lớn nhất và nhỏ nhất tại cùng thời điểm.",'<div id="bms-result-spread" class="plot"></div>')}</div>`+
     panel("Các tín hiệu đã quan sát và cách hiểu","BMS là Hệ thống quản lý pin (Battery Management System). Các tín hiệu dưới đây được ghi lại từ bộ pin trên xe; web phân tích dữ liệu, không điều khiển hoặc kiểm tra trực tiếp xe.",table(signals,"tin_hieu_tom_tat_bms"))+
@@ -162,14 +162,6 @@ function bmsAssessment(d){
 }
 function finishBmsResult(d){
   if(!d.assessment)return;
-  const referenceButton=$("#bms-use-reference");
-  if(referenceButton)referenceButton.onclick=()=>{
-    const source=$("#limit-source"),note="SOH 80% danh định: tiêu chí nghiên cứu tham khảo JRC EUR 29371 EN (2018), không phải ngưỡng hãng/an toàn",value=source.value.trim();
-    const combined=value?value+"; "+note:note;
-    if(combined.length>300){toast("Ghi chú tiêu chí vượt 300 ký tự. Rút gọn nguồn trước khi áp dụng.");return;}
-    $("#limit-soh").value="80";source.value=combined;
-    $("#upload-form").requestSubmit();
-  };
   const limitsButton=$("#bms-open-limits");
   if(limitsButton)limitsButton.onclick=()=>{const section=$(".comparison-settings");if(section){section.open=true;section.scrollIntoView({block:"center"});$("#limit-soh").focus();}};
   chart("bms-result-temperature",[series("Cảm biến thấp nhất",d.signals,"time_s","min_temperature"),series("Cảm biến cao nhất",d.signals,"time_s","max_temperature")],"Giây từ đầu sạc","°C");

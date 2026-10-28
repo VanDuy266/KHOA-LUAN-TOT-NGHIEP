@@ -12,7 +12,7 @@ JRC EUR 29371 EN (2018), Standards for the performance and durability assessment
 
 Áp dụng trên web: mốc SOH 80% là tiêu chí tham khảo do nghiên cứu chọn. Phân loại chỉ cho biết SOH ước tính trên/dưới mốc, không có nghĩa đạt chuẩn hãng hoặc đã kiểm định theo quy trình JRC/SAE/USABC. SOH web tính theo 145 Ah danh định; tài liệu nói đến giá trị ban đầu/rated capacity theo từng phép thử, nên việc quy đổi sang mốc danh định là quy ước nghiên cứu cần công bố, không coi là phép thử chuẩn đã thực hiện.
 
-Ngưỡng tùy chọn vẫn để trống cho tới khi người dùng áp dụng. Không dùng mốc dung lượng này để suy ra trạng thái lỗi hoặc an toàn.
+Kết quả tự đối chiếu mốc dung lượng tham khảo 80% khi chưa nhập mốc SOH riêng; nguồn và phạm vi nghiên cứu hiển thị ngay trong kết quả. Các ngưỡng nhiệt độ/chênh cell vẫn để trống, không tự suy ra. Không dùng mốc dung lượng này để suy ra trạng thái lỗi hoặc an toàn.
 
 ## 3. Nhiệt độ và chênh điện áp
 

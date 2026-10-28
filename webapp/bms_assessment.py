@@ -107,7 +107,23 @@ def assess(window, prediction, outside, limits, source, history=None):
         dict(item="Dung lượng đo độc lập để đối chiếu SOH",status="Chưa có phép đo dung lượng tham chiếu độc lập",purpose="Nhãn hiện tại suy ra từ dòng điện và SOC khi sạc; chưa xác nhận độ chai bằng phép đo độc lập.",action="Bổ sung kết quả đo dung lượng theo quy trình phù hợp và cùng mốc thời gian."),
         dict(item="Theo dõi nhiều phiên và kiểm tra trực tiếp",status="Có lịch sử tháng trước cho mẫu này" if history and len(history.get("points", [])) >= 2 else "Chưa đủ lịch sử liên kết để mô tả xu hướng",purpose="Cửa sổ đầu sạc không đại diện toàn bộ quá trình sử dụng và không thay thế kiểm tra kỹ thuật.",action="Theo dõi thêm phiên sạc; cần kiểm tra kỹ thuật để kết luận lỗi hoặc khả năng tiếp tục sử dụng."),
     ]
+    capacity_threshold=rules.get("soh_min_pct",80.0)
+    capacity_kind="user_criterion" if "soh_min_pct" in rules else "research_reference"
+    if prediction>100:
+        capacity_state="review"
+        capacity_message="SOH vượt 100%; cần đối chiếu dữ liệu và mốc dung lượng."
+    elif prediction<capacity_threshold and not math.isclose(prediction,capacity_threshold,abs_tol=1e-9,rel_tol=1e-9):
+        capacity_state="below"
+        capacity_message=f"Dung lượng ước tính đã dưới mốc {dec(capacity_threshold,1)}%."
+    else:
+        capacity_state="at_or_above"
+        capacity_message=f"Dung lượng ước tính còn trên hoặc bằng mốc {dec(capacity_threshold,1)}%."
+    capacity_reference=dict(threshold=capacity_threshold,status=capacity_state,kind=capacity_kind,message=capacity_message,
+        source=limits["source"] if capacity_kind=="user_criterion" else "JRC EUR 29371 EN (2018), tham khảo tiêu chí vòng đời 80%; áp dụng theo dung lượng danh định là quy ước nghiên cứu.",
+        source_url="https://publications.jrc.ec.europa.eu/repository/bitstream/JRC113420/kjna29371enn.pdf" if capacity_kind=="research_reference" else None,
+        scope="Đối chiếu dung lượng ước tính, không phải ngưỡng lỗi/an toàn chính hãng hoặc phép thử tiêu chuẩn đã thực hiện.")
     report_rows = [
+        {"Hạng mục":"Kết luận theo mốc dung lượng","Giá trị":capacity_message,"Đơn vị":"","Diễn giải":capacity_reference["source"]+" "+capacity_reference["scope"]},
         {"Hạng mục":"Kết luận dung lượng", "Giá trị":headline, "Đơn vị":"", "Diễn giải":"Nhãn SOH suy ra từ vận hành; chưa đối chiếu đo dung lượng độc lập."},
         {"Hạng mục":"Đối chiếu tín hiệu", "Giá trị":comparison, "Đơn vị":"", "Diễn giải":"Chỉ so sánh với tiêu chí được nhập; hệ thống chưa xác minh nguồn ngưỡng."},
         {"Hạng mục":"Tình trạng hỏng / an toàn", "Giá trị":fault, "Đơn vị":"", "Diễn giải":"Không suy ra chẩn đoán từ một con số SOH."},
@@ -145,6 +161,6 @@ def assess(window, prediction, outside, limits, source, history=None):
     for item in alerts:
         report_rows.append({"Hạng mục":"Điểm cần kiểm tra","Giá trị":item["text"],"Đơn vị":"","Diễn giải":"Không phải kết luận pin hỏng."})
     return dict(headline=headline,level="review" if alerts else "info",comparison=comparison,
-        fault_status=fault,explanation=explanation,missing=missing,metrics=metrics,indicators=indicators,alerts=alerts,recommendations=recommendations,
+        capacity_reference=capacity_reference,fault_status=fault,explanation=explanation,missing=missing,metrics=metrics,indicators=indicators,alerts=alerts,recommendations=recommendations,
         limits=limits,source=source,history=history or dict(points=[],message="Chưa có lịch sử liên kết với dữ liệu này."),report_rows=report_rows,
         scope="BAIC EU500 · bộ pin 145 Ah · nhãn dung lượng vận hành suy ra từ dòng điện/SOC")

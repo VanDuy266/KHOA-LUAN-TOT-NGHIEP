@@ -27,3 +27,7 @@ Random Forest học trên 85 pin; SDU_01 bị loại khỏi tập học ở cả
 ## Diễn giải dễ đọc
 
 Phần đầu phân biệt dung lượng còn lại (SOH), mức điện hiện tại (SOC), kết quả so sánh tiêu chí và khả năng kết luận lỗi/an toàn. Bảng thông tin cần bổ sung ghi rõ trạng thái, lý do và cách bổ sung: giới hạn vận hành, mã lỗi/trạng thái bảo vệ, tín hiệu từng cell, phép đo dung lượng độc lập và lịch sử. Dữ liệu mẫu đã tham gia học được ghi rõ là minh họa, không phải kết quả kiểm thử trên xe chưa từng học.
+
+## Kết luận dung lượng mặc định
+
+Khi chưa nhập mốc SOH riêng, kết quả tự đối chiếu với mốc nghiên cứu tham khảo 80% danh định, ghi nguồn JRC EUR 29371 EN (2018) và phạm vi áp dụng. Đây không phải thử nghiệm chuẩn đã thực hiện hoặc ngưỡng lỗi/an toàn BAIC. Ngưỡng nhiệt độ/chênh cell không được tự gán. Kết luận lỗi và an toàn nằm trong phần phạm vi kiểm chứng, không được suy ra từ SOH.
