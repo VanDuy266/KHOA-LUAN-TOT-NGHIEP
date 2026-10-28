@@ -1,10 +1,10 @@
 # Bản trình bày kết quả và chuẩn bị bảo vệ
 
-Bản này phục vụ phần thực nghiệm và bảo vệ; cần ghép vào biểu mẫu của trường, bổ sung trích dẫn theo quy định và trao đổi với giảng viên. Không phải xác nhận đạt điểm hay hoàn thành thủ tục khóa luận.
+Báo cáo kết quả thực nghiệm, nguồn nhãn, thiết kế kiểm thử và phạm vi kết luận của đề tài.
 
 ## 1. Mục tiêu và phạm vi
 
-Ước tính trạng thái sức khỏe dung lượng SOH từ tín hiệu ngắn đầu chu kỳ; đánh giá khả năng dự đoán trên pin/xe không tham gia huấn luyện; triển khai công cụ tra cứu, dự đoán và xuất kết quả. Phạm vi là hồi quy SOH, không chẩn đoán hỏng hay chứng nhận an toàn. SDU tế bào pin và BMS bộ pin xe được xây dựng, huấn luyện và đánh giá riêng.
+Ước tính trạng thái sức khỏe dung lượng SOH từ tín hiệu ngắn đầu chu kỳ; đánh giá khả năng dự đoán trên pin/xe không tham gia huấn luyện; triển khai công cụ tra cứu, dự đoán và xuất kết quả. Phần chính là hồi quy SOH. SDU tế bào pin và BMS bộ pin xe được xây dựng, huấn luyện và đánh giá riêng. Phần mở rộng gồm ngoại suy ngưỡng dung lượng và phân loại dấu hiệu lỗi trên dữ liệu điện áp Zenodo riêng; không chứng nhận an toàn.
 
 ## 2. Nguồn và ý nghĩa SOH tham chiếu
 
@@ -54,7 +54,7 @@ Ridge–RF là phối hợp thuật toán đã có, không tuyên bố phát min
 
 Mẫu pin/xe còn giới hạn; chia theo nhóm chưa chứng minh dự đoán tương lai; BMS thiếu dung lượng đo độc lập và nhãn lỗi; ngân sách tinh chỉnh mô hình chưa ngang nhau. Audit tính lại tệp dự đoán và kiểm tra mã nguồn, không thay thế tái huấn luyện độc lập. Do tập kiểm thử đã được xem để so sánh mô hình, cần tập ngoài chưa dùng lựa chọn hoặc nested CV toàn bộ quy trình nếu muốn đánh giá lựa chọn cuối cùng ít thiên lệch hơn.
 
-Ưu tiên tiếp theo: đối chiếu yêu cầu giảng viên, thống nhất tiêu chí chính trước thí nghiệm mới, cân bằng ngân sách tinh chỉnh, kiểm thử theo thời gian/đội xe ngoài, đối chiếu dung lượng RPT nếu có. Chỉ mở rộng chẩn đoán hỏng khi có nhãn lỗi đã được xác nhận.
+Ưu tiên tiếp theo: đối chiếu yêu cầu giảng viên, thống nhất tiêu chí chính trước thí nghiệm mới, cân bằng ngân sách tinh chỉnh, kiểm thử theo thời gian/đội xe ngoài, đối chiếu dung lượng RPT nếu có. Phân loại lỗi đã được bổ sung trên dữ liệu Zenodo 18505707 v1 có nhãn riêng: 99 xe, 47.698 mẫu. Mô hình vẫn có 87 mẫu lỗi bị bỏ sót và 281 mẫu báo nhầm trong kiểm thử; không xác nhận hỏng/an toàn tuyệt đối. Chi tiết nằm trong docs/health-and-fault.md và reports/fault/summary.json.
 
 ## 7. Dàn ý bảo vệ 8 phần
 

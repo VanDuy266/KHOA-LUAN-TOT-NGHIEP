@@ -42,14 +42,14 @@ Ridge-RF residual có MAE macro thấp nhất: 2.0998 điểm %. SOH tham chiế
 
 Kiểm thử giữ riêng pin/xe đánh giá chuyển sang đối tượng khác, không chứng minh dự đoán tương lai theo thời gian. Tập kiểm thử đã được xem khi so sánh mô hình; nếu cần ước lượng không thiên lệch cho lựa chọn cuối cùng, cần một tập ngoài chưa dùng lựa chọn hoặc nested CV cho toàn bộ quy trình chọn mô hình.
 
-## Đóng góp và cách trình bày khi bảo vệ
+## Đóng góp và kết luận
 
-Đóng góp của đề tài là xây dựng quy trình trích xuất tín hiệu đầu sạc, so sánh mô hình trên cùng nhóm pin giữ riêng, triển khai giao diện dự đoán và bổ sung kiểm chứng trên dữ liệu vận hành xe riêng biệt. Không gọi phối hợp Ridge–RF là thuật toán mới phát minh. Không quy đổi kết quả thành phần trăm hoàn thành hay điểm khóa luận.
+Đóng góp của đề tài là xây dựng quy trình trích xuất tín hiệu đầu chu kỳ, so sánh mô hình trên cùng nhóm pin giữ riêng, triển khai giao diện dự đoán và bổ sung kiểm chứng trên dữ liệu vận hành xe riêng biệt. Ridge–RF là kết hợp thuật toán đã có. Các chỉ số phản ánh sai số mô hình, không phải phần trăm hoàn thành hoặc điểm khóa luận.
 
-Có thể trình bày: “Trong các cấu hình đã khảo sát, Ridge-RF residual có MAE macro thấp nhất trên 86 pin SDU theo kiểm thử nhóm 5 vòng. BMS được đánh giá riêng trên 20 xe, với nhãn SOH suy ra từ vận hành; chưa mở rộng kết luận sang chẩn đoán pin hỏng hoặc xác nhận an toàn.”
+Kết luận thực nghiệm: “Trong các cấu hình đã khảo sát, Ridge-RF residual có MAE macro thấp nhất trên 86 pin SDU theo kiểm thử nhóm 5 vòng. BMS được đánh giá riêng trên 20 xe, với nhãn SOH suy ra từ vận hành; chưa mở rộng kết luận sang chẩn đoán pin hỏng hoặc xác nhận an toàn.”
 
-## Phần cần hoàn thiện tiếp
+## Giới hạn kiểm chứng
 
-Đối chiếu tiêu chí và biểu mẫu báo cáo của trường với giảng viên; bổ sung phép đo dung lượng độc lập nếu muốn xác nhận SOH BMS vật lý; dùng dữ liệu lỗi đã xác minh nếu mở rộng sang chẩn đoán hỏng. Chưa cần bổ sung nhãn tốt/hỏng cho mục tiêu hồi quy SOH hiện tại.
+SOH BMS chưa được đối chiếu với phép đo dung lượng độc lập. Phần đánh giá SOH không xác nhận lỗi hoặc an toàn. Chức năng phân loại dấu hiệu lỗi dùng bộ Zenodo 18505707 riêng; kết quả kiểm thử không gắn sang pin SDU hoặc xe BAIC.
 
 Chạy lại: `.venv/Scripts/python.exe scripts/audit_thesis_results.py`. Đầu ra nằm tại reports/thesis_audit; CSV giữ đầy đủ số lẻ, bảng Markdown làm tròn 4 chữ số.
