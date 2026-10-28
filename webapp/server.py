@@ -577,3 +577,24 @@ def fault_sample():
 @app.get("/api/download/bms-evidence")
 def bms_evidence():
     return send_file(ROOT/"docs/bms-evidence.md",as_attachment=True,download_name="can_cu_doi_chieu_bms.md")
+
+
+@app.post("/api/capacity-measurement")
+def capacity_measurement():
+    """Chemistry-independent capacity ratio, not inference from an unvalidated model."""
+    values = {}
+    for key in ("reference_ah", "measured_ah"):
+        try:
+            values[key] = float(request.form.get(key, ""))
+        except (ValueError, TypeError):
+            raise ValueError("Cần nhập hai dung lượng hợp lệ, cùng đơn vị Ah.")
+        if not math.isfinite(values[key]) or values[key] <= 0:
+            raise ValueError("Dung lượng phải là số hữu hạn lớn hơn 0.")
+    if request.form.get("comparable") != "1":
+        raise ValueError("Cần xác nhận hai phép đo cùng cấu hình và điều kiện đối chiếu.")
+    soh = 100 * values["measured_ah"] / values["reference_ah"]
+    if not math.isfinite(soh):
+        raise ValueError("Tỷ lệ dung lượng không hợp lệ.")
+    return reply(**values, soh_pct=soh, loss_pct=max(0, 100-soh) if soh <= 100 else None,
+                 method="capacity_ratio", above_reference=soh > 100,
+                 fault_status="Không đánh giá lỗi bằng dung lượng.")
