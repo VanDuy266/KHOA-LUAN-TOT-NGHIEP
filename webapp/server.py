@@ -569,3 +569,8 @@ def fault_predict():
 def fault_sample():
     example=metadata("data/fault/processed/examples.json")[0]
     return send_csv(pd.DataFrame(example["voltage"],columns=example["columns"]),"mau_dien_ap_50x14_mV.csv")
+
+
+@app.get("/api/download/bms-evidence")
+def bms_evidence():
+    return send_file(ROOT/"docs/bms-evidence.md",as_attachment=True,download_name="can_cu_doi_chieu_bms.md")

@@ -145,7 +145,7 @@ function bmsAssessment(d){
   const capacityLabel=m.loss_pct==null?"Chưa đánh giá — SOH vượt 100%":capacity.status==="unset"?"Chưa xếp loại — chưa chọn mốc SOH":capacity.status==="exceeded"?"Dưới mức dung lượng yêu cầu":"Đạt mức dung lượng yêu cầu";
   return `<section class="assessment-card ${a.level==="review"?"review":""}"><div class="eyebrow">KẾT QUẢ SỨC KHỎE PIN · ƯỚC TÍNH</div>`+
     kpis([{label:"Sức khỏe dung lượng (SOH)",value:m.soh_pct,digits:1,unit:"%",detail:"So với dung lượng ban đầu danh định"},{label:"Mức chai ước tính",value:m.loss_pct,digits:1,unit:m.loss_pct==null?"":"%",detail:m.loss_pct==null?"Chưa tính khi SOH vượt 100%":"100 − SOH"},{label:"Dung lượng còn lại ước tính",value:m.capacity_ah,digits:1,unit:"Ah",detail:"Mốc ban đầu: 145 Ah"}])+
-    `<p><strong>Đánh giá dung lượng:</strong> ${esc(capacityLabel)}${capacity.threshold==null?"":` (mốc đối chiếu ${fmt(capacity.threshold,1)}%)`}.</p><p><strong>Tín hiệu cần kiểm tra:</strong> ${flagged.length?esc(flagged.map(x=>x.label.toLowerCase()).join(", ")):a.indicators.some(x=>x.status==="unset")?"Chưa đủ tiêu chí đối chiếu":"Chưa có chỉ số vượt tiêu chí đã nhập"}.</p><p><strong>Tình trạng lỗi:</strong> Chưa xác định. <strong>An toàn sử dụng:</strong> Chưa được xác nhận.</p><p class="sub">SOH (State of Health) là sức khỏe dung lượng, không phải mức điện đang còn (SOC). Mức chai không đồng nghĩa pin hỏng.</p><button class="button small" id="bms-open-limits" type="button">Thiết lập tiêu chí đối chiếu</button>${d.sample?'<p class="muted">Mẫu minh họa đã dùng huấn luyện.</p>':""}</section>`+
+    `<p><strong>Đánh giá dung lượng:</strong> ${esc(capacityLabel)}${capacity.threshold==null?"":` (mốc đối chiếu ${fmt(capacity.threshold,1)}%)`}.</p><p><strong>Tín hiệu cần kiểm tra:</strong> ${flagged.length?esc(flagged.map(x=>x.label.toLowerCase()).join(", ")):a.indicators.some(x=>x.status==="unset")?"Chưa đủ tiêu chí đối chiếu":"Chưa có chỉ số vượt tiêu chí đã nhập"}.</p><p><strong>Tình trạng lỗi:</strong> Chưa xác định. <strong>An toàn sử dụng:</strong> Chưa được xác nhận.</p><p class="sub">SOH (State of Health) là sức khỏe dung lượng, không phải mức điện đang còn (SOC). Mức chai không đồng nghĩa pin hỏng.</p><div class="actions"><button class="button small" id="bms-open-limits" type="button">Thiết lập tiêu chí đối chiếu</button>${capacity.threshold==null?'<button class="button small" id="bms-use-reference" type="button">Dùng mốc dung lượng tham khảo 80%</button>':""}<a class="button small" href="/api/download/bms-evidence">Nguồn tiêu chí và dữ liệu còn thiếu</a></div>${d.sample?'<p class="muted">Mẫu minh họa đã dùng huấn luyện.</p>':""}</section>`+
     kpis([{label:"Nhiệt độ cao nhất",value:m.temperature_max_c,digits:1,unit:"°C",tone:a.indicators.find(x=>x.code==="temperature").status==="exceeded"?"attention":"signal",detail:"Thấp nhất "+fmt(m.temperature_min_c,1)+" °C"},
       {label:"Chênh điện áp cell",value:m.cell_spread_max_mv,digits:1,unit:"mV",detail:"Lớn nhất tại cùng thời điểm"},
       {label:"Mức điện hiện tại (SOC)",value:m.soc_end_pct,digits:1,unit:"%",detail:"Cuối cửa sổ đo · khác độ chai"}])+
@@ -161,6 +161,14 @@ function bmsAssessment(d){
 }
 function finishBmsResult(d){
   if(!d.assessment)return;
+  const referenceButton=$("#bms-use-reference");
+  if(referenceButton)referenceButton.onclick=()=>{
+    const source=$("#limit-source"),note="SOH 80% danh định: tiêu chí nghiên cứu tham khảo JRC EUR 29371 EN (2018), không phải ngưỡng hãng/an toàn",value=source.value.trim();
+    const combined=value?value+"; "+note:note;
+    if(combined.length>300){toast("Ghi chú tiêu chí vượt 300 ký tự. Rút gọn nguồn trước khi áp dụng.");return;}
+    $("#limit-soh").value="80";source.value=combined;
+    $("#upload-form").requestSubmit();
+  };
   const limitsButton=$("#bms-open-limits");
   if(limitsButton)limitsButton.onclick=()=>{const section=$(".comparison-settings");if(section){section.open=true;section.scrollIntoView({block:"center"});$("#limit-soh").focus();}};
   chart("bms-result-temperature",[series("Cảm biến thấp nhất",d.signals,"time_s","min_temperature"),series("Cảm biến cao nhất",d.signals,"time_s","max_temperature")],"Giây từ đầu sạc","°C");
