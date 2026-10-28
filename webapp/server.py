@@ -342,7 +342,7 @@ def bms():
     comparison=held.groupby("month")[["reference_soh_pct","prediction"]].mean().reset_index()
     return reply(dataset=metadata("reports/bms/dataset_summary.json"),vehicles=vehicles,vehicle=vehicle,session=sid,
         model=name, comparison=comparison,
-        sessions=sessions[["session","start"]],monthly=monthly,signals=windows,
+        sessions=sessions[["session","start"]],recorded_charge_sessions=len(sessions),monthly=monthly,signals=windows,
         metrics=display(table("reports/bms/metrics_summary.csv")).round(5),
         by_vehicle=display(table("reports/bms/metrics_by_vehicle.csv")).round(5),
         timings=display(table("reports/bms/timings.csv")).round(5))
@@ -469,3 +469,103 @@ def thesis_audit_download():
     if key not in allowed:abort(400)
     path=ROOT/"reports/thesis_audit"/allowed[key]
     return send_file(path,as_attachment=True,download_name=path.name)
+
+
+@app.get("/api/health/options")
+def health_options():
+    return reply(batteries=sorted(table("reports/features.csv").battery.unique()),
+                 vehicles=sorted(table("reports/bms/features.csv").vehicle.unique()))
+
+
+@app.post("/api/health")
+def health_assessment():
+    from webapp.health import trend_forecast
+    kind=request.form.get("kind","sdu")
+    unit=request.form.get("unit","cycles")
+    if unit not in {"cycles","months"}:raise ValueError("Đơn vị không hợp lệ.")
+    threshold=float(request.form.get("threshold","80"))
+    charge_count=None;cycle_count=None
+    if kind=="sdu":
+        phase=request.form.get("phase","primary");pin=request.form.get("battery","SDU_01")
+        if phase not in PHASES:raise ValueError("Giai đoạn không hợp lệ.")
+        data=table("reports/features.csv")
+        data=data[(data.battery==pin)&(data.phase==phase)][["cycle","soh_pct"]].rename(columns={"cycle":"position"}).sort_values("position")
+        unit="cycles";source="Lịch sử SOH tham chiếu SDU · "+pin+" · "+PHASES[phase]
+    elif kind=="bms":
+        vehicle=request.form.get("vehicle","BAIC_01")
+        data=table("reports/bms/monthly_reference.csv")
+        data=data[data.vehicle==vehicle].sort_values("month").copy()
+        periods=pd.PeriodIndex(data.month,freq="M")
+        data["position"]=periods.astype("int64")-periods.astype("int64").min() if len(data) else []
+        data["soh_pct"]=data.reference_capacity_ah/145*100
+        data=data[["position","soh_pct"]];unit="months"
+        source="Lịch sử SOH suy ra BMS · "+vehicle+" · tháng tính từ mốc đầu"
+    elif kind=="upload":
+        data=pd.read_csv(io.BytesIO(uploaded()));source="CSV lịch sử bạn tải lên; cùng một pin, một giai đoạn, không dùng tín hiệu thô."
+    else:raise ValueError("Nguồn lịch sử không hợp lệ.")
+    if request.form.get("cutoff","").strip():
+        cutoff=float(request.form["cutoff"])
+        if not math.isfinite(cutoff):raise ValueError("Mốc kết thúc không hợp lệ.")
+        data=data[data.position<=cutoff]
+    result=trend_forecast(data,threshold)
+    if kind=="sdu":cycle_count=len(data)
+    if kind=="bms":
+        sessions=table("reports/bms/features.csv")
+        sessions=sessions[sessions.vehicle==vehicle]
+        periods=pd.PeriodIndex(sessions.month,freq="M")
+        first=pd.Period(table("reports/bms/monthly_reference.csv").query("vehicle == @vehicle").month.min(),freq="M")
+        positions=periods.astype("int64")-first.ordinal
+        charge_count=int(sessions.loc[positions<=result["current_position"],"session"].nunique())
+    result.update(charge_sessions=charge_count,recorded_cycles=cycle_count,lifetime_charge_count=None)
+    return reply(result=result,unit=unit,source=source)
+
+
+@app.get("/api/download/health-sample")
+def health_sample():
+    # Illustrative synthetic history, explicitly labeled in filename and UI.
+    return send_csv(pd.DataFrame({"position":[0,10,20,30,40,50],"soh_pct":[100,98,96,94,92,90],"soc_pct":[40,50,60,50,45,55]}),"mau_lich_su_gia_lap_khong_phai_do_thuc.csv")
+
+
+@app.get("/api/download/health-validation")
+def health_validation():
+    return send_file(ROOT/"reports/health/validation.md",as_attachment=True,download_name="kiem_chung_du_bao_nguong.md")
+
+
+@app.get("/api/fault")
+def fault_overview():
+    summary=metadata("reports/fault/summary.json")
+    examples=metadata("data/fault/processed/examples.json")
+    return reply(summary=summary,examples=[dict(id=e["id"],vehicle=e["vehicle"],snapshot=e["snapshot"],fold=e["fold"]) for e in examples])
+
+
+@app.post("/api/fault/predict")
+def fault_predict():
+    from webapp.fault import snapshot_features,FEATURES as FAULT_FEATURES
+    sample=request.form.get("sample_id","")
+    if sample:
+        examples=metadata("data/fault/processed/examples.json")
+        case=next((e for e in examples if e["id"]==sample),None)
+        if case is None:raise ValueError("Mẫu lỗi không hợp lệ.")
+        # Saved OOF inference: the vehicle was absent from fitting in this fold.
+        cells=[dict(cell=c["cell"],signal=int(c["prediction"]),reference=int(c["fault"])) for c in case["cells"]]
+        mode="Kết quả kiểm thử đã lưu trên xe giữ riêng · không phải mô hình học lại"
+        outside=False
+    else:
+        frame=pd.read_csv(io.BytesIO(uploaded()))
+        x=snapshot_features(frame)
+        with INFERENCE:
+            model=artifact("fault/random_forest.joblib")
+            pred=model["model"].predict(x)
+        cells=[dict(cell=i+1,signal=int(v),reference=None) for i,v in enumerate(pred)]
+        outside=bool(((x<pd.Series(model['training_min']))|(x>pd.Series(model['training_max']))).any().any())
+        mode="Dự đoán nghiên cứu trên CSV bạn tải lên; chưa xác nhận cấu hình tương thích"
+    flagged=[c["cell"] for c in cells if c["signal"]]
+    return reply(flagged=flagged,cells=cells,mode=mode,outside=outside,
+        headline="Có dấu hiệu thuộc nhóm lỗi" if flagged else "Chưa phát hiện dấu hiệu thuộc nhóm lỗi trong mẫu này",
+        scope="Chỉ áp dụng định dạng nguồn Zenodo: 50 hàng × 14 cột mV. Không phải dữ liệu BAIC min/max. Kết quả mô hình không xác nhận pin hỏng hoặc an toàn; không dự báo ngày xảy ra lỗi.")
+
+
+@app.get("/api/download/fault-sample")
+def fault_sample():
+    example=metadata("data/fault/processed/examples.json")[0]
+    return send_csv(pd.DataFrame(example["voltage"],columns=example["columns"]),"mau_dien_ap_50x14_mV.csv")

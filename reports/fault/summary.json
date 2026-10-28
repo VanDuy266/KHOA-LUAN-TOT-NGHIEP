@@ -1,0 +1,63 @@
+{
+  "source": "https://zenodo.org/records/18505707",
+  "doi": "10.5281/zenodo.18505707",
+  "license": "CC BY 4.0",
+  "citation": "J. Li, Y. Che, S. Onori, W. Li, X. Hu, Decoupling battery faults from sparse voltage snapshots via cross-modal topology",
+  "archive_md5": "190be964af39615428834747654e853f",
+  "archive_sha256": "008352ca383df4665bcf678ffe1eb684b8cf1c4511cf81593bc87164e972ed4c",
+  "vehicles": 99,
+  "snapshots": 3407,
+  "samples": 47698,
+  "source_claimed_samples": 47968,
+  "source_count_mismatch": "Downloaded CSVs contain 47,698 cell-snapshot samples; README states 47,968. Report actual count without silently changing source.",
+  "source_label_counts": {
+    "0": 44802,
+    "1": 1659,
+    "3": 503,
+    "2": 426,
+    "4": 308
+  },
+  "target": "0 = source class 0; 1 = any source fault class 1..4; no unsupported mapping of individual fault types",
+  "method": "Random Forest binary baseline; 9 per-cell voltage/residual descriptors, fixed parameters; 5-fold StratifiedGroupKFold by vehicle, seed 42; no tuning",
+  "metrics": {
+    "accuracy": 0.9922847918151705,
+    "balanced_accuracy": 0.9818432610545949,
+    "precision": 0.9090614886731392,
+    "recall": 0.9699585635359116,
+    "f1": 0.9385232208486468,
+    "confusion_matrix": [
+      [
+        44521,
+        281
+      ],
+      [
+        87,
+        2809
+      ]
+    ]
+  },
+  "majority_baseline": {
+    "accuracy": 0.9392846660237326,
+    "balanced_accuracy": 0.5,
+    "precision": 0.0,
+    "recall": 0.0,
+    "f1": 0.0,
+    "confusion_matrix": [
+      [
+        44802,
+        0
+      ],
+      [
+        2896,
+        0
+      ]
+    ]
+  },
+  "limits": [
+    "Processed voltage snapshots, not raw complete vehicle histories.",
+    "No SOC, capacity SOH, charge counts or time-to-failure labels.",
+    "Model prediction is a fault signal for this source domain, not confirmed physical failure or safety certification.",
+    "Does not apply to existing BAIC max/min BMS CSV schema.",
+    "Individual source class-to-fault-type mapping not confirmed, so binary labels only."
+  ]
+}

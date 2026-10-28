@@ -1,0 +1,22 @@
+[
+  {
+    "dataset": "BMS",
+    "origins": 60,
+    "forecasted": 52,
+    "future_crossings": 44,
+    "scored_crossings": 42,
+    "right_censored": 9,
+    "crossing_mae": 3.294265025869908,
+    "unit": "months"
+  },
+  {
+    "dataset": "SDU",
+    "origins": 516,
+    "forecasted": 137,
+    "future_crossings": 258,
+    "scored_crossings": 137,
+    "right_censored": 0,
+    "crossing_mae": 27.668593263017147,
+    "unit": "cycles"
+  }
+]
