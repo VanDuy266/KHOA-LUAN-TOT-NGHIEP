@@ -635,3 +635,20 @@ def mapping_normalize():
     out=normalize(uploaded(),mapping,units,request.form.get("positive_discharge")=="1")
     return reply(rows=len(out),preview=out.head(5),csv=out.to_csv(index=False),
                  domain_validated=False)
+
+
+@app.get("/api/research")
+def research_extensions():
+    allowed={"shap":"shap_summary.json","curves":"electrochemical_curves.json","transfer":"nasa_transfer.json"}
+    section=request.args.get("section","shap")
+    if section not in allowed:raise ValueError("Phần nghiên cứu không hợp lệ.")
+    return reply(**metadata("reports/research/"+allowed[section]))
+
+
+@app.get("/api/download/research")
+def research_download():
+    allowed={"shap":"shap_importance.csv","nasa":"nasa_by_battery.csv","predictions":"nasa_predictions.csv","protocol":"protocol.md","curves":"electrochemical_curves.json"}
+    kind=request.args.get("kind","protocol")
+    if kind not in allowed:abort(400)
+    path=ROOT/'reports/research'/allowed[kind]
+    return send_file(path,as_attachment=True,download_name=path.name)

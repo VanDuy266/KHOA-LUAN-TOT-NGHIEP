@@ -80,3 +80,13 @@ Mẫu pin/xe còn giới hạn; chia theo nhóm chưa chứng minh dự đoán t
 **Mô hình có học lẫn pin kiểm thử không?** Thiết kế mã nguồn và tệp fold cho thấy tách theo pin/xe; audit đã kiểm tra mẫu, nhãn và fold. Để xác nhận lịch sử huấn luyện hoàn toàn độc lập cần chạy tái lập huấn luyện.
 
 **Đã đạt khóa luận chưa?** Kết quả có bằng chứng thực nghiệm để trình bày; việc đạt yêu cầu và chấm điểm theo tiêu chí trường và hội đồng.
+
+
+## 9. Thực nghiệm bổ sung đã thực hiện
+
+- SHAP tổng hợp CatBoost: 516 mẫu cân bằng theo 86 pin và hai giai đoạn; mô tả mô hình cuối, không phải đánh giá ngoài tập học hay quan hệ nhân quả.
+- ICA/DVA: sáu chu kỳ SDU_01 toàn đoạn xả, có sàng lọc chất lượng và công bố làm trơn. Không đưa toàn chu kỳ vào predictor 120 giây.
+- NASA chính thức: 636 chu kỳ của bốn cell. SDU RF chuyển thẳng có MAE macro 8,5964 điểm %; CatBoost 7,3349; XGBoost 11,9552; Ridge–RF 9850,9403, là bằng chứng ngoại suy thất bại nghiêm trọng.
+- RF học NASA giữ riêng cell: MAE 2,7633; RF gộp SDU+NASA thêm dung lượng định mức: 3,1704. Gộp chưa cải thiện; không gọi là mô hình tổng quát mọi loại pin.
+
+Trình bày kết quả tốt và chưa tốt nguyên trạng. NASA chỉ có bốn cell, điều kiện xả và nhãn khác SDU; chưa làm MIT. Chi tiết phương pháp, hash nguồn và cách tái lập: reports/research/protocol.md. Chế độ “Trình bày khóa luận” trên web chia sáu phần từ mục tiêu đến kết luận, có nút mở demo pin giữ riêng.
