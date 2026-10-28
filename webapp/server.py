@@ -29,7 +29,7 @@ from battery_soh.bms import FEATURES as BMS_FEATURES, charging_features
 
 app = Flask(__name__)
 app.json.sort_keys = False
-app.config.update(MAX_CONTENT_LENGTH=20 * 1024 * 1024, MAX_FORM_MEMORY_SIZE=1024 * 1024)
+app.config.update(MAX_CONTENT_LENGTH=513 * 1024 * 1024, MAX_FORM_MEMORY_SIZE=1024 * 1024)
 INFERENCE = BoundedSemaphore(1)
 TITLE = "Vincent D | Phân tích sức khỏe pin xe điện"
 
@@ -89,7 +89,7 @@ def uploaded(extensions=(".csv", ".csv.gz", ".gz")):
         raise ValueError("Định dạng file chưa được hỗ trợ cho chức năng này.")
     raw = upload.read(20 * 1024 * 1024 + 1)
     if len(raw) > 20 * 1024 * 1024:
-        abort(413)
+        abort(413,description="Dự đoán trực tiếp tối đa 20 MiB; dùng bộ tiếp nhận dữ liệu bên ngoài để lọc CSV tối đa 512 MiB.")
     if raw[:2] == b"\x1f\x8b":
         with gzip.GzipFile(fileobj=io.BytesIO(raw)) as source:
             raw = source.read(50 * 1024 * 1024 + 1)
@@ -131,7 +131,7 @@ def headers(response):
 @app.errorhandler(Exception)
 def errors(error):
     if isinstance(error, HTTPException):
-        message = "File vượt giới hạn tải lên 20 MiB." if error.code == 413 else error.description
+        message = (error.description if error.description != type(error).description else "Yêu cầu vượt giới hạn 512 MiB dữ liệu và phần biểu mẫu.") if error.code == 413 else error.description
         return jsonify(error=message), error.code
     if isinstance(error, (ValueError, TypeError, KeyError, UnicodeError, OSError, EOFError, pd.errors.ParserError)):
         return jsonify(error=str(error)), 400
@@ -241,6 +241,11 @@ def forecast():
         fitted=artifact(MODELS[name])
         frame=input_frame()
         result=predict_batch(frame, fitted)
+        invalid=(result.status=="Thành công") & (~np.isfinite(result.predicted_soh_pct) | ~result.predicted_soh_pct.between(0,130))
+        if invalid.any():
+            result.loc[invalid,"status"]="Không xuất dự đoán"
+            result.loc[invalid,"error"]="Đầu ra ngoài phạm vi SOH hỗ trợ 0–130%; cần kiểm tra cấu hình và miền dữ liệu."
+            result.loc[invalid,"predicted_soh_pct"]=np.nan
         explanation=None
         if len(result)==1 and result.status.iloc[0]=="Thành công":
             estimate,features,outside=predict(frame,int(result.cycle.iloc[0]),fitted)
@@ -428,6 +433,8 @@ def bms_predict():
         features=pd.DataFrame([charging_features(window)])[BMS_FEATURES]
         outside=((features.iloc[0]<pd.Series(fitted['training_min']))|(features.iloc[0]>pd.Series(fitted['training_max'])))
         estimate=float(fitted['model'].predict(features)[0])
+        if not math.isfinite(estimate) or not 0<=estimate<=130:
+            raise ValueError("Đầu ra ngoài phạm vi SOH hỗ trợ 0–130%; chưa đưa kết luận cho dữ liệu này.")
     outside_names=outside[outside].index.tolist()
     assessment=assess_bms(window,estimate,outside_names,limits,source,history)
     assessment["report_rows"].insert(0,{"Hạng mục":"Mô hình","Giá trị":name,"Đơn vị":"","Diễn giải":assessment["scope"]})
@@ -471,7 +478,7 @@ def thesis_audit():
 @app.get("/api/download/thesis-audit")
 def thesis_audit_download():
     allowed={"defense":"bao_cao_va_bao_ve.md","report":"ket_qua_va_gioi_han.md","sdu":"sdu_summary.csv","bms":"bms_summary.csv",
-             "paired":"paired_comparisons.csv","verification":"verification.json","methods":"giai_thich_va_du_bao.md"}
+             "paired":"paired_comparisons.csv","verification":"verification.json","methods":"giai_thich_va_du_bao.md","review":"final_review.md"}
     key=request.args.get("kind","report")
     if key not in allowed:abort(400)
     path=ROOT/"reports/thesis_audit"/allowed[key]
@@ -618,8 +625,9 @@ def speed_summary(frame):
 
 @app.post("/api/column-mapping/preview")
 def mapping_preview():
-    from webapp.column_mapping import preview
-    return reply(**preview(uploaded((".csv", ".csv.gz", ".gz", ".json"))))
+    from webapp.column_mapping import preview_frame
+    from webapp.upload_table import read_upload
+    return reply(**preview_frame(read_upload(request.files.get("file"),preview=True)))
 
 
 @app.post("/api/column-mapping/normalize")
@@ -632,19 +640,29 @@ def mapping_normalize():
         raise ValueError("Ánh xạ hoặc đơn vị không hợp lệ.")
     if not isinstance(mapping,dict) or not isinstance(units,dict):
         raise ValueError("Ánh xạ cần danh sách cột có tên.")
-    raw=uploaded((".csv", ".csv.gz", ".gz", ".json"))
-    out=normalize(raw,mapping,units,request.form.get("positive_discharge")=="1")
+    from webapp.column_mapping import normalize_frame
+    from webapp.upload_table import read_upload,upload_sha256,carry_context
+    filters={}
+    for key in ("battery","cycle","phase"):
+        column=request.form.get("filter_"+key+"_column","")
+        value=request.form.get("filter_"+key+"_value","")
+        if column:
+            if column in filters:raise ValueError("Hai bộ lọc cần cột riêng.")
+            filters[column]=value
+    soc_col=request.form.get("soc_column","")
+    needed=list(mapping.values())+([soc_col] if soc_col else [])
+    source=read_upload(request.files.get("file"),needed=needed,filters=filters)
+    out=normalize_frame(source,mapping,units,request.form.get("positive_discharge")=="1")
+    out=carry_context(out,source,{k:request.form.get("filter_"+k+"_column","") for k in ("battery","cycle","phase")})
     analysis=None
     if request.form.get("profile"):
         from webapp.external import analyze
-        from webapp.column_mapping import read_frame
         profile=json.loads(request.form["profile"])
-        soc_col=request.form.get("soc_column","")
-        source=read_frame(raw) if soc_col else None
-        if soc_col and soc_col not in source:raise ValueError("Không tìm thấy cột SOC.")
         soc=pd.to_numeric(source[soc_col],errors="raise") if soc_col else None
         analysis=analyze(out,profile,soc)
-        analysis["source_sha256"]=hashlib.sha256(raw).hexdigest()
+        analysis["source_sha256"]=upload_sha256(request.files["file"])
+        analysis["filters"]=filters
+        analysis["scanned_rows"]=source.attrs.get("scanned_rows",len(source))
         analysis["method"]="Measured-signal summary, no learned SOH or fault model applied."
     return reply(rows=len(out),preview=out.head(5),csv=out.to_csv(index=False),
                  domain_validated=False,analysis=analysis)

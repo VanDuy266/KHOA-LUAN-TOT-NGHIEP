@@ -38,17 +38,23 @@ def read_frame(raw, preview=False):
         reader.close()
 
 def preview(raw):
-    frame=read_frame(raw,True)
+    return preview_frame(read_frame(raw,True))
+
+
+def preview_frame(frame):
     if frame.empty:raise ValueError("File không có dòng dữ liệu.")
     columns=frame.columns.tolist()
     suggestions={key:next((c for c in columns if str(c).casefold() in [a.casefold() for a in aliases]),"") for key,aliases in ALIASES.items()}
     return dict(columns=columns,preview=frame,suggestions=suggestions)
 
 def normalize(raw, mapping, units, positive_discharge=False):
+    return normalize_frame(read_frame(raw),mapping,units,positive_discharge)
+
+
+def normalize_frame(frame, mapping, units, positive_discharge=False):
     if set(mapping)!=set(ALIASES) or set(units)!=set(ALIASES):raise ValueError("Cần chọn đủ bốn cột và đơn vị.")
     if not all(isinstance(v,str) for v in [*mapping.values(),*units.values()]):raise ValueError("Cột và đơn vị phải là tên hợp lệ.")
     if len(set(mapping.values()))!=4:raise ValueError("Mỗi tín hiệu cần một cột riêng.")
-    frame=read_frame(raw)
     if not set(mapping.values())<=set(frame):raise ValueError("Cột được chọn không có trong file.")
     out=pd.DataFrame()
     for key,col in mapping.items():

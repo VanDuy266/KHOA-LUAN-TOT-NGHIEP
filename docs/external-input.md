@@ -5,7 +5,7 @@ Tên đề tài giữ nguyên: Phân tích và dự đoán tình trạng sức k
 ## Luồng sử dụng
 Kiểm tra pin → Phân tích dữ liệu bên ngoài → tải file → xem trước → khai báo cấu hình → chọn cột/đơn vị → phân tích tín hiệu.
 
-Nhận CSV, CSV.GZ và JSON là mảng bản ghi phẳng; tối đa 20 MiB tải lên, 50 MiB sau giải nén, 100.000 dòng. Không nhận JSON lồng nhau, XLSX hoặc MAT ở luồng này. MAT NASA được xử lý bởi script nghiên cứu riêng, không có nghĩa web đọc mọi cấu trúc MAT.
+Nhận CSV, CSV.GZ và JSON là mảng bản ghi phẳng; CSV/CSV.GZ tối đa 512 MiB tải lên, 1 GiB sau giải nén khi đọc từng khối; JSON tối đa 20 MiB. Giữ tối đa 100.000 dòng của nhóm đã chọn, quét tối đa 10 triệu dòng. Không nhận JSON lồng nhau, XLSX hoặc MAT ở luồng này. MAT NASA được xử lý bởi script nghiên cứu riêng, không có nghĩa web đọc mọi cấu trúc MAT.
 
 ## Cấu hình và tín hiệu
 Khai báo hóa học (hoặc chưa rõ), cell/bộ pin, sạc/xả/hỗn hợp và dung lượng định mức nếu biết. Ánh xạ thời gian dạng số, điện áp, dòng điện, nhiệt độ; SOC phần trăm là tùy chọn. Chọn rõ đơn vị và dấu dòng xả. Không đổi tên điện áp pack thành điện áp cell hoặc suy SOC từ SOH. Mỗi file chỉ gồm một đoạn của cùng pin, thời gian tăng không trùng; mốc đầu được quy về 0.
@@ -22,3 +22,7 @@ Khai báo hóa học (hoặc chưa rõ), cell/bộ pin, sạc/xả/hỗn hợp v
 - Cấu hình khác: phân tích số liệu đo; chưa xuất SOH bằng mô hình SDU. Muốn đưa mô hình mới vào phục vụ cần dữ liệu nhãn, chia nhóm, kiểm thử ngoài tập học và metadata nguồn.
 
 Hỏng/an toàn cần chẩn đoán phù hợp và đối chiếu thực tế; thống kê tín hiệu hoặc dung lượng đơn thuần không chứng nhận an toàn. Các cảnh báo nhập liệu trong phần này không phải mã lỗi của nhà sản xuất.
+
+
+## File nhiều pin hoặc chu kỳ
+Xem trước chỉ đọc 5 dòng. Chọn cột mã pin, chu kỳ và giai đoạn nếu file chứa nhiều nhóm, rồi nhập giá trị cần phân tích. Các nhóm còn lại không được giữ trong bộ nhớ. Mã pin, số chu kỳ hợp lệ và phase_code được bảo toàn trong CSV chuẩn hóa để tránh dùng nhầm mặc định ở mô hình. JSON lớn nên đổi sang CSV. Các endpoint dự đoán trực tiếp vẫn giới hạn 20 MiB; dùng bộ tiếp nhận file lớn để lọc trước.
