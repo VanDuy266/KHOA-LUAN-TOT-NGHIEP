@@ -81,12 +81,12 @@ def display(frame):
     return result.rename(columns=COLUMNS)
 
 
-def uploaded():
+def uploaded(extensions=(".csv", ".csv.gz", ".gz")):
     upload = request.files.get("file")
     if upload is None or not upload.filename:
         raise ValueError("Bạn chưa chọn file CSV.")
-    if not upload.filename.lower().endswith((".csv", ".csv.gz", ".gz")):
-        raise ValueError("Chỉ nhận CSV hoặc CSV.GZ.")
+    if not upload.filename.lower().endswith(extensions):
+        raise ValueError("Định dạng file chưa được hỗ trợ cho chức năng này.")
     raw = upload.read(20 * 1024 * 1024 + 1)
     if len(raw) > 20 * 1024 * 1024:
         abort(413)
@@ -619,7 +619,7 @@ def speed_summary(frame):
 @app.post("/api/column-mapping/preview")
 def mapping_preview():
     from webapp.column_mapping import preview
-    return reply(**preview(uploaded()))
+    return reply(**preview(uploaded((".csv", ".csv.gz", ".gz", ".json"))))
 
 
 @app.post("/api/column-mapping/normalize")
@@ -632,9 +632,22 @@ def mapping_normalize():
         raise ValueError("Ánh xạ hoặc đơn vị không hợp lệ.")
     if not isinstance(mapping,dict) or not isinstance(units,dict):
         raise ValueError("Ánh xạ cần danh sách cột có tên.")
-    out=normalize(uploaded(),mapping,units,request.form.get("positive_discharge")=="1")
+    raw=uploaded((".csv", ".csv.gz", ".gz", ".json"))
+    out=normalize(raw,mapping,units,request.form.get("positive_discharge")=="1")
+    analysis=None
+    if request.form.get("profile"):
+        from webapp.external import analyze
+        from webapp.column_mapping import read_frame
+        profile=json.loads(request.form["profile"])
+        soc_col=request.form.get("soc_column","")
+        source=read_frame(raw) if soc_col else None
+        if soc_col and soc_col not in source:raise ValueError("Không tìm thấy cột SOC.")
+        soc=pd.to_numeric(source[soc_col],errors="raise") if soc_col else None
+        analysis=analyze(out,profile,soc)
+        analysis["source_sha256"]=hashlib.sha256(raw).hexdigest()
+        analysis["method"]="Measured-signal summary, no learned SOH or fault model applied."
     return reply(rows=len(out),preview=out.head(5),csv=out.to_csv(index=False),
-                 domain_validated=False)
+                 domain_validated=False,analysis=analysis)
 
 
 @app.get("/api/research")

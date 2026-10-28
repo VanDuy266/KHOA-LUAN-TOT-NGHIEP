@@ -30,7 +30,7 @@ Không ép ICA/DVA từ đoạn 120 giây thiếu miền điện áp phù hợp.
 | Đặc trưng miền | 120 giây đầu xả/sạc; thống kê điện áp, dòng, nhiệt độ, độ dốc; chu kỳ và giai đoạn cho SDU | Không phải mô hình cơ chế điện hóa; ICA/DVA bổ sung trên sáu đoạn xả đầy đủ đủ điều kiện; không đưa vào mô hình đầu xả 120 giây. |
 | So sánh công bằng | Cùng mẫu kiểm thử và MAE/RMSE/R² theo pin/xe; bảng thời gian thực nghiệm | Ngân sách tinh chỉnh và phần cứng chưa bảo đảm đồng nhất; thiếu thời gian GRU để trống. |
 | Giải thích | Đóng góp cục bộ có tái dựng đầu ra; CatBoost/XGBoost có SHAP gốc | RF/Ridge–RF không gọi là SHAP. Đã có SHAP tổng hợp mô tả 516 mẫu CatBoost cuối; không phải đánh giá ngoài tập học. Không suy nhân quả. |
-| Tổng quát hóa và sản phẩm | Web và ánh xạ CSV/CSV.GZ, đổi đơn vị; SDU và BAIC đánh giá riêng | Đã kiểm thử SDU → NASA trên 636 chu kỳ của bốn cell; chuyển miền kém. Chưa kiểm thử MIT. Ánh xạ không xác nhận tương thích. Chưa hỗ trợ XLSX/MAT/JSON. |
+| Tổng quát hóa và sản phẩm | Web và ánh xạ CSV/CSV.GZ, đổi đơn vị; SDU và BAIC đánh giá riêng | Đã kiểm thử SDU → NASA trên 636 chu kỳ của bốn cell; chuyển miền kém. Chưa kiểm thử MIT. Ánh xạ không xác nhận tương thích. Đã hỗ trợ CSV/CSV.GZ và JSON dạng bảng; chưa XLSX/MAT. |
 | Phản biện và giới hạn | Phân biệt SOH/SOC/lỗi; nêu nhãn BMS suy ra, phạm vi dữ liệu và đánh giá ngưỡng có điều kiện | Không chứng nhận an toàn, không khẳng định ngày hỏng hoặc áp dụng mọi loại pin. |
 
 Các tiêu chí này là bảng tự đối chiếu kỹ thuật, không thay quy định của trường hoặc đánh giá của giảng viên. Không sử dụng con số “80% sinh viên mắc lỗi” vì chưa có nguồn kiểm chứng.

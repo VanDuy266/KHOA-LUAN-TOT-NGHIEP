@@ -13,6 +13,14 @@ ALIASES={
 SCALES={"time":{"s":1,"ms":.001,"min":60},"terminal_voltage":{"V":1,"mV":.001},"terminal_current":{"A":1,"mA":.001},"temperature":{"C":1,"K":1}}
 
 def read_frame(raw, preview=False):
+    if raw.removeprefix(b'\xef\xbb\xbf').lstrip().startswith((b'[',b'{')):
+        try:records=json.loads(raw.decode('utf-8-sig'))
+        except (ValueError,UnicodeError):raise ValueError("JSON không hợp lệ.")
+        if not isinstance(records,list) or not records or not all(isinstance(r,dict) for r in records):raise ValueError("JSON cần mảng các bản ghi phẳng có tên cột.")
+        if len(records)>100000:raise ValueError("Tối đa 100.000 bản ghi.")
+        if any(isinstance(v,(dict,list)) for r in records for v in r.values()):raise ValueError("JSON lồng nhau chưa được hỗ trợ.")
+        frame=pd.DataFrame(records)
+        return frame.head(5) if preview else frame
     reader=csv_chunks(raw)
     try:
         first=next(reader, pd.DataFrame())
@@ -20,7 +28,7 @@ def read_frame(raw, preview=False):
         parts=[first];count=len(first)
         for part in reader:
             count+=len(part)
-            if count>100000:raise ValueError("Ánh xạ tối đa 100.000 dòng cho một đoạn xả.")
+            if count>100000:raise ValueError("Ánh xạ tối đa 100.000 dòng cho một đoạn đo.")
             parts.append(part)
         if count>100000:raise ValueError("Ánh xạ tối đa 100.000 dòng.")
         frame=pd.concat(parts,ignore_index=True)
@@ -45,12 +53,13 @@ def normalize(raw, mapping, units, positive_discharge=False):
     out=pd.DataFrame()
     for key,col in mapping.items():
         if units[key] not in SCALES[key]:raise ValueError("Đơn vị không được hỗ trợ.")
-        out[key]=pd.to_numeric(frame[col],errors="raise")*SCALES[key][units[key]]
+        try:out[key]=pd.to_numeric(frame[col],errors="raise")*SCALES[key][units[key]]
+        except (ValueError,TypeError):raise ValueError(f"Cột {col} cần giá trị số; chuyển timestamp thành thời gian số trước khi tải.")
     if units["temperature"]=="K":out["temperature"]-=273.15
     if positive_discharge:out["terminal_current"]*=-1
     if not np.isfinite(out.to_numpy()).all():raise ValueError("Tín hiệu có giá trị thiếu hoặc vô hạn.")
     if (out.time<0).any() or out.time.duplicated().any() or not out.time.is_monotonic_increasing:
-        raise ValueError("Một đoạn xả cần thời gian không âm, tăng dần và không trùng.")
+        raise ValueError("Một đoạn đo cần thời gian không âm, tăng dần và không trùng.")
     # Relative time retains the beginning of the supplied segment; user must supply start-of-discharge.
     out["time"]-=out.time.iloc[0]
     return out
