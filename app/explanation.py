@@ -79,3 +79,17 @@ def render_explanation(artifact, features):
             + " Đóng góp dương: tăng SOH; âm: giảm SOH so với mốc. "
             + ("Không phải quan hệ nhân quả." if "SHAP" in method else "Không phải SHAP hoặc quan hệ nhân quả.")
         )
+
+
+def explanation_evidence(baseline, effects, prediction, features):
+    """Check additive reconstruction; feature attribution does not establish causality."""
+    total = float(effects.contribution.sum())
+    reconstructed = float(baseline + total)
+    error = abs(float(prediction) - reconstructed)
+    tolerance = max(0.002, abs(float(prediction))*1e-5)
+    records = effects.copy()
+    records["value"] = [float(features.iloc[0][name]) for name in records.feature]
+    return dict(prediction=float(prediction), reconstructed=reconstructed,
+                contribution_sum=total, reconstruction_error=error,
+                reconstruction_ok=bool(error <= tolerance),
+                top_effects=records.iloc[np.argsort(-np.abs(records.contribution.to_numpy()))].head(3))

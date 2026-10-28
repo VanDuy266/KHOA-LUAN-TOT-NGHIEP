@@ -22,7 +22,7 @@ from webapp.data import table, metadata, artifact, cycle_measurements, PHASES, M
 from webapp.bms_assessment import assess as assess_bms, read_limits
 from prediction import read_csv, predict_batch, predict
 from input_audit import audit_frame
-from explanation import prediction_contributions
+from explanation import prediction_contributions, explanation_evidence
 from labels import MODEL_NAMES, COLUMNS
 from battery_soh.features import FEATURES
 from battery_soh.bms import FEATURES as BMS_FEATURES, charging_features
@@ -228,6 +228,7 @@ def evaluation():
         batteries=sorted(part.battery.unique()),battery=pin, metrics=display(metrics).round(5),
         by_battery=display(by_battery[by_battery.model==name]).round(5), phases=display(phases[phases.model==name]).round(5),
         timings=display(timings[timings.model==name]).round(5),
+        speed_summary=speed_summary(timings),
         series=[dict(name=PHASES[phase],points=downsample(p)[["cycle","actual_soh","predicted_soh"]]) for phase,p in shown.groupby("phase")])
 
 
@@ -244,7 +245,8 @@ def forecast():
         if len(result)==1 and result.status.iloc[0]=="Thành công":
             estimate,features,outside=predict(frame,int(result.cycle.iloc[0]),fitted)
             baseline,effects,method=prediction_contributions(fitted["model"],features)
-            explanation=dict(baseline=baseline,effects=effects,method=method,features=features)
+            explanation=dict(baseline=baseline,effects=effects,method=method,features=features,
+                evidence=explanation_evidence(baseline,effects,estimate,features))
     return reply(model=name,results=result,explanation=explanation,sample=request.form.get("sample")=="1")
 
 
@@ -294,6 +296,7 @@ def demo_predict():
     return reply(battery=pin,phase=phase,cycle=cycle,prediction=estimate,reference=reference,
         absolute_error=abs(estimate-reference),train_batteries=len(fitted["batteries"]),
         features=features,baseline=baseline,effects=effects,method=method,
+        evidence=explanation_evidence(baseline,effects,estimate,features),
         signals=downsample(raw[raw.time<=120],300))
 
 
@@ -348,7 +351,8 @@ def bms():
         sessions=sessions[["session","start"]],recorded_charge_sessions=len(sessions),monthly=monthly,signals=windows,
         metrics=display(table("reports/bms/metrics_summary.csv")).round(5),
         by_vehicle=display(table("reports/bms/metrics_by_vehicle.csv")).round(5),
-        timings=display(table("reports/bms/timings.csv")).round(5))
+        timings=display(table("reports/bms/timings.csv")).round(5),
+        speed_summary=speed_summary(table("reports/bms/timings.csv")))
 
 
 def bms_signal_preview(window, limit=300):
@@ -467,7 +471,7 @@ def thesis_audit():
 @app.get("/api/download/thesis-audit")
 def thesis_audit_download():
     allowed={"defense":"bao_cao_va_bao_ve.md","report":"ket_qua_va_gioi_han.md","sdu":"sdu_summary.csv","bms":"bms_summary.csv",
-             "paired":"paired_comparisons.csv","verification":"verification.json"}
+             "paired":"paired_comparisons.csv","verification":"verification.json","methods":"giai_thich_va_du_bao.md"}
     key=request.args.get("kind","report")
     if key not in allowed:abort(400)
     path=ROOT/"reports/thesis_audit"/allowed[key]
@@ -477,7 +481,8 @@ def thesis_audit_download():
 @app.get("/api/health/options")
 def health_options():
     return reply(batteries=sorted(table("reports/features.csv").battery.unique()),
-                 vehicles=sorted(table("reports/bms/features.csv").vehicle.unique()))
+                 vehicles=sorted(table("reports/bms/features.csv").vehicle.unique()),
+                 validation=metadata("reports/health/summary.json"))
 
 
 @app.post("/api/health")
@@ -598,3 +603,35 @@ def capacity_measurement():
     return reply(**values, soh_pct=soh, loss_pct=max(0, 100-soh) if soh <= 100 else None,
                  method="capacity_ratio", above_reference=soh > 100,
                  fault_status="Không đánh giá lỗi bằng dung lượng.")
+
+
+def speed_summary(frame):
+    rows=[]
+    for model, part in frame.groupby("model", sort=False):
+        valid=part[part.predict_seconds.notna() & (part.n_test > 0)]
+        rows.append(dict(model=MODEL_NAMES.get(model,model),
+                         fit_seconds_mean=float(part.fit_seconds.mean()),
+                         predict_ms_per_sample=None if valid.empty else float(1000*valid.predict_seconds.sum()/valid.n_test.sum()),
+                         timed_folds=len(valid), total_folds=len(part)))
+    return rows
+
+
+@app.post("/api/column-mapping/preview")
+def mapping_preview():
+    from webapp.column_mapping import preview
+    return reply(**preview(uploaded()))
+
+
+@app.post("/api/column-mapping/normalize")
+def mapping_normalize():
+    from webapp.column_mapping import normalize
+    try:
+        mapping=json.loads(request.form.get("mapping","{}"))
+        units=json.loads(request.form.get("units","{}"))
+    except (ValueError,TypeError):
+        raise ValueError("Ánh xạ hoặc đơn vị không hợp lệ.")
+    if not isinstance(mapping,dict) or not isinstance(units,dict):
+        raise ValueError("Ánh xạ cần danh sách cột có tên.")
+    out=normalize(uploaded(),mapping,units,request.form.get("positive_discharge")=="1")
+    return reply(rows=len(out),preview=out.head(5),csv=out.to_csv(index=False),
+                 domain_validated=False)
