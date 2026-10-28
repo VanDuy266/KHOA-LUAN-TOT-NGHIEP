@@ -58,3 +58,16 @@ nav a:hover{background:#23806612}nav a.active{background:#2380661b}
 
 #shap-summary{overflow-x:auto}#shap-summary svg{min-width:700px}
 #shap-summary svg{max-height:none}#shap-summary svg text{font-size:14px}
+
+/* Restore the thesis identity and context around the focused analysis workflow. */
+.home-hero{background:linear-gradient(115deg,#12343d,#174b48);color:#f1fff8;border-color:#3b8b78;box-shadow:0 12px 30px #143a3812}
+.home-hero h1{color:#f0fff7;text-shadow:0 0 14px #61d8a82a}
+.home-hero p,.home-hero .home-deliverables span{color:#d2e5df}.home-hero .eyebrow{color:#9de2c7}
+.home-hero .home-deliverables{border-left-color:#91bdaf55}
+.home-hero .button:not(.primary){color:#edfff7;background:#ffffff0b;border-color:#91bdaf55}
+.home-hero .button.primary{color:#123b31;background:#a0e3c6;border-color:#a0e3c6}
+.source-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin:18px 0}.source-overview article{padding:18px;border:1px solid var(--line);border-radius:12px;background:var(--bg)}.source-overview h3{margin:14px 0 8px}.source-overview p{margin:0;color:var(--muted);font-size:15px}
+@media(max-width:1100px){.source-overview{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.source-overview{grid-template-columns:1fr}}
+
+.home-hero .home-deliverables strong{color:#f1fff8}

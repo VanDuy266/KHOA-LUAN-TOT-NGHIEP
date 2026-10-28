@@ -8,7 +8,7 @@ class FocusedScopeTests(unittest.TestCase):
     def test_navigation_matches_requested_outputs(self):
         html=app.test_client().get('/').get_data(as_text=True)
         nav=html[html.index('<nav'):html.index('</nav>')]
-        self.assertEqual(re.findall(r'data-page="([^"]+)"',nav),['overview','check','health','fault','evaluation'])
+        self.assertEqual(re.findall(r'data-page="([^"]+)"',nav),['overview','check','health','fault','evaluation','profile'])
         self.assertNotIn('nav-research',nav)
     def test_impossible_soh_is_not_a_successful_result(self):
         fake=pd.DataFrame([dict(battery='SDU_01',cycle=1,status='Thành công',predicted_soh_pct=9000.,outside_count=4)])

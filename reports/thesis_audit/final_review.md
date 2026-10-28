@@ -3,7 +3,7 @@
 ## Phạm vi web đã chốt
 Đề tài: Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy.
 
-Năm mục chính: Tổng quan; Phân tích pin; Xu hướng dung lượng; Dấu hiệu lỗi; So sánh mô hình. Dữ liệu bên ngoài, tính từ dung lượng đo và các mô hình SDU/BAIC là bước bên trong Phân tích pin. Demo pin giữ riêng là bước bên trong So sánh mô hình. Không còn menu SHAP/ICA/NASA, chế độ bảo vệ riêng, lịch sử riêng, tra cứu riêng hay bảng chất lượng dữ liệu riêng. Tài liệu và mã thực nghiệm được giữ để bàn giao và kiểm chứng.
+Năm mục chức năng và mục Thông tin đề tài: Tổng quan; Phân tích pin; Xu hướng dung lượng; Dấu hiệu lỗi; So sánh mô hình; Thông tin đề tài. Mục thông tin giữ tác giả, đơn vị, nguồn dữ liệu, phương pháp và phạm vi. Dữ liệu bên ngoài, tính từ dung lượng đo và các mô hình SDU/BAIC là bước bên trong Phân tích pin. Demo pin giữ riêng là bước bên trong So sánh mô hình. Không còn menu SHAP/ICA/NASA, chế độ bảo vệ riêng, lịch sử riêng, tra cứu riêng hay bảng chất lượng dữ liệu riêng. Tài liệu và mã thực nghiệm được giữ để bàn giao và kiểm chứng.
 
 ## Kết quả cuối cùng của ứng dụng
 - SOH, mức chai và dung lượng còn lại ước tính khi đầu vào thuộc phạm vi mô hình hỗ trợ.
@@ -15,7 +15,7 @@ Năm mục chính: Tổng quan; Phân tích pin; Xu hướng dung lượng; Dấ
 ## Lỗi và điểm gây hiểu nhầm đã xử lý
 1. Giới hạn 20 MiB cản file nhiều chu kỳ: thêm bộ đọc CSV từng khối, giới hạn tài nguyên rõ ràng và bộ lọc nhóm, không nạp cả CSV vào RAM.
 2. Mất mã pin/chu kỳ/giai đoạn sau chuẩn hóa: giữ lại trường hợp lệ trong CSV chuyển sang mô hình; tránh dùng nhầm chu kỳ 1 hoặc giai đoạn mặc định.
-3. Điều hướng nhiều trang rời gây rối: còn năm mục và chuyển link cũ về mục phù hợp. Đổi tên hàm history cũ để tránh che History API của trình duyệt.
+3. Điều hướng nhiều trang rời gây rối: còn năm mục chức năng cùng Thông tin đề tài và chuyển link cũ về mục phù hợp. Đổi tên hàm history cũ để tránh che History API của trình duyệt.
 4. Đầu ra mô hình ngoại suy quá xa SOH: endpoint dự đoán không xuất kết quả thành công ngoài miền hỗ trợ 0–130%; không cắt số để che sai số trong báo cáo nghiên cứu NASA.
 5. Trộn số liệu kiểm chứng với kết quả một mẫu: thu gọn chỉ số vào chi tiết; không gọi recall 97% là độ chắc chắn của một mẫu.
 6. SOH/SOC/điện lượng đoạn đo: tách ý nghĩa; không suy SOH hay dung lượng đầy từ đoạn sạc/xả không đầy đủ.
