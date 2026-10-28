@@ -330,6 +330,9 @@ def bms():
     sid=integer("session",int(sessions.session.iloc[0]))
     if sid not in set(sessions.session):
         raise ValueError("Phiên sạc không thuộc xe đã chọn.")
+    if request.args.get("view")=="predict":
+        return reply(vehicles=vehicles,vehicle=vehicle,session=sid,
+                     sessions=sessions[["session","start"]],recorded_charge_sessions=len(sessions))
     monthly=table("reports/bms/monthly_reference.csv")
     monthly=monthly[monthly.vehicle==vehicle].copy()
     monthly["soh_pct"]=monthly.reference_capacity_ah/145*100

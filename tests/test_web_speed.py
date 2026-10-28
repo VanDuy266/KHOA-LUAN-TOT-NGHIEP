@@ -10,6 +10,17 @@ class SpeedTests(unittest.TestCase):
             r=app.test_client().get("/api/overview")
         self.assertEqual(r.status_code,200)
         self.assertEqual(r.json['model_count'],8)
+    def test_bms_input_view_skips_heavy_test_tables(self):
+        from webapp.data import table
+        def limited(path):
+            if path in ['reports/bms/predictions.csv','reports/bms/monthly_reference.csv']:
+                raise AssertionError("Unneeded evaluation data loaded")
+            return table(path)
+        with patch('webapp.server.table',side_effect=limited):
+            r=app.test_client().get('/api/bms?view=predict')
+        self.assertEqual(r.status_code,200)
+        self.assertEqual(r.json['recorded_charge_sessions'],len(r.json['sessions']))
+
     def test_small_summary_agrees_with_full_evaluation(self):
         a=evaluation_metrics().sort_values('model').reset_index(drop=True)
         b=evaluation_results()[0].sort_values('model').reset_index(drop=True)
