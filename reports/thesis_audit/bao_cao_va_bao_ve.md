@@ -90,3 +90,7 @@ Mẫu pin/xe còn giới hạn; chia theo nhóm chưa chứng minh dự đoán t
 - RF học NASA giữ riêng cell: MAE 2,7633; RF gộp SDU+NASA thêm dung lượng định mức: 3,1704. Gộp chưa cải thiện; không gọi là mô hình tổng quát mọi loại pin.
 
 Trình bày kết quả tốt và chưa tốt nguyên trạng. NASA chỉ có bốn cell, điều kiện xả và nhãn khác SDU; chưa làm MIT. Chi tiết phương pháp, hash nguồn và cách tái lập: reports/research/protocol.md. Web có năm mục chức năng và mục Thông tin đề tài để xem tác giả, nguồn dữ liệu và phạm vi; demo pin giữ riêng nằm trong So sánh mô hình. Bằng chứng SHAP/ICA/NASA giữ trong tài liệu tải về, không còn là trang thao tác riêng.
+
+
+## 10. Huấn luyện thử trong ứng dụng
+Web có chức năng huấn luyện thử từ bảng đặc trưng có nhãn SOH; giữ riêng 25% mã pin, seed42, so sánh Mean/Ridge/Random Forest cấu hình cố định. Cần 40–5.000 dòng, 4–200 pin, ít nhất 5 mẫu mỗi pin. Chuẩn hóa chỉ fit train; nhãn và mã pin không là đầu vào. Có tải gói mô hình, kết quả và dự đoán pin giữ riêng. Đây là một holdout thử nghiệm, không thay thế kết quả 5 vòng trên 86 pin/20 xe hoặc chứng minh áp dụng mọi pin. Chi tiết ở docs/training-workspace.md.

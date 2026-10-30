@@ -8,6 +8,7 @@
 <meta name="twitter:card" content="summary"><meta name="twitter:title" content="{{ title }}">
 <link rel="icon" type="image/png" href="/assets/logo.png">
 <link rel="stylesheet" href="{{ url_for('static',filename='app.css') }}?v={{ version }}">
+<link rel="stylesheet" href="{{ url_for('static',filename='product.css') }}?v={{ version }}">
 <script>try{if(localStorage.getItem('vincent-theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
 <script defer src="{{ url_for('static',filename='app.js') }}?v={{ version }}"></script>
 </head>
@@ -23,7 +24,7 @@
 <a href="#check" data-page="check"><img src="/static/icons/battery-half.svg" alt="">Phân tích pin</a>
 <a href="#health" data-page="health"><img src="/static/icons/graph-up-arrow.svg" alt="">Xu hướng dung lượng</a>
 <a href="#fault" data-page="fault"><img src="/static/icons/shield-check.svg" alt="">Dấu hiệu lỗi</a>
-<a href="#evaluation" data-page="evaluation"><img src="/static/icons/bar-chart-line.svg" alt="">So sánh mô hình</a>
+<a href="#evaluation" data-page="evaluation"><img src="/static/icons/bar-chart-line.svg" alt="">Huấn luyện &amp; so sánh</a>
 <div class="nav-divider"></div>
 <a href="#profile" data-page="profile"><img src="/static/icons/person-circle.svg" alt="">Thông tin đề tài</a>
 </nav>

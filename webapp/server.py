@@ -141,7 +141,7 @@ def errors(error):
 
 @app.get("/")
 def home():
-    return render_template("index.html", title=TITLE, version=hashlib.sha256(b"".join((ROOT / name).read_bytes() for name in ("webapp/static/app.js", "webapp/static/app.css", "webapp/templates/index.html"))).hexdigest()[:12])
+    return render_template("index.html", title=TITLE, version=hashlib.sha256(b"".join((ROOT / name).read_bytes() for name in ("webapp/static/app.js", "webapp/static/app.css", "webapp/static/product.css", "webapp/templates/index.html"))).hexdigest()[:12])
 
 
 @app.get("/healthz")
@@ -683,3 +683,31 @@ def research_download():
     if kind not in allowed:abort(400)
     path=ROOT/'reports/research'/allowed[kind]
     return send_file(path,as_attachment=True,download_name=path.name)
+
+
+@app.get("/api/benchmarks")
+def ui_benchmarks():
+    source=request.args.get("dataset","SDU")
+    if source not in {"SDU","BMS"}:raise ValueError("Nguồn so sánh không hợp lệ.")
+    return reply(**metadata("reports/thesis_audit/ui_benchmarks.json")[source])
+
+
+@app.post("/api/training")
+def training_experiment():
+    from webapp.training import run
+    if not INFERENCE.acquire(blocking=False):abort(429,description="Máy chủ đang xử lý mô hình; thử lại sau khi yêu cầu trước hoàn tất.")
+    try:
+        label_source=request.form.get("label_source","").strip()
+        if not 3<=len(label_source)<=300:raise ValueError("Cần ghi nguồn hoặc cách xác định nhãn SOH (3–300 ký tự).")
+        result=run(uploaded(),label_source=label_source)
+        result["label_source"]=label_source
+        return reply(**result)
+    finally:INFERENCE.release()
+
+
+@app.get("/api/download/training-template")
+def training_template():
+    data=table("reports/features.csv")
+    pins=sorted(data.battery.unique())[:8]
+    sample=data[data.battery.isin(pins)].groupby(['battery','phase'],group_keys=False).head(8)
+    return send_csv(sample[['battery',*FEATURES,'soh_pct']],"mau_dac_trung_co_nhan_sdu.csv")

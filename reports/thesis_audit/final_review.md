@@ -3,7 +3,7 @@
 ## Phạm vi web đã chốt
 Đề tài: Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy.
 
-Năm mục chức năng và mục Thông tin đề tài: Tổng quan; Phân tích pin; Xu hướng dung lượng; Dấu hiệu lỗi; So sánh mô hình; Thông tin đề tài. Mục thông tin giữ tác giả, đơn vị, nguồn dữ liệu, phương pháp và phạm vi. Dữ liệu bên ngoài, tính từ dung lượng đo và các mô hình SDU/BAIC là bước bên trong Phân tích pin. Demo pin giữ riêng là bước bên trong So sánh mô hình. Không còn menu SHAP/ICA/NASA, chế độ bảo vệ riêng, lịch sử riêng, tra cứu riêng hay bảng chất lượng dữ liệu riêng. Tài liệu và mã thực nghiệm được giữ để bàn giao và kiểm chứng.
+Năm mục chức năng và mục Thông tin đề tài: Tổng quan; Phân tích pin; Xu hướng dung lượng; Dấu hiệu lỗi; Huấn luyện & so sánh mô hình; Thông tin đề tài. Mục thông tin giữ tác giả, đơn vị, nguồn dữ liệu, phương pháp và phạm vi. Dữ liệu bên ngoài, tính từ dung lượng đo và các mô hình SDU/BAIC là bước bên trong Phân tích pin. Demo pin giữ riêng là bước bên trong So sánh mô hình. Không còn menu SHAP/ICA/NASA, chế độ bảo vệ riêng, lịch sử riêng, tra cứu riêng hay bảng chất lượng dữ liệu riêng. Tài liệu và mã thực nghiệm được giữ để bàn giao và kiểm chứng.
 
 ## Kết quả cuối cùng của ứng dụng
 - SOH, mức chai và dung lượng còn lại ước tính khi đầu vào thuộc phạm vi mô hình hỗ trợ.
@@ -31,3 +31,9 @@ SDU: Ridge–RF MAE macro 1,6122 điểm % so với RF 1,6189; cải thiện nh�
 NASA: 636 chu kỳ ngoài nguồn cho thấy chuyển thẳng mô hình SDU kém; mô hình gộp chưa hơn NASA riêng. Kết quả âm được giữ làm bằng chứng giới hạn tổng quát hóa. Chưa làm MIT. Không khẳng định pin an toàn hoặc không hỏng từ SOH. Không suy nhãn lỗi của bộ 99 xe sang BAIC.
 
 Kiểm tra thực hiện: audit_thesis_results.py; bộ pytest tests; kiểm tra trình duyệt toàn bộ năm mục, lọc file nhiều nhóm, chuyển ngữ cảnh, demo, kết quả và giao diện điện thoại. Tệp này không thay kết luận đánh giá của giảng viên.
+
+
+## Cập nhật giao diện và huấn luyện thử
+Khung đề tài nổi bật, thống nhất màu sắc và kiểu chữ Times New Roman; giữ hiệu ứng avatar. Bảng so sánh chọn riêng SDU/BAIC, đổi chỉ số MAE/RMSE/R² và hiển thị mức chênh so với Random Forest. Dữ liệu so sánh được tổng hợp từ kết quả đã audit, có kiểm tra hash nguồn khi build để tránh hiển thị cũ. Thời gian chưa có số đo được để trống.
+
+Bổ sung huấn luyện thử trên CSV đặc trưng có nhãn với chia nhóm pin 25% giữ riêng, StandardScaler chỉ fit train, cấu hình Mean/Ridge/RF cố định và giới hạn dữ liệu. Tải ZIP chứa mô hình, cấu hình/phiên bản, SHA256, nguồn nhãn và dự đoán test. Chức năng này không cập nhật artifact chính hoặc nhập kết quả thử vào bảng chính. CSV mẫu chỉ là tập con để thử thao tác. Không khẳng định sản phẩm chính xác 100% cho mọi loại pin.
