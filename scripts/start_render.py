@@ -17,7 +17,7 @@ def main():
         from waitress import serve
         from webapp.server import app
         print(f"Vincent D: http://localhost:{port}", flush=True)
-        serve(app, host="0.0.0.0", port=port, threads=2, max_request_body_size=20*1024*1024)
+        serve(app, host="0.0.0.0", port=port, threads=2, max_request_body_size=app.config["MAX_CONTENT_LENGTH"])
     else:
         args = [sys.executable, "-m", "gunicorn", "webapp.server:app", "--bind", f"0.0.0.0:{port}",
                 "--workers", "1", "--threads", "2", "--timeout", "120", "--access-logfile", "-", "--error-logfile", "-"]
