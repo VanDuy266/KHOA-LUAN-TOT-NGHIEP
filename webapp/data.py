@@ -7,7 +7,7 @@ import pandas as pd
 
 ROOT = Path(__file__).resolve().parents[1]
 PHASES = {"primary": "Sử dụng ban đầu", "second_life": "Tái sử dụng"}
-MODELS = {"Random Forest": "random_forest.joblib", "Ridge-RF residual": "ridge_residual_forest.joblib", "CatBoost": "boosting/catboost.joblib", "XGBoost": "boosting/xgboost.joblib"}
+MODELS = {"Random Forest": "random_forest.joblib", "Ridge-RF residual": "ridge_residual_forest.joblib", "Ridge": "ridge.joblib", "LightGBM": "lightgbm.joblib", "CatBoost": "boosting/catboost.joblib", "XGBoost": "boosting/xgboost.joblib"}
 
 @lru_cache(maxsize=12)
 def table(relative):

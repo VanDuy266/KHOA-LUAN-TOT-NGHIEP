@@ -5,7 +5,7 @@ Mở **Phân tích pin** để làm việc theo bốn bước. Công cụ dành 
 ## 1. Chọn bài toán và khai báo hồ sơ
 
 - **Tín hiệu đo:** pin khác hoặc chưa rõ cấu hình. Chỉ tổng hợp điện áp, dòng, nhiệt độ và điện lượng đoạn quan sát; không suy SOH từ đoạn sạc/xả.
-- **SDU:** đầu xả cell SDU NMC 2,4 Ah, đúng phạm vi nguồn. Hỗ trợ Random Forest, Ridge–RF, CatBoost, XGBoost.
+- **SDU:** đầu xả cell SDU NMC 2,4 Ah, đúng phạm vi nguồn. Hỗ trợ Random Forest, Ridge–RF, Ridge, LightGBM, CatBoost, XGBoost.
 - **BAIC EU500:** đầu sạc bộ pin NMC 145 Ah, đúng quy ước BMS của nguồn. Hỗ trợ Random Forest và Ridge–RF. Nhãn SOH suy ra từ dòng/SOC, chưa có phép đo dung lượng RPT độc lập.
 - **Dung lượng đo:** hai dung lượng xả đầy đủ của cùng pin và cùng điều kiện. SOH = hiện tại / tham chiếu × 100. Không dùng SOC hoặc lượng điện nạp của một phiên sạc dở dang.
 
@@ -57,4 +57,40 @@ Có thể đặt `CHROMIUM_PATH` nếu Chromium không nằm tại `/usr/bin/chr
 
 Render tiếp tục dùng `requirements-render.txt`, `scripts/check_hosting.py` và `scripts/start_render.py`; không thêm phụ thuộc production. Sau triển khai, kiểm tra `/healthz`, `/api/readiness`, phiên bản commit ở chân trang và chạy thử một hồ sơ trên chính bản Render trước khi xác nhận Live. `/api/readiness` xác nhận sự hiện diện tài nguyên, không thay thế kiểm thử dự đoán.
 
-Chưa bổ sung dữ liệu đo độc lập mới, chưa hiệu chuẩn khoảng dự đoán và chưa đưa Ridge/LightGBM/GRU vào API dự đoán trực tiếp. Các phần này cần thực nghiệm và kiểm chứng riêng.
+Chưa bổ sung dữ liệu đo độc lập mới, chưa hiệu chuẩn khoảng dự đoán và chưa đưa GRU vào API dự đoán trực tiếp. Các phần này cần thực nghiệm và kiểm chứng riêng.
+
+## Dữ liệu riêng: từ tín hiệu đến mô hình và dự đoán mới
+
+Trang **Mô hình của tôi** hỗ trợ bảng của người dùng; không tra kết quả dự đoán từ báo cáo SDU đã lưu.
+
+1. Nếu có tín hiệu thô, xuất CSV chuẩn hóa gồm `battery, cycle, phase_code, time, terminal_voltage, terminal_current, temperature`; tùy chọn nhãn `soh_pct` nhất quán trong mỗi nhóm. Công cụ trích xuất thống kê từ 120 giây đầu từng nhóm. Giữ đúng đơn vị V/A/°C, cùng cách lấy cửa sổ và quy trình ở cả train lẫn dữ liệu mới.
+2. Nếu chưa có nhãn, chỉ tạo bảng đặc trưng để dự đoán bằng mô hình phù hợp. Muốn huấn luyện cần nhãn từ phép đo/nguồn đã giải thích; ứng dụng không tự tạo nhãn giả từ dự đoán cũ.
+3. Tải bảng có nhãn tại **Huấn luyện trên dữ liệu của tôi**, ghi nguồn nhãn; cần 40–5.000 dòng, 4–200 pin, mỗi pin tối thiểu 5 mẫu. Các pin test được giữ riêng khỏi train. Chỉ số MAE/RMSE/R² được tính lại từ file tải lên.
+4. Bật xuất mô hình dùng lại, ghi hóa học, cấp đo, chế độ, dung lượng định mức và quy trình trích xuất. Tải `ridge_portable.json` hoặc bấm **Dự đoán dữ liệu mới**. Mô hình Ridge này chỉ học nhóm train; không refit theo nhãn test.
+5. Tải CSV mới gồm `battery` và 12 đặc trưng, không cần `soh_pct`; khai báo đúng cấu hình/quy trình và xác nhận. Server tính lại dự đoán từ tham số JSON và file mới. Kết quả nêu mã pin có trong train hay không, số đặc trưng ngoài miền học và SHA256 file/mô hình.
+
+Không nạp file joblib/pickle của người dùng để suy luận. JSON chỉ chứa tham số số học, vẫn không xác thực được chất lượng nhãn hoặc nguồn gốc mô hình. Kết quả là thực nghiệm trong cấu hình khai báo; cùng cấu hình chưa chứng minh tổng quát hóa, không chứng nhận lỗi/an toàn.
+
+## Sao lưu và xu hướng theo hồ sơ thực tế
+
+Tại **Hồ sơ & lịch sử**, tải gói JSON để sao lưu/chuyển thiết bị; nhập một hồ sơ hoặc gói tối đa 5 MiB. Server kiểm tra cấu trúc, số hữu hạn và giới hạn kích thước, rồi tạo lại báo cáo. Hồ sơ nhập luôn được gắn cờ chưa xác thực. Mã đã tồn tại được bỏ qua; không ghi đè âm thầm. Thao tác nhập không lưu hồ sơ trên server.
+
+Chọn ít nhất 5 hồ sơ khác ngày, cùng pin, mô hình, nguồn, giai đoạn, mốc tham chiếu và điều kiện để phân tích xu hướng theo ngày. Không biến nhiều lần chạy cùng ngày thành nhiều mốc đo. Kết quả chỉ ngoại suy khi xu hướng giảm đủ rõ và ngưỡng nằm trong giới hạn của phương pháp; không phải dự báo ngày hỏng.
+
+## Phiên bản giao diện mới
+
+Trang Tổng quan mở bằng **Đánh giá pin từ lần đo thực tế**, có ô tải file thật, hồ sơ gần đây, mục riêng cho mẫu thử và lối vào mô hình riêng. Mã commit / phiên bản giao diện nằm trên thanh đầu trang để đối chiếu với lượt deploy Render.
+
+API dự đoán SDU hiện hỗ trợ thêm Ridge và LightGBM, tổng cộng sáu mô hình bảng; LightGBM dùng đóng góp TreeSHAP gốc, Ridge dùng hệ số trên đặc trưng chuẩn hóa. GRU vẫn phục vụ thực nghiệm chuỗi, chưa đưa vào dịch vụ dự đoán trực tiếp trên Render.
+
+Kiểm thử mở rộng:
+
+```bash
+.venv/bin/python -m pytest -q tests/test_records.py tests/test_custom_model.py tests/test_assessment.py tests/test_training.py
+npm ci --prefix tests
+# Nếu chưa có Chromium:
+tests/node_modules/.bin/playwright install chromium
+ASSESSMENT_BASE_URL=http://127.0.0.1:8504 node tests/browser_workbench.cjs
+```
+
+GitHub Actions tại `.github/workflows/web-validation.yml` chạy kiểm tra tài nguyên, bộ kiểm thử ứng dụng và hai luồng trình duyệt khi push/PR. Đây là bộ kiểm thử ứng dụng, không tái huấn luyện toàn bộ thực nghiệm nghiên cứu hoặc thu thập thêm dữ liệu đo độc lập.

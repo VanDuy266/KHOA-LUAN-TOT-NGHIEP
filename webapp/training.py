@@ -12,7 +12,7 @@ from sklearn.metrics import mean_absolute_error,root_mean_squared_error,r2_score
 from battery_soh.features import FEATURES
 
 
-def run(raw,label_source="Không cung cấp"):
+def run(raw,label_source="Không cung cấp",domain=None):
     required=[*FEATURES,'battery','soh_pct']
     data=pd.read_csv(io.BytesIO(raw),nrows=5001,usecols=lambda c:c in required)
     missing=set(required)-set(data)
@@ -53,11 +53,14 @@ def run(raw,label_source="Không cung cấp"):
                 configurations={'Mean baseline':{'strategy':'mean'},'Ridge':{'alpha':1.,'scaling':'StandardScaler fit on training rows only'},'Random Forest':{'n_estimators':80,'max_depth':10,'min_samples_leaf':3,'n_jobs':1,'random_state':42}},
                 versions={'scikit-learn':sklearn.__version__,'numpy':np.__version__,'pandas':pd.__version__},
                 scope='Single group holdout on user-provided features and SOH labels; not five-fold thesis results or proof of cross-source performance.')
+    from webapp.custom_model import export_ridge
+    portable = export_ridge(fitted['Ridge'], train, report, domain)
     archive=io.BytesIO()
     with zipfile.ZipFile(archive,'w',compression=zipfile.ZIP_DEFLATED) as z:
         z.writestr('results.json',json.dumps(report,ensure_ascii=False))
+        z.writestr('ridge_portable.json',json.dumps(portable,ensure_ascii=False))
         z.writestr('held_out_predictions.csv',pd.DataFrame(predictions).to_csv(index=False))
         for name,model in fitted.items():
             binary=io.BytesIO();joblib.dump(dict(model=model,features=FEATURES,train_batteries=report['train_batteries'],test_batteries=report['test_batteries'],source_sha256=report['source_sha256']),binary,compress=3)
             z.writestr(name.lower().replace(' ','_')+'.joblib',binary.getvalue())
-    return dict(**report,bundle_base64=base64.b64encode(archive.getvalue()).decode('ascii'))
+    return dict(**report,portable_ridge=portable,bundle_base64=base64.b64encode(archive.getvalue()).decode('ascii'))

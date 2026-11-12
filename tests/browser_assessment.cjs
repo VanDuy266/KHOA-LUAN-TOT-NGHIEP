@@ -1,8 +1,9 @@
 // Run against a running app: ASSESSMENT_BASE_URL=http://127.0.0.1:8504 node tests/browser_assessment.cjs
 const {chromium, expect} = require('playwright/test');
 const fs = require('node:fs/promises');
+const {existsSync}=require('node:fs');
 (async () => {
-  const browser = await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||'/usr/bin/chromium',args:['--no-sandbox']});
+  const browser = await chromium.launch({headless:true,executablePath:process.env.CHROMIUM_PATH||(existsSync('/usr/bin/chromium')?'/usr/bin/chromium':chromium.executablePath()),args:['--no-sandbox']});
   try {
     const context = await browser.newContext({viewport:{width:1365,height:900},locale:'vi-VN'});
     const page = await context.newPage(), errors=[];

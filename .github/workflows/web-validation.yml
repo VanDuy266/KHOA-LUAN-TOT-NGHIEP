@@ -1,0 +1,66 @@
+name: Web workflow validation
+on:
+  push:
+    branches: [main, 'codex/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: web-validation-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      OMP_NUM_THREADS: '2'
+      OPENBLAS_NUM_THREADS: '1'
+      MKL_NUM_THREADS: '2'
+      MPLCONFIGDIR: /tmp/vincent-mpl
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            requirements-render.txt
+            requirements-web.txt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: tests/package-lock.json
+      - name: Install web and test dependencies
+        run: |
+          python -m venv .venv
+          .venv/bin/python -m pip install -r requirements-render.txt pytest==8.4.2
+          .venv/bin/python -m pip check
+          npm ci --prefix tests
+          tests/node_modules/.bin/playwright install --with-deps chromium
+      - name: Check deployment assets
+        run: .venv/bin/python scripts/check_hosting.py
+      - name: Application regression tests
+        run: >-
+          .venv/bin/python -m pytest -q
+          tests/test_assessment.py tests/test_records.py tests/test_custom_model.py
+          tests/test_web.py tests/test_startup.py tests/test_web_speed.py
+          tests/test_features.py tests/test_prediction.py tests/test_training.py
+          tests/test_health.py tests/test_fault.py tests/test_column_mapping.py
+          tests/test_capacity_measurement.py tests/test_external.py
+          tests/test_focused_scope.py tests/test_bms_assessment.py
+      - name: Browser workflows
+        env:
+          ASSESSMENT_BASE_URL: http://127.0.0.1:8504
+        run: |
+          PORT=8504 .venv/bin/python scripts/start_render.py > /tmp/vincent-web.log 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid" || true' EXIT
+          for attempt in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8504/healthz; then break; fi
+            sleep 2
+          done
+          curl -fsS http://127.0.0.1:8504/healthz
+          node tests/browser_assessment.cjs
+          node tests/browser_workbench.cjs

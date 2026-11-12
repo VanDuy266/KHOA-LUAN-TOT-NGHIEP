@@ -129,12 +129,13 @@ def test_bms_json_uses_prepared_frame_not_raw_csv_route(client):
 
 
 def test_service_and_frontend_assets(client):
+    assert client.get("/").headers["Cache-Control"] == "no-cache"
     assert client.get("/api/readiness").json["ready"]
     assert client.get("/static/assessment.js").status_code==200
     assert client.get("/api/version").json["frontend"]==client.get("/api/readiness").json["frontend"]
 
 
-@pytest.mark.parametrize("model", ["Random Forest", "Ridge-RF residual", "CatBoost", "XGBoost"])
+@pytest.mark.parametrize("model", ["Random Forest", "Ridge-RF residual", "Ridge", "LightGBM", "CatBoost", "XGBoost"])
 def test_every_available_sdu_model_has_validation_and_explanation(client, model):
     response=client.post("/api/assessment",data=dict(task="sdu",sample="1",profile="{}",model=model))
     assert response.status_code==200,response.json
@@ -150,3 +151,11 @@ def test_numeric_error_identifies_selected_data_rows(client):
     assert response.status_code==400
     assert "terminal_voltage" in response.json["error"]
     assert "2" in response.json["error"]
+
+
+@pytest.mark.parametrize("column,value", [("cycle", "bad"), ("phase_code", 9)])
+def test_invalid_context_in_file_cannot_be_replaced_with_form_defaults(client,column,value):
+    frame=pd.DataFrame(dict(time=[0,30,60,90,120],terminal_voltage=[4,3.95,3.9,3.85,3.8],terminal_current=[-2]*5,temperature=[25]*5))
+    frame[column]=value
+    response=client.post('/api/assessment/check',data=upload_data(frame))
+    assert response.status_code==400,response.json

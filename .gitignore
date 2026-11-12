@@ -14,3 +14,5 @@ data/hust/
 data/source/
 
 data/xjtu/raw/
+
+/tests/node_modules/

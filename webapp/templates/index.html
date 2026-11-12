@@ -11,6 +11,7 @@
 <link rel="stylesheet" href="{{ url_for('static',filename='product.css') }}?v={{ version }}">
 <script>try{if(localStorage.getItem('vincent-theme')==='dark')document.documentElement.dataset.theme='dark'}catch(e){}</script>
 <script defer src="{{ url_for('static',filename='assessment.js') }}?v={{ version }}"></script>
+<script defer src="{{ url_for('static',filename='workbench.js') }}?v={{ version }}"></script>
 <script defer src="{{ url_for('static',filename='app.js') }}?v={{ version }}"></script>
 </head>
 <body>
@@ -26,14 +27,16 @@
 <a href="#health" data-page="health"><img src="/static/icons/graph-up-arrow.svg" alt="">Xu hướng dung lượng</a>
 <a href="#fault" data-page="fault"><img src="/static/icons/shield-check.svg" alt="">Dấu hiệu lỗi</a>
 <a href="#evaluation" data-page="evaluation"><img src="/static/icons/bar-chart-line.svg" alt="">Huấn luyện &amp; so sánh</a>
+<a href="#custom" data-page="custom"><img src="/static/icons/bar-chart-line.svg" alt="">Mô hình của tôi</a>
 <a href="#history" data-page="history"><img src="/static/icons/clock-history.svg" alt="">Hồ sơ &amp; lịch sử</a>
+<a href="#guide" data-page="guide"><img src="/static/icons/grid.svg" alt="">Hướng dẫn sử dụng</a>
 <div class="nav-divider"></div>
 <a href="#profile" data-page="profile"><img src="/static/icons/person-circle.svg" alt="">Thông tin đề tài</a>
 </nav>
 <div class="student"><strong>Nguyễn Văn Duy</strong><span>MSSV 2311553949 · Khoa Học Dữ Liệu</span></div>
 </aside>
 <div class="workspace">
-<header class="topbar"><div><strong>Vincent D</strong><span id="breadcrumb">Tổng quan</span></div><button id="theme" class="icon-button" aria-label="Đổi giao diện sáng tối" title="Đổi giao diện sáng tối"><img src="/static/icons/moon.svg" alt=""></button></header>
+<header class="topbar"><div><strong>Vincent D</strong><span id="breadcrumb">Tổng quan</span><small id="release-badge" class="release-badge">Đang xác nhận phiên bản…</small></div><button id="theme" class="icon-button" aria-label="Đổi giao diện sáng tối" title="Đổi giao diện sáng tối"><img src="/static/icons/moon.svg" alt=""></button></header>
 <main id="content" tabindex="-1"><div class="welcome thesis-heading"><div class="eyebrow">ĐỀ TÀI KHÓA LUẬN</div><h1>Phân tích và dự đoán tình trạng sức khỏe pin xe điện bằng các mô hình học máy</h1><p>Tra cứu tín hiệu đo, so sánh mô hình và ước lượng dung lượng còn lại.</p></div><p class="loading" role="status">Đang lấy dữ liệu…</p></main>
 <footer>Vincent D · Nguyễn Văn Duy · Đề tài khóa luận về sức khỏe pin xe điện<br><span id="service-status" role="status">Đang kiểm tra phiên bản máy chủ…</span></footer>
 </div>

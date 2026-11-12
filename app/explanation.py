@@ -36,6 +36,13 @@ def tree_contributions(estimator, features):
 
 def prediction_contributions(estimator, features):
     library = type(estimator).__module__.split(".")[0]
+    if library == "lightgbm":
+        values = np.asarray(estimator.booster_.predict(features, pred_contrib=True, num_threads=2))[0]
+        return float(values[-1]), pd.DataFrame({"feature":features.columns,"contribution":values[:-1]}), "Đóng góp TreeSHAP gốc từ LightGBM."
+    if hasattr(estimator, "steps") and hasattr(estimator.steps[-1][1], "coef_"):
+        transformed = estimator[:-1].transform(features)[0]
+        linear = estimator.steps[-1][1]
+        return float(linear.intercept_), pd.DataFrame({"feature":features.columns,"contribution":linear.coef_ * transformed}), "Hệ số Ridge trên đặc trưng chuẩn hóa; không phải quan hệ nhân quả."
     if library == "catboost":
         from catboost import Pool
         values = np.asarray(estimator.get_feature_importance(Pool(features), type="ShapValues", thread_count=2))[0]

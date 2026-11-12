@@ -97,9 +97,13 @@ def carry_context(out,source,chosen):
         if key=='battery':out['battery']=values.astype(str).str.strip().to_numpy()
         elif key=='cycle':
             numeric=pd.to_numeric(values,errors='coerce')
-            if numeric.notna().all() and (numeric>0).all() and (numeric%1==0).all():out['cycle']=numeric.astype(int).to_numpy()
+            if not (numeric.notna().all() and (numeric>0).all() and (numeric%1==0).all()):
+                raise ValueError("Cột chu kỳ trong file cần số nguyên dương; không thay bằng chu kỳ mặc định khi dữ liệu lỗi.")
+            out['cycle']=numeric.astype(int).to_numpy()
         else:
-            codes=values.replace({'primary':0,'second_life':1})
+            codes=values.map(lambda value: {'primary':0,'second_life':1}.get(value,value) if isinstance(value,str) else value)
             numeric=pd.to_numeric(codes,errors='coerce')
-            if numeric.isin([0,1]).all():out['phase_code']=numeric.astype(int).to_numpy()
+            if not numeric.isin([0,1]).all():
+                raise ValueError("Cột giai đoạn trong file cần 0/1 hoặc primary/second_life; không tự thay dữ liệu lỗi.")
+            out['phase_code']=numeric.astype(int).to_numpy()
     return out

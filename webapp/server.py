@@ -125,6 +125,8 @@ def headers(response):
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
     if request.path.startswith("/api/"):
         response.headers["Cache-Control"] = "no-store"
+    elif request.path == "/":
+        response.headers["Cache-Control"] = "no-cache"
     return response
 
 
@@ -147,7 +149,7 @@ def home():
 def frontend_version():
     return hashlib.sha256(b"".join((ROOT / name).read_bytes() for name in (
         "webapp/static/app.js", "webapp/static/assessment.js", "webapp/static/app.css",
-        "webapp/static/product.css", "webapp/templates/index.html"))).hexdigest()[:12]
+        "webapp/static/workbench.js", "webapp/static/product.css", "webapp/templates/index.html"))).hexdigest()[:12]
 
 
 @app.get("/healthz")
@@ -339,6 +341,26 @@ def readiness():
     return reply(ready=not missing, missing=missing, runtime="Flask / Gunicorn",
                  commit=os.environ.get("RENDER_GIT_COMMIT", "local"), frontend=frontend_version(),
                  storage="File tải lên và hồ sơ không được lưu trên máy chủ; lịch sử do trình duyệt quản lý.")
+
+
+@app.post("/api/assessment/restore")
+def assessment_restore():
+    from webapp.records import restore_backup
+    if request.content_length is None or request.content_length > 5*1024*1024:
+        raise ValueError("Gói sao lưu tối đa 5 MiB.")
+    payload = request.get_json()
+    return reply(items=restore_backup(payload))
+
+
+@app.post("/api/assessment/trend")
+def assessment_trend():
+    from webapp.records import records_trend
+    if request.content_length is None or request.content_length > 5*1024*1024:
+        raise ValueError("Dữ liệu lịch sử tối đa 5 MiB.")
+    payload = request.get_json()
+    if not isinstance(payload, dict):
+        raise ValueError("Cần danh sách hồ sơ và ngưỡng SOH.")
+    return reply(**records_trend(payload.get("records"), payload.get("threshold", 80)))
 
 
 @app.get("/api/demo")
@@ -787,7 +809,12 @@ def training_experiment():
     try:
         label_source=request.form.get("label_source","").strip()
         if not 3<=len(label_source)<=300:raise ValueError("Cần ghi nguồn hoặc cách xác định nhãn SOH (3–300 ký tự).")
-        result=run(uploaded(),label_source=label_source)
+        domain=None
+        if request.form.get("domain_profile"):
+            from webapp.custom_model import domain_profile
+            try: domain=domain_profile(json.loads(request.form["domain_profile"]))
+            except json.JSONDecodeError: raise ValueError("Hồ sơ dữ liệu huấn luyện không phải JSON hợp lệ.")
+        result=run(uploaded(),label_source=label_source,domain=domain)
         result["label_source"]=label_source
         return reply(**result)
     finally:INFERENCE.release()
@@ -799,3 +826,25 @@ def training_template():
     pins=sorted(data.battery.unique())[:8]
     sample=data[data.battery.isin(pins)].groupby(['battery','phase'],group_keys=False).head(8)
     return send_csv(sample[['battery',*FEATURES,'soh_pct']],"mau_dac_trung_co_nhan_sdu.csv")
+
+
+@app.post("/api/custom/predict")
+def custom_predict():
+    from webapp.custom_model import predict_portable
+    model_file=request.files.get("model_file")
+    if model_file is None or not model_file.filename.lower().endswith(".json"):
+        raise ValueError("Chọn mô hình Ridge JSON; không nhận file thực thi joblib/pickle.")
+    raw_model=model_file.read(128*1024+1)
+    if len(raw_model)>128*1024:raise ValueError("Mô hình JSON tối đa 128 KiB.")
+    try:
+        model=json.loads(raw_model)
+        domain=json.loads(request.form.get("domain_profile","null"))
+    except (ValueError,TypeError):
+        raise ValueError("Mô hình hoặc hồ sơ không phải JSON hợp lệ.")
+    return reply(**predict_portable(model,uploaded(),domain))
+
+
+@app.post("/api/custom/features")
+def custom_features():
+    from webapp.custom_model import extract_features
+    return reply(**extract_features(uploaded()))
