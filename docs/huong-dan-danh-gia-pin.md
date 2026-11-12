@@ -1,6 +1,6 @@
 # Đánh giá pin theo hồ sơ
 
-Mở **Phân tích pin** để làm việc theo bốn bước. Công cụ dành cho người có dữ liệu đo, hỗ trợ phân tích và đối chiếu dung lượng; chưa chứng nhận lỗi, an toàn hoặc quyết định thay pin.
+Mở **Phân tích pin**, chọn phép phân tích, nhập dữ liệu và nhấn **Phân tích**. Công cụ dành cho người có dữ liệu đo, hỗ trợ phân tích và đối chiếu dung lượng; chưa chứng nhận lỗi, an toàn hoặc quyết định thay pin.
 
 ## 1. Chọn bài toán và khai báo hồ sơ
 
@@ -21,7 +21,7 @@ BAIC cần tên cột và đơn vị của file mẫu: `time_s`, `soc`, `pack_vo
 
 ## 3. Kiểm tra trước khi chạy
 
-Bấm **Kiểm tra dữ liệu & phạm vi**. Chưa gọi mô hình ở bước này. Máy chủ kiểm tra lại khi bấm **Phân tích & lập báo cáo**, nên không thể bỏ qua bằng cách bỏ bước kiểm tra ở trình duyệt. Mọi thay đổi đầu vào làm mất kết quả kiểm tra và dự đoán cũ.
+Nhấn **Phân tích**. Máy chủ kiểm tra dữ liệu và phạm vi trước khi gọi mô hình; dữ liệu không đạt được trả về kèm lỗi. Mọi thay đổi đầu vào làm mất kết quả kiểm tra và dự đoán cũ.
 
 Sửa mục không đạt trước khi tiếp tục. Pin ngoài phạm vi SDU/BAIC chuyển sang phân tích tín hiệu hoặc phép đo dung lượng. Đặc trưng ngoài khoảng huấn luyện được ghi cảnh báo trong kết quả; chưa có khoảng dự đoán đã hiệu chuẩn riêng cho mỗi lần đo.
 
@@ -31,7 +31,7 @@ Kết quả có SOH (nếu phù hợp), mức chai, dung lượng, kiểm tra đ
 
 Tải CSV, JSON hoặc báo cáo HTML độc lập. Mở HTML và chọn **In / Lưu PDF** để có bản PDF; không cần dịch vụ xuất tài liệu bên ngoài. Báo cáo có mã hồ sơ, SHA256 file nguồn và mô hình, cấu hình, ngày đo, điều kiện đo và phiên bản ứng dụng.
 
-Chọn **Lưu vào lịch sử** để giữ trong tab. Chỉ khi bật tùy chọn lưu trên thiết bị mới ghi vào localStorage; không đồng bộ tài khoản. Tối đa 100 hồ sơ mỗi nơi lưu. Trình duyệt có thể từ chối lưu, hết dung lượng hoặc xóa lịch sử; tự tải báo cáo để lưu trữ. Xóa từng hồ sơ tại **Hồ sơ & lịch sử**.
+Chọn **Lưu kết quả** để giữ trong tab. Chỉ khi bật tùy chọn lưu trên thiết bị mới ghi vào localStorage; không đồng bộ tài khoản. Tối đa 100 hồ sơ mỗi nơi lưu. Trình duyệt có thể từ chối lưu, hết dung lượng hoặc xóa lịch sử; tự tải báo cáo để lưu trữ. Xóa từng hồ sơ tại **Hồ sơ & lịch sử**.
 
 Chỉ tính chênh lệch khi cùng pin, bài toán, nguồn, cấu hình, phiên bản mô hình, giai đoạn, điều kiện và hai ngày đo khác nhau; phép đo dung lượng phải cùng mốc tham chiếu. Khác điều kiện chỉ hiển thị hai hồ sơ, không tính mức thay đổi. Hai lần đo không đủ để kết luận tốc độ suy giảm hoặc dự báo tuổi thọ.
 
@@ -79,7 +79,7 @@ Chọn ít nhất 5 hồ sơ khác ngày, cùng pin, mô hình, nguồn, giai đ
 
 ## Phiên bản giao diện mới
 
-Trang Tổng quan mở bằng **Đánh giá pin từ lần đo thực tế**, có ô tải file thật, hồ sơ gần đây, mục riêng cho mẫu thử và lối vào mô hình riêng. Mã commit / phiên bản giao diện nằm trên thanh đầu trang để đối chiếu với lượt deploy Render.
+Trang chính là biểu mẫu **Phân tích pin**, dùng một nút chạy. Các thông số ít dùng được gấp lại; huấn luyện, so sánh và mô hình riêng nằm trong menu **Nghiên cứu**. Mã commit và trạng thái tài nguyên nằm trong mục **Phiên bản** ở cuối trang.
 
 API dự đoán SDU hiện hỗ trợ thêm Ridge và LightGBM, tổng cộng sáu mô hình bảng; LightGBM dùng đóng góp TreeSHAP gốc, Ridge dùng hệ số trên đặc trưng chuẩn hóa. GRU vẫn phục vụ thực nghiệm chuỗi, chưa đưa vào dịch vụ dự đoán trực tiếp trên Render.
 
@@ -94,3 +94,7 @@ ASSESSMENT_BASE_URL=http://127.0.0.1:8504 node tests/browser_workbench.cjs
 ```
 
 GitHub Actions tại `.github/workflows/web-validation.yml` chạy kiểm tra tài nguyên, bộ kiểm thử ứng dụng và hai luồng trình duyệt khi push/PR. Đây là bộ kiểm thử ứng dụng, không tái huấn luyện toàn bộ thực nghiệm nghiên cứu hoặc thu thập thêm dữ liệu đo độc lập.
+
+## Giao diện gọn
+
+Menu chính gồm Phân tích pin và Lịch sử. Thông số bổ sung, dữ liệu mẫu và các công cụ nghiên cứu được gấp lại. Khi có kết quả, dùng Sửa dữ liệu để quay lại biểu mẫu hoặc Phân tích khác để bắt đầu hồ sơ mới. Icon chức năng được giữ; bỏ các thẻ giới thiệu và nhãn trang trí.
