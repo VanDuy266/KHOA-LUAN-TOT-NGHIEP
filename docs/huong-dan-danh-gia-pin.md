@@ -79,7 +79,7 @@ Chọn ít nhất 5 hồ sơ khác ngày, cùng pin, mô hình, nguồn, giai đ
 
 ## Phiên bản giao diện mới
 
-Trang chính là biểu mẫu **Phân tích pin**, dùng một nút chạy. Các thông số ít dùng được gấp lại; huấn luyện, so sánh và mô hình riêng nằm trong menu **Nghiên cứu**. Mã commit và trạng thái tài nguyên nằm trong mục **Phiên bản** ở cuối trang.
+Trang chính là biểu mẫu **Phân tích pin**, dùng một nút chạy. Các thông số ít dùng được gấp lại; huấn luyện, so sánh và mô hình riêng nằm trong menu **Nghiên cứu**. Cuối trang hiển thị phiên bản sản phẩm **V2.0**. Mã commit và trạng thái tài nguyên chỉ dùng cho chẩn đoán qua API.
 
 API dự đoán SDU hiện hỗ trợ thêm Ridge và LightGBM, tổng cộng sáu mô hình bảng; LightGBM dùng đóng góp TreeSHAP gốc, Ridge dùng hệ số trên đặc trưng chuẩn hóa. GRU vẫn phục vụ thực nghiệm chuỗi, chưa đưa vào dịch vụ dự đoán trực tiếp trên Render.
 

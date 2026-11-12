@@ -32,6 +32,7 @@ app.json.sort_keys = False
 app.config.update(MAX_CONTENT_LENGTH=513 * 1024 * 1024, MAX_FORM_MEMORY_SIZE=1024 * 1024)
 INFERENCE = BoundedSemaphore(1)
 TITLE = "Vincent D | Phân tích sức khỏe pin xe điện"
+APP_VERSION = "2.0"
 
 
 def clean(value):
@@ -143,7 +144,7 @@ def errors(error):
 
 @app.get("/")
 def home():
-    return render_template("index.html", title=TITLE, version=frontend_version())
+    return render_template("index.html", title=TITLE, version=frontend_version(), app_version=APP_VERSION)
 
 
 def frontend_version():
@@ -161,7 +162,7 @@ def health():
 
 @app.get("/api/version")
 def version():
-    return reply(runtime="Flask", commit=os.environ.get("RENDER_GIT_COMMIT", "local"),
+    return reply(runtime="Flask", app_version=APP_VERSION, commit=os.environ.get("RENDER_GIT_COMMIT", "local"),
         frontend=frontend_version())
 
 
@@ -338,7 +339,7 @@ def readiness():
         "artifacts/bms/random_forest.joblib", "artifacts/bms/ridge_residual_forest.joblib",
         "data/clean/sample_measurements.csv", "data/bms/processed/01_example.csv.gz"]
     missing = [path for path in paths if not (ROOT/path).is_file()]
-    return reply(ready=not missing, missing=missing, runtime="Flask / Gunicorn",
+    return reply(ready=not missing, missing=missing, app_version=APP_VERSION, runtime="Flask / Gunicorn",
                  commit=os.environ.get("RENDER_GIT_COMMIT", "local"), frontend=frontend_version(),
                  storage="File tải lên và hồ sơ không được lưu trên máy chủ; lịch sử do trình duyệt quản lý.")
 

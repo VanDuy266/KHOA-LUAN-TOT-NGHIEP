@@ -11,7 +11,11 @@ class FocusedScopeTests(unittest.TestCase):
         self.assertEqual(re.findall(r'data-page="([^"]+)"',nav.split('<details',1)[0]),['overview','history'])
         advanced=nav[nav.index('<details'):nav.index('</details>')]
         self.assertEqual(re.findall(r'data-page="([^"]+)"',advanced),['health','fault','evaluation','training','custom'])
-        self.assertNotIn('avatar-arcs',html)
+        self.assertIn('avatar-arcs',html)
+        self.assertIn('id="avatar-electric-route"',html)
+        footer=html[html.index('<footer'):html.index('</footer>')]
+        self.assertIn('V2.0',footer)
+        self.assertNotIn('service-status',footer)
         self.assertNotIn('nav-research',nav)
     def test_impossible_soh_is_not_a_successful_result(self):
         fake=pd.DataFrame([dict(battery='SDU_01',cycle=1,status='Thành công',predicted_soh_pct=9000.,outside_count=4)])
