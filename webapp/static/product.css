@@ -9,3 +9,19 @@ body{font-size:16px;line-height:1.55}.app-shell{grid-template-columns:265px minm
 .kpis:has(>.kpi:nth-child(3):last-child){grid-template-columns:repeat(3,minmax(0,1fr))}.kpis:has(>.kpi:nth-child(2):last-child){grid-template-columns:repeat(2,minmax(0,1fr))}@media(max-width:740px){.kpis:has(>.kpi:nth-child(3):last-child){grid-template-columns:1fr}}
 
 .benchmark-table{max-height:none}#form-result,#training-result,#fault-result,#demo-result,#health-result,#mapping-result{scroll-margin-top:92px}@media(max-width:740px){#form-result,#training-result,#fault-result,#demo-result,#health-result,#mapping-result{scroll-margin-top:76px}}
+
+/* Guided assessment and locally retained records. */
+[hidden]{display:none!important}
+.assessment-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));list-style:none;gap:12px;margin:0 0 24px;padding:0}
+.assessment-steps li{display:flex;gap:9px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--muted);font-size:13px}
+.assessment-steps li span{display:grid;place-items:center;flex:0 0 28px;height:28px;border-radius:50%;background:var(--soft);font-weight:700}
+.assessment-steps .current{border-color:var(--accent);color:var(--text)}.assessment-steps .current span,.assessment-steps .done span{background:var(--accent);color:var(--surface)}
+.assessment-task-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px;margin:18px 0}
+.assessment-task{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:18px;border:1px solid var(--line);border-radius:12px;cursor:pointer;background:var(--surface)}
+.assessment-task:has(input:checked){border-color:var(--accent);background:var(--soft)}
+.assessment-task input{grid-row:1/3;align-self:start;margin-top:5px}.assessment-task strong{font-size:16px}.assessment-task span{font-size:14px;color:var(--muted)}
+#assessment-progress,#assessment-preflight,#assessment-result,#assessment-history-report{scroll-margin-top:90px}#assessment-preflight,#assessment-result{margin-top:22px}
+#assessment-form input:not([type=checkbox]):not([type=radio]),#assessment-form select{max-width:100%;width:100%}#assessment-form .field{min-width:0}#assessment-form .controls{flex-wrap:wrap}
+#assessment-model-panel .controls>.field,#assessment-form .controls>div{flex:1 1 180px}
+button:disabled{opacity:.55;cursor:not-allowed}#service-status{font-size:12px}
+@media(max-width:740px){.assessment-steps{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.assessment-steps li{padding:10px;font-size:12px}.assessment-task-grid{grid-template-columns:1fr}.assessment-task{padding:15px}#assessment-result .actions .button{flex:1 1 100%}}

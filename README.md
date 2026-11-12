@@ -184,3 +184,7 @@ Nhãn BMS là **SOH suy ra từ dòng điện và SOC khi sạc**, không có ph
 - `webapp/data.py`: đọc dữ liệu và tổng hợp kết quả kiểm thử đã có.
 
 Sửa trong VS Code, kiểm tra rồi đẩy lên nhánh GitHub mà Render theo dõi. Link Render giữ nguyên sau triển khai. Thư mục `app/` được giữ làm bản tham chiếu và chứa các hàm dự đoán thuần Python; ứng dụng mới không tải trình chạy Streamlit. Thư viện nghiên cứu/báo cáo cài riêng từ `requirements-research.txt`.
+
+## Đánh giá pin theo hồ sơ
+
+Trang **Phân tích pin** có quy trình chọn bài toán → khai báo cấu hình → ánh xạ và kiểm tra dữ liệu → lập báo cáo. Hỗ trợ SDU, BMS BAIC, tổng hợp tín hiệu pin khác và tỷ lệ dung lượng đo. Có hồ sơ theo mã pin/ngày đo, báo cáo HTML để in PDF, xuất CSV/JSON và lịch sử riêng trong trình duyệt. Xem [hướng dẫn đánh giá pin](docs/huong-dan-danh-gia-pin.md) về định dạng, phạm vi, lưu trữ và kiểm thử.

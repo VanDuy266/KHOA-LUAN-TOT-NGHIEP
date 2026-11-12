@@ -141,7 +141,13 @@ def errors(error):
 
 @app.get("/")
 def home():
-    return render_template("index.html", title=TITLE, version=hashlib.sha256(b"".join((ROOT / name).read_bytes() for name in ("webapp/static/app.js", "webapp/static/app.css", "webapp/static/product.css", "webapp/templates/index.html"))).hexdigest()[:12])
+    return render_template("index.html", title=TITLE, version=frontend_version())
+
+
+def frontend_version():
+    return hashlib.sha256(b"".join((ROOT / name).read_bytes() for name in (
+        "webapp/static/app.js", "webapp/static/assessment.js", "webapp/static/app.css",
+        "webapp/static/product.css", "webapp/templates/index.html"))).hexdigest()[:12]
 
 
 @app.get("/healthz")
@@ -154,7 +160,7 @@ def health():
 @app.get("/api/version")
 def version():
     return reply(runtime="Flask", commit=os.environ.get("RENDER_GIT_COMMIT", "local"),
-        frontend=hashlib.sha256((ROOT/"webapp/static/app.js").read_bytes()).hexdigest()[:12])
+        frontend=frontend_version())
 
 
 @app.get("/assets/logo.png")
@@ -260,6 +266,79 @@ def audit():
     frame=input_frame()
     schema,checks,issue=audit_frame(frame)
     return reply(schema=schema,checks=checks,issue=issue,rows=len(frame),preview=frame.head(100))
+
+
+@app.post("/api/assessment/check")
+def assessment_check():
+    from webapp.assessment import prepare
+    preflight, _ = prepare(request.form, request.files, validate_bms_window)
+    return reply(**preflight)
+
+
+@app.post("/api/assessment")
+def assessment_run():
+    from webapp.assessment import prepare, finalize, report_html
+    from webapp.external import analyze
+    preflight, frame = prepare(request.form, request.files, validate_bms_window)
+    if not preflight["ready"]:
+        return reply(error=preflight["scope"]["message"], preflight=preflight), 400
+    task = preflight["task"]
+    name = request.form.get("model", "Random Forest")
+    details = None
+    explanation = None
+    if task == "sdu":
+        with INFERENCE:
+            fitted = artifact(MODELS[name])
+            estimate, features, outside = predict(frame, preflight["cycle"], fitted)
+            if not math.isfinite(estimate) or not 0 <= estimate <= 130:
+                raise ValueError("Đầu ra ngoài phạm vi SOH 0–130%; chưa xuất đánh giá cho dữ liệu này.")
+            baseline, effects, method = prediction_contributions(fitted["model"], features)
+            explanation = clean(dict(baseline=baseline, effects=effects, method=method,
+                                     evidence=explanation_evidence(baseline, effects, estimate, features)))
+        result = dict(soh_pct=estimate, loss_pct=100-estimate if estimate <= 100 else None,
+                      capacity_ah=2.4*estimate/100, outside_count=len(outside), outside=outside,
+                      cycle=preflight["cycle"], phase_code=preflight["phase_code"])
+    elif task == "bms":
+        # The existing BMS route applies the same validator and comparison rules.
+        data = bms_prediction(frame, name, read_limits(request.form),
+                              dict(kind="example" if preflight["sample"] else "upload",
+                                   label=preflight["source_name"]))
+        estimate = data["prediction"]
+        result = dict(soh_pct=estimate, loss_pct=100-estimate if estimate <= 100 else None,
+                      capacity_ah=145*estimate/100, outside_count=len(data["outside"]), outside=data["outside"])
+        details = data["assessment"]
+    elif task == "capacity":
+        values = preflight["capacity"]
+        estimate = 100*values["measured_ah"]/values["reference_ah"]
+        result = dict(soh_pct=estimate, loss_pct=100-estimate if estimate <= 100 else None,
+                      capacity_ah=values["measured_ah"], **values)
+        name = "Tỷ lệ dung lượng đo"
+    else:
+        details = analyze(frame, preflight["profile"])
+        result = dict(soh_pct=None, loss_pct=None, capacity_ah=None,
+                      duration_seconds=details["duration_seconds"], voltage_min=details["voltage_min"],
+                      voltage_max=details["voltage_max"], temperature_max=details["temperature_max"],
+                      charged_ah=details["charged_ah"], discharged_ah=details["discharged_ah"])
+        name = "Tổng hợp tín hiệu đo"
+    build = os.environ.get("RENDER_GIT_COMMIT", "local") + ":" + frontend_version()
+    record = clean(finalize(preflight, [result], name, build, explanation, details))
+    if frame is not None:
+        signals = [x for x in ("time", "terminal_voltage", "terminal_current", "temperature") if x in frame]
+        if task == "bms":
+            signals = ["time_s", "pack_voltage", "charge_current", "max_temperature"]
+        record["signals"] = clean(downsample(frame, 200)[signals])
+    return reply(record=record, report_html=report_html(record))
+
+
+@app.get("/api/readiness")
+def readiness():
+    paths = ["artifacts/" + path for path in MODELS.values()] + [
+        "artifacts/bms/random_forest.joblib", "artifacts/bms/ridge_residual_forest.joblib",
+        "data/clean/sample_measurements.csv", "data/bms/processed/01_example.csv.gz"]
+    missing = [path for path in paths if not (ROOT/path).is_file()]
+    return reply(ready=not missing, missing=missing, runtime="Flask / Gunicorn",
+                 commit=os.environ.get("RENDER_GIT_COMMIT", "local"), frontend=frontend_version(),
+                 storage="File tải lên và hồ sơ không được lưu trên máy chủ; lịch sử do trình duyệt quản lý.")
 
 
 @app.get("/api/demo")
@@ -369,6 +448,30 @@ def bms_signal_preview(window, limit=300):
     return window.iloc[sorted(indexes)]
 
 
+def validate_bms_window(window):
+    required=['time_s','soc','pack_voltage','charge_current','max_cell_voltage','min_cell_voltage','max_temperature','min_temperature']
+    if set(required)-set(window):
+        raise ValueError("CSV thiếu cột: "+", ".join(sorted(set(required)-set(window))))
+    window=window[required].apply(pd.to_numeric,errors="raise")
+    if not np.isfinite(window.to_numpy()).all():
+        raise ValueError("CSV chứa giá trị thiếu hoặc vô hạn.")
+    delta=window.time_s.diff().dropna()
+    if (delta<=0).any() or (delta>10).any() or window.empty or abs(window.time_s.iloc[0])>1e-6:
+        raise ValueError("Thời gian phải bắt đầu từ 0, tăng đều và không gián đoạn quá 10 giây.")
+    window=window[window.time_s<=120]
+    if len(window)<12 or window.time_s.max()<112:
+        raise ValueError("Chưa đủ cửa sổ đầu sạc 120 giây.")
+    if not window.soc.between(0,100).all() or (window.soc.diff().dropna()<-.1).any() or (window.soc.diff().dropna()>2).any():
+        raise ValueError("SOC phải trong 0–100% và không nhảy bất thường.")
+    if not window.pack_voltage.between(200,450).all() or not window.charge_current.between(-300,0).all() or (window.charge_current<0).mean()<.95:
+        raise ValueError("Điện áp bộ pin cần 200–450 V; dòng sạc âm trong khoảng −300 đến 0 A.")
+    if not window.min_cell_voltage.between(2,4.5).all() or not window.max_cell_voltage.between(2,4.5).all() or (window.max_cell_voltage<window.min_cell_voltage).any():
+        raise ValueError("Điện áp cell không hợp lệ.")
+    if not window.min_temperature.between(-30,85).all() or not window.max_temperature.between(-30,85).all() or (window.max_temperature<window.min_temperature).any():
+        raise ValueError("Nhiệt độ không hợp lệ.")
+    return window
+
+
 @app.post("/api/bms/predict")
 def bms_predict():
     name=request.form.get("model","Random Forest")
@@ -408,26 +511,11 @@ def bms_predict():
         if upload and upload.filename:
             filename=upload.filename.replace("\\","/").split("/")[-1][:120]
             source.update(label="CSV tải lên · "+filename, filename=filename)
-    required=['time_s','soc','pack_voltage','charge_current','max_cell_voltage','min_cell_voltage','max_temperature','min_temperature']
-    if set(required)-set(window):
-        raise ValueError("CSV thiếu cột: "+", ".join(sorted(set(required)-set(window))))
-    window=window[required].apply(pd.to_numeric,errors="raise")
-    if not np.isfinite(window.to_numpy()).all():
-        raise ValueError("CSV chứa giá trị thiếu hoặc vô hạn.")
-    delta=window.time_s.diff().dropna()
-    if (delta<=0).any() or (delta>10).any() or window.empty or abs(window.time_s.iloc[0])>1e-6:
-        raise ValueError("Thời gian phải bắt đầu từ 0, tăng đều và không gián đoạn quá 10 giây.")
-    window=window[window.time_s<=120]
-    if len(window)<12 or window.time_s.max()<112:
-        raise ValueError("Chưa đủ cửa sổ đầu sạc 120 giây.")
-    if not window.soc.between(0,100).all() or (window.soc.diff().dropna()<-.1).any() or (window.soc.diff().dropna()>2).any():
-        raise ValueError("SOC phải trong 0–100% và không nhảy bất thường.")
-    if not window.pack_voltage.between(200,450).all() or not window.charge_current.between(-300,0).all() or (window.charge_current<0).mean()<.95:
-        raise ValueError("Điện áp bộ pin cần 200–450 V; dòng sạc âm trong khoảng −300 đến 0 A.")
-    if not window.min_cell_voltage.between(2,4.5).all() or not window.max_cell_voltage.between(2,4.5).all() or (window.max_cell_voltage<window.min_cell_voltage).any():
-        raise ValueError("Điện áp cell không hợp lệ.")
-    if not window.min_temperature.between(-30,85).all() or not window.max_temperature.between(-30,85).all() or (window.max_temperature<window.min_temperature).any():
-        raise ValueError("Nhiệt độ không hợp lệ.")
+    window=validate_bms_window(window)
+    return reply(**bms_prediction(window, name, limits, source, history))
+
+
+def bms_prediction(window, name, limits, source, history=None):
     with INFERENCE:
         fitted=artifact("bms/"+("random_forest.joblib" if name=="Random Forest" else "ridge_residual_forest.joblib"))
         features=pd.DataFrame([charging_features(window)])[BMS_FEATURES]
@@ -439,7 +527,7 @@ def bms_predict():
     assessment=assess_bms(window,estimate,outside_names,limits,source,history)
     assessment["report_rows"].insert(0,{"Hạng mục":"Mô hình","Giá trị":name,"Đơn vị":"","Diễn giải":assessment["scope"]})
     assessment["report_rows"].insert(1,{"Hạng mục":"Nguồn đầu vào","Giá trị":source["label"],"Đơn vị":"","Diễn giải":str(source.get("vehicle",""))+" · "+str(source.get("session",""))})
-    return reply(model=name,prediction=estimate,outside=outside_names,sample=request.form.get("sample")=="1",
+    return dict(model=name,prediction=estimate,outside=outside_names,sample=request.form.get("sample")=="1",
         assessment=assessment,signals=bms_signal_preview(window))
 
 
