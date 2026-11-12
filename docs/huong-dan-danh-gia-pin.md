@@ -98,3 +98,9 @@ GitHub Actions tại `.github/workflows/web-validation.yml` chạy kiểm tra t�
 ## Giao diện gọn
 
 Menu chính gồm Phân tích pin và Lịch sử. Thông số bổ sung, dữ liệu mẫu và các công cụ nghiên cứu được gấp lại. Khi có kết quả, dùng Sửa dữ liệu để quay lại biểu mẫu hoặc Phân tích khác để bắt đầu hồ sơ mới. Icon chức năng được giữ; bỏ các thẻ giới thiệu và nhãn trang trí.
+
+## Nhận diện dữ liệu đầu vào
+
+Tên cột tiếng Việt có dấu/không dấu và đơn vị ghi trong tiêu đề được gợi ý tự động. Nếu một tín hiệu khớp nhiều cột, cần chọn rõ cột; không tự chọn cột đầu tiên. Tên cột không có đơn vị dùng đơn vị chuẩn đang hiển thị, có thể sửa trong mục Cột và đơn vị. Tên pin được lấy từ mã pin trong bản xem trước hoặc tên tệp khi chưa nhập; toàn bộ tệp vẫn phải qua kiểm tra nhóm trước phân tích.
+
+Nút Xem kết quả mẫu chạy trực tiếp một ví dụ được ghi nhãn mẫu. Khi nhập dung lượng, chỉ dùng hai phép đo đầy đủ cùng điều kiện, không dùng SOC. Kết quả có phần diễn giải tỷ lệ dung lượng và biểu đồ đổi được tín hiệu hiển thị.

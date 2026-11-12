@@ -1,15 +1,39 @@
 """Explicit unit and column adapter; does not establish cross-domain validity."""
 import io
 import json
+import re
+import unicodedata
 import numpy as np
 import pandas as pd
 from prediction import csv_chunks
 
 ALIASES={
-    "time":["time","Time","Test_Time(s)","Timestamp"],
-    "terminal_voltage":["terminal_voltage","Voltage","Voltage_measured","Voltage(V)"],
-    "terminal_current":["terminal_current","Current","Current_measured","Current(A)","I_pack"],
-    "temperature":["temperature","Temperature","Temperature_measured","Aux_Temperature_1(C)"]}
+    "time":["time","Time","Test_Time(s)","Timestamp","Thời gian","Thời gian (s)","Thời gian (giây)","Thời gian (ms)","Thời gian (phút)","time_ms","time_min","Time(ms)","Time(min)"],
+    "terminal_voltage":["terminal_voltage","Voltage","Voltage_measured","Voltage(V)","Voltage(mV)","voltage_mv","Điện áp","Điện áp (V)","Điện áp (mV)"],
+    "terminal_current":["terminal_current","Current","Current_measured","Current(A)","Current(mA)","current_ma","I_pack","Dòng điện","Dòng điện (A)","Dòng điện (mA)"],
+    "temperature":["temperature","Temperature","Temperature_measured","Aux_Temperature_1(C)","Temperature(C)","Temperature(K)","temperature_k","Nhiệt độ","Nhiệt độ (C)","Nhiệt độ (°C)","Nhiệt độ (K)"]}
+
+
+def column_key(value):
+    value=unicodedata.normalize("NFD",str(value).casefold().replace("đ","d"))
+    return re.sub(r"[^a-z0-9]+","", "".join(c for c in value if not unicodedata.combining(c)))
+
+
+def suggested_unit(signal, column):
+    name=column_key(column)
+    if signal=="time":
+        if name.endswith("ms"):return "ms"
+        if name.endswith(("min","phut")):return "min"
+        return "s"
+    if signal=="terminal_voltage":return "mV" if name.endswith("mv") else "V"
+    if signal=="terminal_current":return "mA" if name.endswith("ma") else "A"
+    return "K" if name.endswith("k") else "C"
+
+
+CONTEXT_ALIASES={"battery":["battery","battery_id","Mã pin","Ma pin"],
+                 "cycle":["cycle","cycle_index","Chu kỳ","Chu ky"],
+                 "phase":["phase","phase_code","Giai đoạn","Giai doan"]}
+
 SCALES={"time":{"s":1,"ms":.001,"min":60},"terminal_voltage":{"V":1,"mV":.001},"terminal_current":{"A":1,"mA":.001},"temperature":{"C":1,"K":1}}
 
 def read_frame(raw, preview=False):
@@ -44,8 +68,12 @@ def preview(raw):
 def preview_frame(frame):
     if frame.empty:raise ValueError("File không có dòng dữ liệu.")
     columns=frame.columns.tolist()
-    suggestions={key:next((c for c in columns if str(c).casefold() in [a.casefold() for a in aliases]),"") for key,aliases in ALIASES.items()}
-    return dict(columns=columns,preview=frame,suggestions=suggestions)
+    candidates={key:[c for c in columns if column_key(c) in [column_key(a) for a in aliases]] for key,aliases in ALIASES.items()}
+    suggestions={key:matches[0] if len(matches)==1 else "" for key,matches in candidates.items()}
+    context_columns={key:next((c for c in columns if column_key(c) in [column_key(a) for a in aliases]),"") for key,aliases in CONTEXT_ALIASES.items()}
+    context_values={key:str(frame[col].iloc[0]) for key,col in context_columns.items() if col and frame[col].nunique(dropna=False)==1 and frame[col].notna().all()}
+    return dict(columns=columns,preview=frame,suggestions=suggestions,context_columns=context_columns,context_values=context_values,
+                suggested_units={key:suggested_unit(key,col) for key,col in suggestions.items()})
 
 def normalize(raw, mapping, units, positive_discharge=False):
     return normalize_frame(read_frame(raw),mapping,units,positive_discharge)

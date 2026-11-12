@@ -1,7 +1,7 @@
 """Bounded CSV streaming for external uploads; never materialize the whole CSV."""
 import csv,gzip,hashlib,io
 import pandas as pd
-from .column_mapping import read_frame
+from .column_mapping import read_frame,column_key,CONTEXT_ALIASES
 MAX_CSV_BYTES=512*1024*1024
 MAX_JSON_BYTES=20*1024*1024
 MAX_EXPANDED_BYTES=1024*1024*1024
@@ -41,7 +41,7 @@ def read_upload(upload,preview=False,needed=None,filters=None):
             data=data[_match(data[col],value)]
         if not preview:
             for col in data:
-                if col.casefold() in {'battery','battery_id','cycle','cycle_index','phase','phase_code'} and data[col].nunique(dropna=False)>1:raise ValueError("File chứa nhiều pin/chu kỳ: chọn cột và giá trị lọc.")
+                if column_key(col) in {column_key(a) for aliases in CONTEXT_ALIASES.values() for a in aliases} and data[col].nunique(dropna=False)>1:raise ValueError("File chứa nhiều pin/chu kỳ: chọn cột và giá trị lọc.")
         data.attrs['scanned_rows']=scanned
         return data.head(5) if preview else data
     if not filename.endswith(('.csv','.csv.gz','.gz')):raise ValueError("Chỉ nhận CSV, CSV.GZ hoặc JSON dạng bảng.")
@@ -60,7 +60,7 @@ def read_upload(upload,preview=False,needed=None,filters=None):
     reader.seek(0)
     if preview:return pd.read_csv(LimitedReader(reader),nrows=5,**options)
     if needed is not None and not set(needed)<=set(columns):raise ValueError("Cột tín hiệu hoặc SOC không có trong file.")
-    group_columns=[c for c in columns if c.casefold() in {'battery','battery_id','cycle','cycle_index','phase','phase_code'}]
+    group_columns=[c for c in columns if column_key(c) in {column_key(a) for aliases in CONTEXT_ALIASES.values() for a in aliases}]
     keep=None if needed is None else list(set(needed)|set(filters)|set(group_columns))
     parts=[];selected=0;scanned=0;seen={c:set() for c in group_columns}
     chunks=pd.read_csv(LimitedReader(reader),usecols=keep,chunksize=50000,**options)
@@ -88,9 +88,9 @@ def upload_sha256(upload):
 
 
 def carry_context(out,source,chosen):
-    aliases={'battery':{'battery','battery_id'},'cycle':{'cycle','cycle_index'},'phase':{'phase','phase_code'}}
+    aliases={key:{column_key(name) for name in names} for key,names in CONTEXT_ALIASES.items()}
     for key,names in aliases.items():
-        column=chosen.get(key) or next((c for c in source if c.casefold() in names),'')
+        column=chosen.get(key) or next((c for c in source if column_key(c) in names),'')
         if not column or column not in source:continue
         values=source[column]
         if values.nunique(dropna=False)!=1:raise ValueError("Nhóm đã chọn còn nhiều mã pin, chu kỳ hoặc giai đoạn.")
