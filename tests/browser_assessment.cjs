@@ -10,6 +10,13 @@ const {existsSync}=require('node:fs');
   const open=async()=>{await page.goto(base+'/?test='+Date.now()+'#check');await expect(page.locator('#assessment-form')).toBeVisible();};
   const sample=async task=>{await page.locator('#assessment-samples>summary').click();await page.locator('[data-assessment-sample='+task+']').click();};
   const run=async()=>{await page.locator('#assessment-check').click();await expect(page.locator('#assessment-save')).toBeVisible();await expect(page.locator('#assessment-form')).toBeHidden();};
+  // The home page explains the thesis and opens the correct task for each input.
+  for(const task of ['sdu','bms','capacity','signals']){
+   await page.goto(base+'/#overview');await expect(page.locator('#battery-start-title')).toHaveText('Bạn có dữ liệu nào?');await expect(page.locator('#assessment-form')).toHaveCount(0);await page.locator('[data-start-task='+task+']').click();await expect(page.locator('#assessment-task')).toHaveValue(task);await expect(page.locator('#assessment-title')).not.toHaveText('Phân tích pin');
+   if(['sdu','bms'].includes(task)){await expect(page.locator('#assessment-origin')).toHaveValue(task==='sdu'?'SDU':'BAIC EU500');await expect(page.locator('#assessment-confirm-wrap')).toBeVisible();}
+   if(task==='capacity'){await expect(page.locator('#assessment-capacity-panel')).toBeVisible();await expect(page.locator('#assessment-upload-panel')).toBeHidden();}
+  }
+  await page.goto(base+'/#overview');await page.locator('#battery-demo').click();await expect(page.locator('#assessment-save')).toBeVisible();await expect(page.locator('#assessment-result')).toContainText('Dữ liệu mẫu');
   await open();await expect(page.locator('#research-navigation')).not.toHaveAttribute('open','');await expect(page.locator('.assessment-steps')).toHaveCount(0);
   await page.locator('#assessment-quick-sample').click();await expect(page.locator('#assessment-save')).toBeVisible();await expect(page.locator('#assessment-form')).toBeHidden();await expect(page.locator('#assessment-result')).toContainText('SOH trên 100%');
   const downloadEvent=page.waitForEvent('download');await page.locator('[data-assessment-html]').click();const download=await downloadEvent,html=await fs.readFile(await download.path(),'utf8');

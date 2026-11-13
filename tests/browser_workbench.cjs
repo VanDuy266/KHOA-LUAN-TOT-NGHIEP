@@ -7,7 +7,7 @@ const fs=require('node:fs/promises');
   try{
     const base=process.env.ASSESSMENT_BASE_URL||'http://127.0.0.1:8506',context=await browser.newContext({viewport:{width:1365,height:900},locale:'vi-VN'}),page=await context.newPage(),errors=[];
     page.on('pageerror',e=>errors.push(e.message));
-    await page.goto(base+'/');await expect(page.locator('#assessment-form')).toBeVisible();await expect(page.locator('h1')).toHaveText('Phân tích pin');
+    await page.goto(base+'/');await expect(page.locator('#battery-start-title')).toBeVisible();await expect(page.locator('h1')).toContainText('Pin còn bao nhiêu dung lượng');
     const trainingCSV=await (await page.request.get(base+'/api/download/training-template')).text();
     await page.locator('#research-navigation>summary').click();await page.locator('#research-navigation a[href="#training"]').click();await page.locator('#training-file').setInputFiles({name:'my_labeled_data.csv',mimeType:'text/csv',buffer:Buffer.from(trainingCSV)});
     await page.locator('#training-label-source').fill('Browser test fixture: reference capacity labels');
@@ -33,9 +33,9 @@ const fs=require('node:fs/promises');
     for(const box of await page.locator('[data-compare]').all())await box.check();await page.locator('#assessment-trend').click();await expect(page.locator('#assessment-comparison')).toContainText('OWN-TRACK');await expect(page.locator('#assessment-history-trend svg')).toBeVisible();
     await page.locator('.history-backup>summary').click();const backupEvent=page.waitForEvent('download');await page.locator('#assessment-backup').click();const backup=await fs.readFile(await (await backupEvent).path());
     const otherContext=await browser.newContext(),otherPage=await otherContext.newPage();await otherPage.goto(base+'/#history');await expect(otherPage.locator('#content')).toContainText('Chưa có hồ sơ');await otherPage.locator('.history-backup>summary').click();await otherPage.locator('#assessment-import').setInputFiles({name:'restore.json',mimeType:'application/json',buffer:backup});await expect(otherPage.locator('[data-open-assessment]')).toHaveCount(5);await otherContext.close();
-    await page.goto(base+'/');await expect(page.locator('#assessment-form')).toBeVisible();await page.screenshot({path:'/tmp/vincent-dashboard-final.png',fullPage:true});
+    await page.goto(base+'/');await expect(page.locator('#battery-start-title')).toBeVisible();await page.screenshot({path:'/tmp/vincent-dashboard-final.png',fullPage:true});
     await page.locator('#theme').click();await page.screenshot({path:'/tmp/vincent-dashboard-final-dark.png',fullPage:true});
-    await page.setViewportSize({width:390,height:844});await page.reload();await expect(page.locator('#assessment-form')).toBeVisible();await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1))throw new Error('Dashboard mobile overflow');await page.screenshot({path:'/tmp/vincent-dashboard-final-mobile.png',fullPage:true});
+    await page.setViewportSize({width:390,height:844});await page.reload();await expect(page.locator('#battery-start-title')).toBeVisible();await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1))throw new Error('Dashboard mobile overflow');await page.screenshot({path:'/tmp/vincent-dashboard-final-mobile.png',fullPage:true});
     await page.goto(base+'/#guide');await expect(page.locator('#content')).toContainText('Tín hiệu đo');
     // Changing inputs must clear results in the older analysis forms too.
     await page.goto(base+'/#health');await expect(page.locator('#health-file')).toBeVisible();
