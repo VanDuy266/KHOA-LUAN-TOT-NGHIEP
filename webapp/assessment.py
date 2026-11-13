@@ -13,7 +13,7 @@ import numpy as np
 import pandas as pd
 
 from webapp.data import ROOT, MODELS, table, evaluation_metrics
-from webapp.column_mapping import normalize_frame
+from webapp.column_mapping import normalize_frame, validate_filter_column, BMS_COLUMNS
 from webapp.upload_table import read_upload, upload_sha256, carry_context
 from webapp.external import analyze
 from input_audit import audit_frame
@@ -130,17 +130,24 @@ def prepare(form, files, bms_validator):
         upload = files.get("file")
         if upload is None or not upload.filename:
             raise ValueError("Chọn file dữ liệu trước khi kiểm tra.")
+        header = read_upload(upload, preview=True)
+        if task == "bms":
+            missing = [name for name in BMS_COLUMNS if name not in header]
+            if missing:
+                raise ValueError("Tệp không đúng cấu trúc BMS BAIC EU500. Thiếu cột: " + ", ".join(missing) + ". Chọn phân tích số đo cho tệp khác; không đổi tên cột để ép chạy mô hình BAIC.")
         filters = {}
         chosen = {}
-        for key in ("battery", "cycle", "phase"):
+        for key in ("battery", "cycle", "phase", "step"):
             col = form.get("filter_" + key + "_column", "")
             val = form.get("filter_" + key + "_value", "")
             chosen[key] = col
             if col:
+                validate_filter_column(key, col, header.columns, task)
                 if col in filters:
                     raise ValueError("Các bộ lọc phải dùng cột riêng.")
                 filters[col] = val
         source = read_upload(upload, filters=filters)
+        base["filters"] = dict(filters)
         base.update(source_name=upload.filename.replace("\\", "/").split("/")[-1][:120], source_sha256=upload_sha256(upload))
         if task == "bms":
             for group in ("vehicle", "session"):
@@ -164,8 +171,22 @@ def prepare(form, files, bms_validator):
                     if len(bad_rows):
                         positions = ", ".join(str(int(i)+1) for i in bad_rows[:10])
                         raise ValueError(f"Cột {column}: {len(bad_rows)} giá trị thiếu/không phải số/vô hạn. Dòng dữ liệu trong đoạn đã lọc: {positions}.")
+            raw_sdu = task == "sdu" and str(mapping.get("time", "")).strip().casefold() == "test_time(s)"
+            if raw_sdu and form.get("positive_discharge") == "1":
+                raise ValueError("Tệp SDU gốc quy ước dòng xả âm. Bỏ tùy chọn đổi dấu dòng điện để không lấy nhầm bước sạc.")
+            if raw_sdu:
+                source = source.sort_values(mapping["time"], key=lambda values: pd.to_numeric(values, errors="raise"), kind="stable")
             frame = normalize_frame(source, mapping, units, form.get("positive_discharge") == "1")
             frame = carry_context(frame, source, chosen)
+            if raw_sdu:
+                frame = frame[frame.terminal_current < -.1].copy()
+                if frame.empty:
+                    raise ValueError("Nhóm đã chọn không có đoạn xả dòng âm. Bỏ bộ lọc bước đo hoặc chọn bước xả; không dùng bước sạc để dự đoán SDU.")
+                discharge_start = float(frame.time.min())
+                frame["time"] -= discharge_start
+                frame = frame[frame.time <= 120].copy()
+                base["window"] = dict(method="first_discharge", offset_from_selected_start_seconds=discharge_start, duration_seconds=120)
+                base["source_rows"] = len(source)
             base["mapping"] = dict(columns=mapping, units=units, positive_discharge=form.get("positive_discharge") == "1", filters=filters)
             if task == "sdu":
                 for key, fallback in (("cycle", form.get("cycle", "1")), ("phase_code", form.get("phase_code", "0"))):
@@ -272,6 +293,6 @@ def report_html(record):
             parts.append("<h2>" + title + "</h2><pre>" + text(json.dumps(content, ensure_ascii=False, indent=2)) + "</pre>")
     parts += ["<h2>Giới hạn và bước tiếp theo</h2><p>" + text(record["uncertainty"]) + "</p><p>" + text(record["limitation"]) + "</p>",
               "<ul>" + "".join("<li>" + text(x) + "</li>" for x in record["warnings"] + record["next_steps"]) + "</ul>",
-              "<h2>Truy xuất kết quả</h2><table>" + rows((k,record.get(k)) for k in ("id", "created_at", "source_name", "source_sha256", "model", "model_sha256", "app_version", "label_source")) + "</table>",
+              "<h2>Truy xuất kết quả</h2><table>" + rows((k,record.get(k)) for k in ("id", "created_at", "source_name", "source_sha256", "filters", "model", "model_sha256", "app_version", "label_source")) + "</table>",
               "<p>File đầu vào và hồ sơ không được ứng dụng lưu trên máy chủ. Lịch sử trong trình duyệt có thể bị xóa; tự tải báo cáo để lưu trữ.</p>"]
     return '<!doctype html><html lang="vi"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Báo cáo đánh giá pin</title><style>body{font:16px/1.6 system-ui;max-width:960px;margin:30px auto;padding:20px;color:#193834}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ccc;text-align:left;padding:9px;overflow-wrap:anywhere}th{width:35%}pre{white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px}h2{margin-top:30px}button{padding:12px}@media print{button{display:none}body{margin:0}tr{break-inside:avoid}}</style><button onclick="window.print()">In / Lưu PDF</button>' + "".join(parts) + '</html>'

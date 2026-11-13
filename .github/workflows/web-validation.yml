@@ -44,7 +44,7 @@ jobs:
       - name: Application regression tests
         run: >-
           .venv/bin/python -m pytest -q
-          tests/test_assessment.py tests/test_records.py tests/test_custom_model.py
+          tests/test_assessment.py tests/test_records.py tests/test_custom_model.py tests/test_filter_safety.py
           tests/test_web.py tests/test_startup.py tests/test_web_speed.py
           tests/test_features.py tests/test_prediction.py tests/test_training.py
           tests/test_health.py tests/test_fault.py tests/test_column_mapping.py

@@ -34,6 +34,29 @@ CONTEXT_ALIASES={"battery":["battery","battery_id","Mã pin","Ma pin"],
                  "cycle":["cycle","cycle_index","Chu kỳ","Chu ky"],
                  "phase":["phase","phase_code","Giai đoạn","Giai doan"]}
 
+BMS_COLUMNS=['time_s','soc','pack_voltage','charge_current','max_cell_voltage','min_cell_voltage','max_temperature','min_temperature']
+STEP_ALIASES=['step','step_index','step_id','Bước đo','Buoc do']
+BMS_CONTEXT_ALIASES={'battery':['vehicle','vehicle_id','Mã xe','Ma xe','battery','battery_id'],
+                     'cycle':['session','session_id','Phiên sạc','Phien sac'], 'phase':[]}
+
+
+def filter_candidates(columns, task='signals'):
+    aliases=dict(BMS_CONTEXT_ALIASES if task=='bms' else CONTEXT_ALIASES)
+    aliases['step']=[] if task=='bms' else STEP_ALIASES
+    return {key:[c for c in columns if column_key(c) in {column_key(a) for a in names}] for key,names in aliases.items()}
+
+
+def validate_filter_column(key, column, columns, task='signals'):
+    if not column:return
+    if column not in filter_candidates(columns,task).get(key,[]):
+        if key=='cycle' and column_key(column) in {column_key(a) for a in STEP_ALIASES}:
+            raise ValueError(f'{column} là bước đo, không phải chu kỳ. Dùng bộ lọc Bước đo; chu kỳ dùng Cycle_Index hoặc cycle.')
+        label={'battery':'mã pin/xe','cycle':'phiên sạc' if task=='bms' else 'chu kỳ','phase':'giai đoạn sử dụng','step':'bước đo'}.get(key,key)
+        candidates=filter_candidates(columns,task).get(key,[])
+        expected=('Cột phù hợp: '+', '.join(candidates)+'.') if candidates else ('Tệp không có cột '+label+'; bỏ bộ lọc này.')
+        raise ValueError(f'Cột {column} không phải cột {label}. '+expected)
+
+
 SCALES={"time":{"s":1,"ms":.001,"min":60},"terminal_voltage":{"V":1,"mV":.001},"terminal_current":{"A":1,"mA":.001},"temperature":{"C":1,"K":1}}
 
 def read_frame(raw, preview=False):
@@ -72,8 +95,14 @@ def preview_frame(frame):
     suggestions={key:matches[0] if len(matches)==1 else "" for key,matches in candidates.items()}
     context_columns={key:next((c for c in columns if column_key(c) in [column_key(a) for a in aliases]),"") for key,aliases in CONTEXT_ALIASES.items()}
     context_values={key:str(frame[col].iloc[0]) for key,col in context_columns.items() if col and frame[col].nunique(dropna=False)==1 and frame[col].notna().all()}
+    groups=filter_candidates(columns)
+    bms_groups=filter_candidates(columns,'bms')
+    filter_columns={column for group in [*groups.values(),*bms_groups.values()] for column in group}
     return dict(columns=columns,preview=frame,suggestions=suggestions,context_columns=context_columns,context_values=context_values,
-                suggested_units={key:suggested_unit(key,col) for key,col in suggestions.items()})
+                suggested_units={key:suggested_unit(key,col) for key,col in suggestions.items()},
+                filter_candidates=groups,bms_filter_candidates=bms_groups,
+                filter_values={c:[str(v) for v in frame[c].dropna().unique()[:20]] for c in columns if c in filter_columns},
+                bms_missing=[name for name in BMS_COLUMNS if name not in columns])
 
 def normalize(raw, mapping, units, positive_discharge=False):
     return normalize_frame(read_frame(raw),mapping,units,positive_discharge)

@@ -104,3 +104,11 @@ Menu chính gồm Phân tích pin và Lịch sử. Thông số bổ sung, dữ l
 Tên cột tiếng Việt có dấu/không dấu và đơn vị ghi trong tiêu đề được gợi ý tự động. Nếu một tín hiệu khớp nhiều cột, cần chọn rõ cột; không tự chọn cột đầu tiên. Tên cột không có đơn vị dùng đơn vị chuẩn đang hiển thị, có thể sửa trong mục Cột và đơn vị. Tên pin được lấy từ mã pin trong bản xem trước hoặc tên tệp khi chưa nhập; toàn bộ tệp vẫn phải qua kiểm tra nhóm trước phân tích.
 
 Nút Xem kết quả mẫu chạy trực tiếp một ví dụ được ghi nhãn mẫu. Khi nhập dung lượng, chỉ dùng hai phép đo đầy đủ cùng điều kiện, không dùng SOC. Kết quả có phần diễn giải tỷ lệ dung lượng và biểu đồ đổi được tín hiệu hiển thị.
+
+## Bộ lọc nhóm và kiểm tra nguồn
+
+Danh sách cột lọc chỉ chứa cột đúng nghĩa. `Cycle_Index` là chu kỳ; `Step_Index` là bước đo trong chu kỳ. Điện áp/dòng điện không được chọn làm giai đoạn sử dụng. Không có cột tương ứng thì bộ lọc đó không xuất hiện. Với BAIC, các nhóm là xe và phiên sạc.
+
+Tệp thiếu cấu trúc tám tín hiệu BAIC sẽ bị chặn trước khi lọc hoặc dự đoán; có thể chuyển sang xem số đo mà không suy SOH. Khi không có dòng khớp, thông báo nêu bộ lọc đã dùng và một số giá trị thực quan sát được. Không tự bỏ bộ lọc để ép ra kết quả.
+
+Với tệp SDU gốc dùng `Test_Time(s)`, sau khi chọn một chu kỳ, hệ thống lấy 120 giây đầu có dòng xả âm, không lấy nhầm 120 giây đầu của bước sạc. Nếu lọc riêng một bước sạc, yêu cầu bị từ chối thay vì bỏ qua bộ lọc.

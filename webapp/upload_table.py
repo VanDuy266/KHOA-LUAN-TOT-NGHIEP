@@ -1,11 +1,25 @@
 """Bounded CSV streaming for external uploads; never materialize the whole CSV."""
 import csv,gzip,hashlib,io
 import pandas as pd
-from .column_mapping import read_frame,column_key,CONTEXT_ALIASES
+from .column_mapping import read_frame,column_key,CONTEXT_ALIASES,BMS_CONTEXT_ALIASES
 MAX_CSV_BYTES=512*1024*1024
 MAX_JSON_BYTES=20*1024*1024
 MAX_EXPANDED_BYTES=1024*1024*1024
 MAX_SELECTED_ROWS=100000
+GROUP_KEYS={column_key(a) for aliases in [*CONTEXT_ALIASES.values(),*BMS_CONTEXT_ALIASES.values()] for a in aliases}
+
+
+def observe_values(observed, column, series):
+    for value in series.dropna().astype(str).unique():
+        if len(observed[column])>=20:break
+        observed[column].add(value[:120])
+
+
+def empty_filter_error(filters, observed):
+    if not filters:return ValueError('Tệp không có dòng dữ liệu.')
+    requested='; '.join(f'{col}: {value[:120]}' for col,value in filters.items())
+    examples='; '.join(f'{col}: '+', '.join(sorted(values)) for col,values in observed.items() if values)
+    return ValueError('Không có dòng khớp bộ lọc ('+requested+'). '+('Một số giá trị quan sát được: '+examples+'. ' if examples else '')+'Kiểm tra lại giá trị hoặc bỏ bộ lọc; không dùng cột tín hiệu làm mã nhóm.')
 
 class LimitedReader(io.RawIOBase):
     def __init__(self,source):self.source=source;self.total=0
@@ -36,12 +50,15 @@ def read_upload(upload,preview=False,needed=None,filters=None):
         if size>MAX_JSON_BYTES:raise ValueError("JSON tối đa 20 MiB; chuyển dữ liệu lớn sang CSV.")
         data=read_frame(source.read(),preview=False)
         scanned=len(data)
+        observed={col:set() for col in filters}
         for col,value in filters.items():
             if col not in data:raise ValueError("Cột lọc không có trong file.")
+            observe_values(observed,col,data[col])
             data=data[_match(data[col],value)]
+        if data.empty:raise empty_filter_error(filters,observed)
         if not preview:
             for col in data:
-                if column_key(col) in {column_key(a) for aliases in CONTEXT_ALIASES.values() for a in aliases} and data[col].nunique(dropna=False)>1:raise ValueError("File chứa nhiều pin/chu kỳ: chọn cột và giá trị lọc.")
+                if column_key(col) in GROUP_KEYS and data[col].nunique(dropna=False)>1:raise ValueError(f"File chứa nhiều pin/chu kỳ/phiên: cột {col} có nhiều giá trị. Chọn bộ lọc cho cột này.")
         data.attrs['scanned_rows']=scanned
         return data.head(5) if preview else data
     if not filename.endswith(('.csv','.csv.gz','.gz')):raise ValueError("Chỉ nhận CSV, CSV.GZ hoặc JSON dạng bảng.")
@@ -60,23 +77,25 @@ def read_upload(upload,preview=False,needed=None,filters=None):
     reader.seek(0)
     if preview:return pd.read_csv(LimitedReader(reader),nrows=5,**options)
     if needed is not None and not set(needed)<=set(columns):raise ValueError("Cột tín hiệu hoặc SOC không có trong file.")
-    group_columns=[c for c in columns if column_key(c) in {column_key(a) for aliases in CONTEXT_ALIASES.values() for a in aliases}]
+    group_columns=[c for c in columns if column_key(c) in GROUP_KEYS]
     keep=None if needed is None else list(set(needed)|set(filters)|set(group_columns))
-    parts=[];selected=0;scanned=0;seen={c:set() for c in group_columns}
+    parts=[];selected=0;scanned=0;seen={c:set() for c in group_columns};observed={col:set() for col in filters}
     chunks=pd.read_csv(LimitedReader(reader),usecols=keep,chunksize=50000,**options)
     try:
         for chunk in chunks:
             scanned+=len(chunk)
             if scanned>10000000:raise ValueError("Tối đa 10 triệu dòng quét; hãy tách dữ liệu theo pin/chu kỳ.")
-            for col,value in filters.items():chunk=chunk[_match(chunk[col],value)]
+            for col,value in filters.items():
+                observe_values(observed,col,chunk[col])
+                chunk=chunk[_match(chunk[col],value)]
             for col in group_columns:
                 seen[col].update(chunk[col].astype(str).unique())
-                if len(seen[col])>1:raise ValueError("File chứa nhiều pin/chu kỳ: chọn cột và giá trị lọc trước khi phân tích.")
+                if len(seen[col])>1:raise ValueError(f"File chứa nhiều pin/chu kỳ/phiên: cột {col} có nhiều giá trị. Chọn bộ lọc cho cột này trước khi phân tích.")
             selected+=len(chunk)
             if selected>MAX_SELECTED_ROWS:raise ValueError("Đoạn đã chọn vượt 100.000 dòng; lọc một pin và một chu kỳ hoặc tách đoạn đo.")
             if len(chunk):parts.append(chunk)
     finally:chunks.close()
-    if not parts:raise ValueError("Không có dòng khớp pin/chu kỳ đã chọn.")
+    if not parts:raise empty_filter_error(filters,observed)
     result=pd.concat(parts,ignore_index=True);result.attrs['scanned_rows']=scanned
     return result
 

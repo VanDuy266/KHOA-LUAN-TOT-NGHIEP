@@ -753,11 +753,14 @@ def mapping_normalize():
         raise ValueError("Ánh xạ cần danh sách cột có tên.")
     from webapp.column_mapping import normalize_frame
     from webapp.upload_table import read_upload,upload_sha256,carry_context
+    from webapp.column_mapping import validate_filter_column
+    header=read_upload(request.files.get("file"),preview=True)
     filters={}
-    for key in ("battery","cycle","phase"):
+    for key in ("battery","cycle","phase","step"):
         column=request.form.get("filter_"+key+"_column","")
         value=request.form.get("filter_"+key+"_value","")
         if column:
+            validate_filter_column(key,column,header.columns)
             if column in filters:raise ValueError("Hai bộ lọc cần cột riêng.")
             filters[column]=value
     soc_col=request.form.get("soc_column","")
