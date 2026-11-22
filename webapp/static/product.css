@@ -92,3 +92,32 @@ main :is(.analysis-main-fields, .controls) > .field {
     grid-template-columns: minmax(0, 1fr);
   }
 }
+
+.battery-intro .actions,
+.battery-research .actions,
+.result-toolbar {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.battery-intro .button,
+.battery-research .button {
+  text-decoration: none;
+  border-radius: 8px;
+}
+.result-toolbar {
+  margin-top: 16px;
+}
+.result-notes > summary {
+  cursor: pointer;
+}
+.result-notes[open] > summary {
+  margin-bottom: 12px;
+}
+.result-notes > details.panel {
+  padding: 12px 0;
+  margin: 0;
+  border: 0;
+  border-top: 1px solid var(--line);
+}
