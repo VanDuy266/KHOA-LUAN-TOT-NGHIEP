@@ -87,10 +87,10 @@ def test_xjtu_group_splits_and_predictions_are_complete():
     assert np.isfinite(predictions[["actual_soh", "predicted_soh"]]).all().all()
 
 
-def test_xjtu_app_and_forecast_render():
+def test_archived_xjtu_screen_and_forecast_render(monkeypatch):
     from streamlit.testing.v1 import AppTest
-    app = AppTest.from_file(str(ROOT / "app/streamlit_app.py"), default_timeout=30).run()
-    app.radio(key="navigation").set_value("Thực nghiệm XJTU").run()
+    monkeypatch.syspath_prepend(str(ROOT / "app"))
+    app = AppTest.from_string("from screens.xjtu import render\nrender()", default_timeout=30).run()
     assert not app.exception and not app.error
     app.radio(key="xjtu_mode").set_value("Dự đoán XJTU").run()
     app.button(key="xjtu_predict").click().run()

@@ -82,7 +82,7 @@ def figures(data, predictions):
     plt.close(fig)
 
 
-def word_report(text):
+def word_report(text, pages=None):
     doc = Document()
     doc.core_properties.author = "Nguyễn Văn Duy"
     doc.core_properties.title = (
@@ -142,8 +142,7 @@ def word_report(text):
             doc.add_page_break()
             doc.add_heading("Mục lục", level=1)
             # Mục lục tĩnh theo đề mục để luôn hiển thị cả khi chưa cập nhật trường Word.
-            page_file = ROOT / "reports/document_pages.json"
-            pages = json.loads(page_file.read_text()) if page_file.exists() else {}
+            pages = pages or {}
             titles = re.findall(r"^# (.+)$", text, re.M)[2:]
             for title in titles:
                 if title not in ["KHÓA LUẬN TỐT NGHIỆP"]:
@@ -176,7 +175,7 @@ def word_report(text):
     doc.save(ROOT / "docs/bao-cao-khoa-luan.docx")
 
 
-def slides(summary, temporal):
+def slides(summary, temporal, bms_discussion, fault_discussion):
     rf = summary[summary.model == "Random Forest"].iloc[0]
     sections = [
         (
@@ -276,13 +275,13 @@ def slides(summary, temporal):
         (
             "Sản phẩm Vincent D",
             [
-                "Tra cứu hai giai đoạn, tín hiệu và so sánh chu kỳ",
-                "Dự đoán một/lô, lịch sử và phiếu kết quả",
-                "Chất lượng, nguồn dữ liệu và bảng thực nghiệm",
+                "Nhận dữ liệu SDU, BAIC, dung lượng đo và tín hiệu V/I/T",
+                "Xuất phiếu, lưu hồ sơ và theo dõi dung lượng đến ngưỡng",
+                "So sánh mô hình, huấn luyện thử và dùng Ridge JSON",
             ],
             None,
         ),
-        ("Giao diện ứng dụng", [], "docs/images/vincent_d_sdu_overview.png"),
+        ("Giao diện ứng dụng", [], "docs/images/vincent_d_web_overview.png"),
         (
             "Kết luận và hướng phát triển",
             [
@@ -310,7 +309,7 @@ def slides(summary, temporal):
                 "Quy tắc quá khứ và Isolation Forest · giữ riêng pin",
                 "74 cờ giai đoạn đầu; 135 cờ tái sử dụng",
                 "Chưa có nhãn lỗi; cờ không phải kết luận hỏng pin",
-                "Chưa có dữ liệu BMS để kiểm chứng trên xe",
+                "Thí nghiệm này dùng chuỗi SOH tham chiếu của SDU",
             ],
             None,
         ),
@@ -333,6 +332,10 @@ def slides(summary, temporal):
         x_scores = pd.read_csv(xjtu_scores)
         x_rf = x_scores[(x_scores.design == "XJTU held-out") & (x_scores.model == "Random Forest")].iloc[0]
         sections.insert(-2, ("Thực nghiệm nguồn XJTU độc lập", ["23 pin Lishen NCM 2 Ah; Batch-1/2, giữ riêng pin", f"RF: MAE {x_rf.mae:.3f}; RMSE {x_rf.rmse:.3f}; R² {x_rf.r2:.3f}", "So sánh RF đa nguồn và chuyển miền SDU → XJTU", "Dữ liệu phòng lab; chưa kiểm chứng BMS trên xe"], None))
+    sections[-2:-2] = [
+        ("Thực nghiệm BAIC trên xe", [bms_discussion, "Nhãn suy ra từ dòng điện/SOC, cần đối chiếu RPT độc lập"], None),
+        ("Phân loại dấu hiệu lỗi", [fault_discussion, "Mẫu đầu vào là ma trận điện áp 50 × 14 cell"], None),
+    ]
     prs = Presentation()
     prs.core_properties.author = "Nguyễn Văn Duy"
     prs.slide_width = Inches(13.333)
@@ -522,6 +525,17 @@ def main():
         + "; ".join(f"{row.model}: {row.mae:.3f}" for row in temporal.itertuples())
         + " điểm phần trăm SOH. Đây là kết quả riêng của thiết kế thời gian.",
     }
+    bms = pd.read_csv(ROOT / "reports/thesis_audit/bms_summary.csv").set_index("model")
+    bms_discussion = (
+        f'BAIC · MAE theo xe của Ridge–RF {bms.loc["Ridge-RF residual", "macro_mae"]:.3f} '
+        f'và Random Forest {bms.loc["Random Forest", "macro_mae"]:.3f} điểm phần trăm SOH.'
+    )
+    fault = json.loads((ROOT / "reports/fault/summary.json").read_text())
+    fault_discussion = (
+        f'Zenodo · {fault["vehicles"]} xe, kiểm thử giữ riêng xe. '
+        f'Precision {fault["metrics"]["precision"]:.2%}, recall {fault["metrics"]["recall"]:.2%}.'
+    )
+    replacements.update(BMS_DISCUSSION=bms_discussion, FAULT_DISCUSSION=fault_discussion)
     xml = ROOT / "reports/pytest-results.xml"
     if xml.exists():
         suite = ET.parse(xml).getroot().find("testsuite")
@@ -539,14 +553,14 @@ def main():
     if "{{" in text:
         raise ValueError("Còn biến mẫu báo cáo")
     # Ảnh lấy từ ứng dụng thật, không dựng lại giao diện trong báo cáo.
-    if (ROOT / "docs/images/vincent_d_sdu_overview.png").exists():
+    if (ROOT / "docs/images/vincent_d_web_overview.png").exists():
         text = text.replace(
             "## 5.3. Mô hình ứng dụng",
-            "![Hình 5.1. Tổng quan Vincent D với dữ liệu SDU](images/vincent_d_sdu_overview.png)\n\n## 5.3. Mô hình ứng dụng",
+            "![Hình 5.1. Trang Sức khỏe pin của Vincent D](images/vincent_d_web_overview.png)\n\n## 5.3. Mô hình ứng dụng",
         )
     (ROOT / "docs/bao-cao-khoa-luan.md").write_text(text)
     word_report(text)
-    slides(summary, temporal)
+    slides(summary, temporal, bms_discussion, fault_discussion)
     # PDF là bước tùy chọn khi máy có LibreOffice và pdftotext.
     office = shutil.which("soffice")
     pdf = ROOT / "docs/bao-cao-khoa-luan.pdf"
@@ -582,11 +596,25 @@ def main():
                 (ROOT / "reports/document_pages.json").write_text(
                     json.dumps(pages, ensure_ascii=False, indent=2) + "\n"
                 )
-                word_report(text)
+                word_report(text, pages)
         print("Đã xuất PDF và đối chiếu số trang mục lục.")
-    elif pdf.exists():
-        pdf.unlink()
-        print("Chưa xuất PDF mới: máy không có LibreOffice; bản Word đã cập nhật.")
+    elif shutil.which("pandoc") and shutil.which("xelatex"):
+        with tempfile.TemporaryDirectory() as folder:
+            output_pdf = Path(folder) / pdf.name
+            subprocess.run(
+                [
+                    "pandoc", "bao-cao-khoa-luan.md", "--pdf-engine=xelatex", "--toc",
+                    "--variable=mainfont:Noto Serif", "--variable=geometry:margin=26mm",
+                    "--variable=papersize:a4", "--variable=fontsize:12pt",
+                    "-o", str(output_pdf),
+                ],
+                cwd=ROOT / "docs",
+                check=True,
+            )
+            shutil.copyfile(output_pdf, pdf)
+        print("Đã xuất PDF từ bản Markdown bằng Pandoc và XeLaTeX.")
+    else:
+        print("Cần LibreOffice hoặc Pandoc và XeLaTeX để cập nhật PDF.")
     print("Đã tạo báo cáo Word/Markdown và slide từ các bảng kết quả thực nghiệm.")
 
 

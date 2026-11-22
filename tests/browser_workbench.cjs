@@ -36,6 +36,18 @@ const fs=require('node:fs/promises');
     await page.goto(base+'/');await expect(page.locator('#battery-start-title')).toBeVisible();await page.screenshot({path:'/tmp/vincent-dashboard-final.png',fullPage:true});
     await page.locator('#theme').click();await page.screenshot({path:'/tmp/vincent-dashboard-final-dark.png',fullPage:true});
     await page.setViewportSize({width:390,height:844});await page.reload();await expect(page.locator('#battery-start-title')).toBeVisible();await page.evaluate(()=>{document.activeElement?.blur();window.scrollTo(0,0);});if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1))throw new Error('Dashboard mobile overflow');await page.screenshot({path:'/tmp/vincent-dashboard-final-mobile.png',fullPage:true});
+    await page.goto(base+'/#evaluation');
+    await expect(page.locator('[data-benchmark="SDU"]')).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('#content')).toContainText('86 pin');
+    await page.locator('[data-benchmark="BMS"]').click();
+    await expect(page.locator('[data-benchmark="BMS"]')).toHaveAttribute('aria-pressed','true');
+    await expect(page.locator('#content')).toContainText('20 xe');
+    await page.locator('#benchmark-metric').selectOption('macro_rmse');
+    await expect(page.locator('.benchmark-verdict .eyebrow')).toContainText('RMSE');
+    await page.goto(base+'/#profile');
+    await expect(page.locator('#content')).toContainText('Nguyễn Văn Duy');
+    const defense=await page.request.get(base+'/api/download/thesis-audit?kind=defense');
+    if(!defense.ok()||!(await defense.text()).trim())throw new Error('Defense material unavailable');
     await page.goto(base+'/#guide');await expect(page.locator('#content')).toContainText('Tín hiệu đo');
     // Changing inputs must clear results in the older analysis forms too.
     await page.goto(base+'/#health');await expect(page.locator('#health-file')).toBeVisible();

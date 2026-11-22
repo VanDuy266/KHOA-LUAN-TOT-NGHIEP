@@ -224,22 +224,33 @@ Các phép kiểm tra batch và bảng theo từng pin nằm trong reports/xjtu 
 
 # Chương 5. Xây dựng sản phẩm Vincent D
 ## 5.1. Kiến trúc phần mềm
-Quy trình gồm tầng nguồn CSV gzip, tầng chuyển đổi Parquet, tầng đặc trưng và huấn luyện, tầng báo cáo kết quả và tầng giao diện. Thư mục src/battery_soh chứa hàm đặc trưng dùng chung; scripts chứa các bước có thể chạy lại; app/screens chia từng màn hình; reports lưu bằng chứng thực nghiệm; artifacts lưu mô hình tin cậy do dự án tạo.
-Giao diện đọc bảng nhỏ cho thống kê và chỉ đọc dữ liệu chu kỳ khi cần. Mô hình được nạp một lần trong bộ nhớ đệm. Trình duyệt nhận dữ liệu biểu đồ đã giới hạn điểm hiển thị, trong khi file xuất vẫn giữ các mẫu theo bộ lọc. Cách này tránh gửi hàng triệu điểm lên trình duyệt.
+Ứng dụng dùng HTML/CSS/JavaScript ở trình duyệt và Flask ở máy chủ. Gunicorn phục vụ bản Linux trên Render, Waitress phục vụ bản Windows. Máy chủ đọc Parquet và bảng dẫn xuất theo yêu cầu, nạp mô hình đã huấn luyện và gửi dữ liệu đã giới hạn điểm hiển thị. Mã web nằm trong webapp, hàm trích đặc trưng trong src/battery_soh, tập lệnh tái lập trong scripts. Phiên bản Streamlit trong app được lưu để tham chiếu.
 ## 5.2. Các chức năng
-Tổng quan trình bày quy mô dữ liệu, sai số và đường SOH theo giai đoạn. Tra cứu cho phép lọc pin, giai đoạn, khoảng chu kỳ, xem tín hiệu và so sánh hai chu kỳ. Đánh giá mô hình hiển thị chỉ số, dự đoán giữ riêng, sai số, thời gian và thử nghiệm bỏ đặc trưng.
-Dự đoán nhận CSV hoặc CSV.GZ tới 512 MiB cho một chu kỳ hoặc tối đa 2.000 nhóm trong một lần. Chương trình kiểm tra tên cột, tín hiệu hữu hạn, số chu kỳ và giai đoạn. Với lô dữ liệu, lỗi của một nhóm được báo riêng, không làm mất các kết quả hợp lệ khác. CSV mẫu có nhãn nguồn và không được trình bày như kiểm thử độc lập.
-Lịch sử được giữ trong phiên; khi người dùng chọn lưu, kết quả và tên nguồn được ghi vào SQLite cục bộ trên máy chủ, không lưu nội dung CSV tải lên. Kho này dùng chung trên máy chủ, chưa có phân quyền tài khoản. Phiếu kết quả có thể tải dưới dạng CSV và HTML. Trang Xu hướng bất thường hiển thị chuỗi SOH, nền quá khứ, cờ của quy tắc/Isolation Forest và lý do; dữ liệu có thể xuất CSV. Trang chất lượng trình bày nguồn, tiến trình chọn dữ liệu và các điểm nghi vấn. Trang thông tin cung cấp trích dẫn và tài liệu nghiên cứu. Các trang kiểm tra đầu vào và demo trên pin giữ riêng được giữ lại. Phần phân rã dự đoán dùng hệ số Ridge và đường đi trong cây phù hợp với mô hình đang chọn, không gọi là SHAP hoặc quan hệ nhân quả.
-Mục Thực nghiệm XJTU bổ sung bảng kiểm thử nguồn độc lập, biểu đồ theo pin, nguồn và dự đoán MAT riêng. RF riêng XJTU và RF đa nguồn dùng dòng chuẩn hóa theo dung lượng danh định; điểm refit ứng dụng được phân biệt với kiểm thử pin giữ riêng.
+| Mục | Đầu vào | Kết quả |
+| --- | --- | --- |
+| Sức khỏe pin | Mẫu SDU, BAIC, dung lượng đo hoặc tín hiệu V/I/T | SOH theo miền hỗ trợ hoặc biểu đồ tín hiệu, kèm phiếu kết quả |
+| Lịch sử | Hồ sơ đánh giá đã lưu hoặc JSON sao lưu | So sánh hồ sơ, theo dõi theo ngày, xuất và khôi phục JSON |
+| Xu hướng dung lượng | Lịch sử một pin/xe hoặc CSV | Xu hướng và vị trí chạm ngưỡng khi đạt điều kiện ngoại suy |
+| Phân loại lỗi | Ma trận điện áp 50 hàng × 14 cell, theo mV | Dấu hiệu theo cell và đối chiếu nhãn nguồn khi có |
+| So sánh mô hình | Chọn nguồn SDU hoặc BAIC và chỉ số | MAE, RMSE, R² và thời gian đã ghi của từng nguồn |
+| Huấn luyện | Bảng đặc trưng CSV có nhãn và mã pin | Điểm trên nhóm pin giữ riêng và gói kết quả |
+| Mô hình riêng | Tín hiệu thô hoặc Ridge JSON kèm CSV đặc trưng | Bảng đặc trưng hoặc dự đoán trên dữ liệu đúng miền |
+| Định dạng và thông tin | Nhu cầu chuẩn bị dữ liệu hoặc tra cứu đề tài | Cột, đơn vị, nguồn và tài liệu bảo vệ |
 
-![Hình 5.1. Tổng quan Vincent D với dữ liệu SDU](images/vincent_d_sdu_overview.png)
+Bộ tiếp nhận phân tích hỗ trợ CSV/CSV.GZ tối đa 512 MiB và JSON tối đa 20 MiB. Người dùng có thể ánh xạ tên cột và đơn vị, lọc nhóm và xác nhận nguồn trước khi đánh giá. Lịch sử lưu trong phiên trình duyệt hoặc lưu lâu dài trên trình duyệt khi được chọn. Phiếu xuất dưới dạng HTML, CSV hoặc JSON.
+![Hình 5.1. Trang Sức khỏe pin của Vincent D](images/vincent_d_web_overview.png)
 
 ## 5.3. Mô hình ứng dụng
-Random Forest là mô hình triển khai được quy định trước cho bản ứng dụng. Mô hình này được học lại trên toàn bộ 20.823 mẫu để phục vụ ước lượng; không lấy sai số trên chính dữ liệu học lại để báo cáo chất lượng. Điểm thực nghiệm luôn đọc từ các dự đoán giữ riêng đã lưu.
-Ứng dụng hiển thị cảnh báo khi đặc trưng nằm ngoài khoảng quan sát của dữ liệu huấn luyện. Kiểm tra khoảng riêng từng biến chưa đủ phát hiện mọi trường hợp ngoài phân phối. Dự đoán không bị ép vào một khoảng đẹp hơn và không được dùng như chứng nhận an toàn pin.
+Mô hình triển khai được huấn luyện lại để suy luận, còn bảng điểm lấy từ dự đoán giữ riêng. Bộ SDU dùng SOH dung lượng trên 86 tế bào. Bộ BAIC dùng SOH suy ra từ dòng điện/SOC của 20 xe BAIC EU500, gồm 27.205 phiên trong bảng thực nghiệm và 5 vòng kiểm thử theo xe. Kiểm chứng BAIC mang tính hồi cứu và cần phép đo RPT độc lập để đối chiếu SOH vật lý.
+
+BAIC · MAE theo xe của Ridge–RF 2.100 và Random Forest 2.172 điểm phần trăm SOH.
+
+Zenodo · 99 xe, kiểm thử giữ riêng xe. Precision 90.91%, recall 97.00%.
+
+Ngoại suy xu hướng áp dụng cho một đối tượng có lịch sử đủ điều kiện. Kết quả chạm ngưỡng theo chu kỳ hoặc tháng có miền hiệu lực riêng. Phép phân loại lỗi dùng một bộ điện áp độc lập với SDU và BAIC. Mẫu demo minh họa thao tác, còn chỉ số đánh giá tính trên dữ liệu giữ riêng.
 ## 5.4. Kiểm tra sản phẩm
-Các kiểm thử bao gồm tính độc lập của đặc trưng với tín hiệu sau 120 giây và nhãn, tính đúng định nghĩa SOH, khóa pin/giai đoạn/chu kỳ, phân hoạch không trùng pin, đối chiếu chỉ số với dự đoán đã lưu và kiểm thử các màn hình Streamlit. Dự đoán mẫu, dự đoán theo lô, lịch sử phiên và lỗi CSV cũng được kiểm tra.
-Lần kiểm thử lưu trong reports/pytest-results.xml gồm 82 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
+Các kiểm thử đối chiếu đặc trưng, phân hoạch theo nhóm, chỉ số thực nghiệm, giới hạn dữ liệu, API và tệp triển khai. Các kịch bản Chromium chạy qua phân tích mẫu và CSV, phiếu kết quả, lưu/khôi phục, xu hướng, lỗi, so sánh, huấn luyện và suy luận từ dữ liệu mới.
+Lần kiểm thử lưu trong reports/pytest-results.xml gồm 260 trường hợp, 0 thất bại, 0 lỗi và 0 bỏ qua. Tệp dataset_check.json ghi kết quả kiểm tra toàn bộ 10.505.065 dòng.
 ## 5.5. Lưu trữ và bàn giao
 Gói sản phẩm chứa mã nguồn, thư viện được khóa phiên bản, dữ liệu Parquet phục vụ tra cứu, bảng đặc trưng, mô hình, notebook đã chạy, kết quả thực nghiệm và báo cáo/slide. Bộ dữ liệu nguồn được nộp riêng dưới dạng source_rows với hai giai đoạn, các bảng chu kỳ và hồ sơ kiểm tra, trích dẫn. Không cần giải nén từng file CSV gzip để chương trình đọc.
 Các file nguồn lớn không được đưa vào bộ nhớ cùng lúc. Môi trường .venv không đóng gói vì phụ thuộc hệ điều hành; môi trường được tạo lại bằng danh sách thư viện. Dữ liệu nguồn không thuộc quyền sở hữu riêng của tác giả khóa luận và được sử dụng theo giấy phép CC BY 4.0.

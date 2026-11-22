@@ -3,6 +3,7 @@ from pathlib import Path
 import sys,json,unittest
 import numpy as np
 import pandas as pd
+from webapp.data import table
 ROOT=Path(__file__).resolve().parents[1]
 sys.path[:0]=[str(ROOT/'src'),str(ROOT/'app')]
 from battery_soh.features import FEATURES
@@ -11,7 +12,7 @@ from battery_soh.features import FEATURES
 class BoostingChecks(unittest.TestCase):
     def test_same_rows_and_outer_folds(self):
         data=pd.read_csv(ROOT/'reports/features.csv')
-        pred=pd.read_csv(ROOT/'reports/boosting/predictions.csv')
+        pred=table('reports/boosting/predictions.csv')
         folds=pd.read_csv(ROOT/'reports/split_assignments.csv').set_index('battery').test_fold
         for name in ['CatBoost','XGBoost']:
             part=pred[pred.model==name]
@@ -24,13 +25,13 @@ class BoostingChecks(unittest.TestCase):
         for split in splits:
             fit=set(split['fit_batteries']);validation=set(split['validation_batteries']);test=set(split['test_batteries'])
             self.assertTrue(fit.isdisjoint(validation) and fit.isdisjoint(test) and validation.isdisjoint(test))
-        trials=pd.read_csv(ROOT/'reports/boosting/validation_trials.csv')
+        trials=table('reports/boosting/validation_trials.csv')
         self.assertEqual(len(trials),30)
         self.assertTrue(trials.trees.between(1,1000).all())
     def test_macro_scores_match_held_out_predictions(self):
         from sklearn.metrics import mean_absolute_error,root_mean_squared_error,r2_score
-        pred=pd.read_csv(ROOT/'reports/boosting/predictions.csv')
-        summary=pd.read_csv(ROOT/'reports/boosting/metrics_summary.csv').set_index('model')
+        pred=table('reports/boosting/predictions.csv')
+        summary=table('reports/boosting/metrics_summary.csv').set_index('model')
         for name,part in pred.groupby('model'):
             scores=[]
             for _,group in part.groupby('battery'):

@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 INCLUDE = {
     "app",
+    "webapp",
     "src",
     "scripts",
     "tests",
@@ -19,15 +20,22 @@ INCLUDE = {
     ".streamlit",
     "artifacts",
 }
-EXCLUDE = {"__pycache__", ".cache", ".pytest_cache"}
+EXCLUDE = {"__pycache__", ".cache", ".pytest_cache", "node_modules"}
 ROOT_FILES = {
     "README.md",
     "chay_windows.ps1",
     "requirements-app.txt",
     "requirements.txt",
     "requirements-deep.txt",
+    "requirements-boosting.txt",
+    "requirements-render.txt",
+    "requirements-research.txt",
+    "requirements-web.txt",
     "requirements.lock.txt",
     ".gitignore",
+    ".python-version",
+    "Procfile",
+    "render.yaml",
 }
 CLEAN_FILES = {
     "cycle_features.csv",
@@ -50,6 +58,9 @@ def product_files():
                 yield path
             elif rel.parts[1] == "xjtu" and len(rel.parts) > 2 and rel.parts[2] != "raw":
                 yield path
+            elif rel.parts[1] in {"bms", "fault"} and len(rel.parts) > 2:
+                if rel.parts[2] in {"processed", "provenance"}:
+                    yield path
             elif rel.parts[1] == "provenance":
                 yield path
             elif rel.parts[1] == "clean" and (

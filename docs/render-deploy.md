@@ -19,7 +19,7 @@ Sửa `webapp/templates/index.html`, `webapp/static/app.css`, `webapp/static/app
 
 ## Dữ liệu và quyền riêng tư
 
-Mô hình, cách chia tập và điểm kiểm thử giữ nguyên. Không huấn luyện khi khởi động. Chỉ có các bảng dẫn xuất và mô hình BMS cần cho web, không đưa RAR nguồn lên máy chủ. CSV upload giới hạn 20 MiB, dữ liệu giải nén tối đa 50 MiB, tối đa 2.000 chu kỳ theo quy tắc SDU. Lịch sử nằm trong sessionStorage của tab, không dùng SQLite chung giữa người dùng.
+Mô hình, cách chia tập và điểm kiểm thử giữ nguyên. Không huấn luyện khi khởi động. Chỉ có các bảng dẫn xuất và mô hình BMS cần cho web, không đưa RAR nguồn lên máy chủ. Bộ tiếp nhận và lọc trong Phân tích pin nhận CSV/CSV.GZ tới 512 MiB, dữ liệu sau giải nén tới 1 GiB và JSON tới 20 MiB. API dự đoán SDU trực tiếp có giới hạn tải lên 20 MiB. Lịch sử hồ sơ lưu theo phiên trình duyệt bằng sessionStorage hoặc lưu lâu dài bằng localStorage khi người dùng chọn. Có thể xuất và khôi phục bản sao JSON.
 
 HTML trả ngay tiêu đề và metadata Vincent D cho crawler; không cần chạy JavaScript để lấy tên đề tài. Bản xem trước tin nhắn cũ có thể còn được ứng dụng nhắn tin lưu cache. Gói Render Free vẫn có thể ngủ khi không có truy cập; đổi giao diện không loại bỏ giới hạn hosting này.
 

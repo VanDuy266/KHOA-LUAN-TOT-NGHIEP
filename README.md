@@ -100,7 +100,8 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 
 | Thư mục | Nội dung |
 | --- | --- |
-| `app/` | 11 trang web riêng, dự đoán CSV, biểu đồ, lịch sử phiên và lưu kết quả tùy chọn trên máy chủ |
+| `webapp/` | Ứng dụng Flask, API phân tích pin, giao diện và lịch sử trên trình duyệt |
+| `app/` | Bản Streamlit tham chiếu và các hàm phân tích dùng chung |
 | `src/battery_soh/` | Hàm đặc trưng và kiểm nhãn dùng chung |
 | `scripts/` | Nhận dữ liệu, chuyển đổi, huấn luyện, đánh giá, tạo tài liệu |
 | `data/clean/` | Parquet theo pin/giai đoạn, mẫu CSV, bảng đặc trưng và nhãn |
@@ -108,7 +109,7 @@ Các bước thực hiện lần lượt: `check_dataset.py` → `run_experiment
 | `artifacts/` | Mô hình bảng, trọng số GRU và thông số chuẩn hóa |
 | `reports/` | Dự đoán kiểm thử, chỉ số, phân hoạch, thời gian và biểu đồ |
 | `notebooks/01_eda.ipynb` | Notebook phân tích đã chạy |
-| `docs/` | Báo cáo Word/Markdown/PDF, 20 slide, tài liệu kỹ thuật |
+| `docs/` | Báo cáo Word/Markdown/PDF, 23 slide, tài liệu kỹ thuật |
 | `tests/` | Kiểm thử dữ liệu, mô hình, CSV và giao diện |
 
 [Giải thích mã nguồn](docs/giai-thich-code.md) · [Nội dung trình bày](docs/noi-dung-trinh-bay.md) · [Danh mục bàn giao](docs/danh-muc-ban-giao.md)
@@ -189,4 +190,6 @@ Sửa trong VS Code, kiểm tra rồi đẩy lên nhánh GitHub mà Render theo 
 
 Trang **Phân tích pin** có quy trình chọn bài toán → khai báo cấu hình → ánh xạ và kiểm tra dữ liệu → lập báo cáo. Hỗ trợ SDU, BMS BAIC, tổng hợp tín hiệu pin khác và tỷ lệ dung lượng đo. Có hồ sơ theo mã pin/ngày đo, báo cáo HTML để in PDF, xuất CSV/JSON và lịch sử riêng trong trình duyệt. Xem [hướng dẫn đánh giá pin](docs/huong-dan-danh-gia-pin.md) về định dạng, phạm vi, lưu trữ và kiểm thử.
 
-Trang chính là biểu mẫu Phân tích pin, có một nút chạy và thông số bổ sung thu gọn. **Mô hình của tôi** cho phép trích xuất đặc trưng từ tín hiệu, huấn luyện với nhãn của người dùng, xuất Ridge JSON và dự đoán từ bảng mới cùng cấu hình. Lịch sử có sao lưu/khôi phục JSON và xu hướng theo ngày từ các hồ sơ đủ điều kiện. Sáu mô hình bảng SDU gồm Ridge, Random Forest, Ridge–RF, LightGBM, CatBoost và XGBoost; kết quả mẫu được phân biệt với upload của người dùng.
+Trang **Sức khỏe pin** dẫn đến biểu mẫu phù hợp với loại dữ liệu người dùng chọn. Biểu mẫu có một nút chạy và thông số bổ sung thu gọn. **Mô hình của tôi** cho phép trích xuất đặc trưng từ tín hiệu, huấn luyện với nhãn của người dùng, xuất Ridge JSON và dự đoán từ bảng mới cùng cấu hình. Lịch sử có sao lưu/khôi phục JSON và xu hướng theo ngày từ các hồ sơ đủ điều kiện. Sáu mô hình bảng SDU gồm Ridge, Random Forest, Ridge–RF, LightGBM, CatBoost và XGBoost; kết quả mẫu được phân biệt với upload của người dùng.
+
+[Danh mục chức năng, căn cứ kiểm thử và tài liệu bàn giao](docs/danh-muc-ban-giao.md#đối-chiếu-chức-năng-web).

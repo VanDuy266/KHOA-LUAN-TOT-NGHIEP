@@ -3,6 +3,7 @@ import sys, unittest
 from pathlib import Path
 import numpy as np
 import pandas as pd
+from webapp.data import table
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'src'))
 from battery_soh.bms import FEATURES, charging_features, tail_capacity
 
@@ -38,9 +39,9 @@ class SavedBMSChecks(unittest.TestCase):
         import json
         from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
         info=json.loads((ROOT/'reports/bms/dataset_summary.json').read_text(encoding='utf-8'))
-        features=pd.read_csv(ROOT/'reports/bms/features.csv')
-        predictions=pd.read_csv(ROOT/'reports/bms/predictions.csv')
-        metrics=pd.read_csv(ROOT/'reports/bms/metrics_summary.csv').set_index('model')
+        features=table('reports/bms/features.csv')
+        predictions=table('reports/bms/predictions.csv')
+        metrics=table('reports/bms/metrics_summary.csv').set_index('model')
         self.assertEqual(features.vehicle.nunique(),20)
         self.assertEqual(len(features),info['sessions'])
         self.assertGreaterEqual(features.reference_sessions.min(),3)
