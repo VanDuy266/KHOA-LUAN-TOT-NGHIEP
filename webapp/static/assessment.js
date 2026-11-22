@@ -48,7 +48,7 @@ function assessmentResult(item,actions=""){
     r.warnings.map(w=>notice(w,'warning')).join('')+actions+
     (r.signals?.length?'<details class="panel" '+(isSignals?'open':'')+'><summary>Biểu đồ số đo</summary><p>Hiển thị tối đa 200 điểm; kiểm tra dữ liệu dùng toàn bộ đoạn đã chọn.</p><div data-assessment-signals></div></details>':'')+
     '<details class="panel result-notes"><summary>Chi tiết kết quả</summary>'+
-    '<details class="result-detail"><summary>Phạm vi và phương pháp</summary>'+panel('Phạm vi áp dụng','',`<p>${esc(isSignals?'Đoạn dữ liệu này chỉ được tổng hợp tín hiệu. Điện lượng của một đoạn sạc/xả không phải dung lượng đầy và không xác định SOH.':r.task==='capacity'?'Tỷ lệ dung lượng hiện tại so với mốc tham chiếu do bạn cung cấp; chất lượng phụ thuộc phép đo.':'Hỗ trợ đối chiếu dung lượng trong cấu hình đã khai báo. Kết quả từ mô hình chưa thay thế phép đo dung lượng độc lập.')}</p><p>${esc(r.scope.message)}</p><p>${esc(r.uncertainty)}</p><p>${esc(r.limitation)}</p><ol>${r.next_steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`)+'</details>'+
+    '<details class="result-detail"><summary>Phạm vi áp dụng</summary>'+panel('Phương pháp','',`<p>${esc(isSignals?'Đoạn dữ liệu này chỉ được tổng hợp tín hiệu. Điện lượng của một đoạn sạc/xả không phải dung lượng đầy và không xác định SOH.':r.task==='capacity'?'Tỷ lệ dung lượng hiện tại so với mốc tham chiếu do bạn cung cấp; chất lượng phụ thuộc phép đo.':'Hỗ trợ đối chiếu dung lượng trong cấu hình đã khai báo. Kết quả từ mô hình chưa thay thế phép đo dung lượng độc lập.')}</p><p>${esc(r.scope.message)}</p><p>${esc(r.uncertainty)}</p><p>${esc(r.limitation)}</p><ol>${r.next_steps.map(x=>`<li>${esc(x)}</li>`).join('')}</ol>`)+'</details>'+
     '<details class="result-detail"><summary>Kiểm tra dữ liệu</summary>'+table(r.checks,'kiem_tra_danh_gia')+'</details>'+
     (r.explanation?`<details class="panel"><summary>Đóng góp đặc trưng</summary>${explanationEvidence(r.explanation.evidence,r.explanation.baseline)}<p>Giải thích đóng góp của mô hình, không chứng minh nguyên nhân hư hỏng vật lý.</p></details>`:'')+
     (r.validation?.length?`<details class="panel"><summary>Chỉ số kiểm thử mô hình</summary>${table(r.validation,'kiem_thu_mo_hinh')}<p>MAE là sai số trung bình trên dữ liệu kiểm thử giữ riêng pin/xe; không phải độ chính xác của hồ sơ này.</p></details>`:'')+
@@ -70,13 +70,41 @@ function assessmentFilterControls(data,task){
   return `<details class="analysis-filters"><summary>Lọc ${keys.map(key=>labels[key].toLowerCase()).join(' / ')}</summary>${keys.map(key=>`<div class="controls">${select('assessment-filter-'+key,'Cột '+labels[key].toLowerCase(),[{value:'',label:'Không lọc'},...candidates[key]],'')}<div class="field"><label for="assessment-filter-value-${key}">${labels[key]} cần lấy</label><input id="assessment-filter-value-${key}" maxlength="100" list="assessment-filter-options-${key}" placeholder="Chọn cột trước" disabled><datalist id="assessment-filter-options-${key}"></datalist></div></div>`).join('')}${candidates.step?.length?'<p class="input-example">Cycle_Index là chu kỳ. Step_Index là bước đo trong chu kỳ.</p>':''}</details>`;
 }
 function assessmentHome(token){
-  const choices=[
-    ['sdu','Dự đoán sức khỏe cell pin','CSV đo 120 giây đầu xả · pin SDU 2,4 Ah','Sức khỏe pin và mức chai.'],
-    ['bms','Dự đoán sức khỏe bộ pin xe','Tệp BMS đầu sạc · xe BAIC EU500 NMC 145 Ah','Sức khỏe bộ pin ước tính.'],
-    ['capacity','Tính sức khỏe từ dung lượng đo','Dung lượng ban đầu và hiện tại, cùng điều kiện đo','Sức khỏe pin tính từ hai số đo.'],
-    ['signals','Xem số đo của pin khác','Tệp có thời gian, điện áp, dòng điện và nhiệt độ','Biểu đồ các số đo.']
+  const choices = [
+    ['sdu','battery-half','Pin SDU','CSV đo 120 giây đầu xả · NMC 2,4 Ah','Dự đoán SOH'],
+    ['bms','car-front','Bộ pin BAIC','CSV đầu sạc · BAIC EU500 145 Ah','Dự đoán SOH'],
+    ['capacity','bar-chart-line','Dung lượng đã đo','Hai số đo Ah trong cùng điều kiện','Tính SOH'],
+    ['signals','activity','Số đo pin khác','Thời gian, điện áp, dòng điện và nhiệt độ','Xem biểu đồ']
   ];
-  if(!put(`<section class="battery-intro"><h1>Pin còn bao nhiêu dung lượng<br>so với lúc ban đầu?</h1><p class="soh-definition"><strong>SOH 85%</strong> nghĩa là pin còn giữ được 85% dung lượng ban đầu. Mức điện đang còn được gọi là SOC.</p><div class="actions"><button class="button primary" id="battery-demo">Xem kết quả pin mẫu</button><a class="button" href="#guide">Định dạng tệp</a></div><p class="sample-disclosure">Mẫu này đã dùng để huấn luyện mô hình.</p></section><section class="battery-start" aria-labelledby="battery-start-title"><h2 id="battery-start-title">Bạn có dữ liệu nào?</h2><div class="battery-options">${choices.map(([task,title,input,output])=>`<div class="battery-option"><div><h3>${title}</h3><p><strong>Cần có:</strong> ${input}</p><p><strong>Nhận được:</strong> ${output}</p></div><button class="button ${task==='sdu'?'primary':''}" type="button" data-start-task="${task}">${task==='signals'?'Xem số đo':task==='capacity'?'Nhập dung lượng':'Tải tệp dự đoán'}</button></div>`).join('')}</div></section><section class="battery-research"><h2>Kết quả và mô hình</h2><div class="actions"><a class="button" href="#evaluation">So sánh mô hình</a><a class="button" href="#training">Thử huấn luyện</a><a class="button" href="#history">Xem lịch sử</a></div></section>`,token))return;
+  if(!put(`
+    <section class="battery-intro">
+      <h1>Pin còn bao nhiêu dung lượng<br>so với lúc ban đầu?</h1>
+      <p class="soh-definition"><strong>SOH 85%</strong> nghĩa là pin còn 85% dung lượng ban đầu.</p>
+      <div class="actions">
+        <button class="button primary" id="battery-demo">Xem kết quả pin mẫu</button>
+        <a class="button" href="#guide">Định dạng tệp</a>
+      </div>
+      <p class="sample-disclosure">Mẫu đã dùng để huấn luyện.</p>
+    </section>
+    <section class="battery-start" aria-labelledby="battery-start-title">
+      <h2 id="battery-start-title">Bạn có dữ liệu nào?</h2>
+      <div class="battery-options">${choices.map(([task,icon,title,input,label])=>`
+        <button class="battery-option" type="button" data-start-task="${task}">
+          <span class="battery-option-icon" aria-hidden="true" style="--option-icon:url('/static/icons/${icon}.svg')"></span>
+          <span class="battery-option-name">${title}</span>
+          <span class="battery-option-input">${input}</span>
+          <span class="battery-option-action">${label} <span aria-hidden="true">→</span></span>
+        </button>`).join('')}
+      </div>
+    </section>
+    <section class="battery-research">
+      <h2>Kết quả và mô hình</h2>
+      <div class="actions">
+        <a class="button" href="#evaluation">So sánh mô hình</a>
+        <a class="button" href="#training">Thử huấn luyện</a>
+        <a class="button" href="#history">Xem lịch sử</a>
+      </div>
+    </section>`,token))return;
   for(const button of document.querySelectorAll('[data-start-task]'))button.onclick=()=>{state('check').entryTask=button.dataset.startTask;location.hash='check';};
   $('#battery-demo').onclick=()=>{state('check').sampleTask='sdu';state('check').runSample=true;location.hash='check';};
 }
@@ -136,7 +164,7 @@ async function assessment(token){
   form.onsubmit=async event=>{
     event.preventDefault();const rev=revision,button=$('#assessment-check'),out=$('#assessment-result');button.disabled=true;
     try{const body=payload();out.innerHTML='<p class="loading" role="status">Đang phân tích…</p>';const item=await api('/api/assessment',{method:'POST',body});if(token!==version||rev!==revision)return;
-      form.hidden=true;out.innerHTML=assessmentResult(item,`<div class="result-toolbar">${assessmentExportButtons()}<button class="button" id="assessment-save" type="button">Lưu kết quả</button><button class="button" id="assessment-edit" type="button">Sửa dữ liệu</button><button class="button" id="assessment-new" type="button">Phân tích khác</button></div><label class="check result-retention"><input id="assessment-persist" type="checkbox">Lưu trên thiết bị này; bỏ chọn để chỉ giữ trong tab.</label><p id="assessment-saved" role="status"></p>`);
+      form.hidden=true;out.innerHTML=assessmentResult(item,`<div class="result-toolbar">${assessmentExportButtons()}<button class="button" id="assessment-save" type="button">Lưu kết quả</button><button class="button" id="assessment-edit" type="button">Sửa dữ liệu</button><button class="button" id="assessment-new" type="button">Phân tích khác</button></div><label class="check result-retention"><input id="assessment-persist" type="checkbox">Giữ kết quả trên thiết bị này.</label><p id="assessment-saved" role="status"></p>`);
       assessmentBindExports(item,out);$('#assessment-save').onclick=()=>{try{assessmentSave(item,$('#assessment-persist').checked);$('#assessment-saved').innerHTML='Đã lưu. <a href="#history">Xem lịch sử</a>';}catch(e){$('#assessment-saved').textContent='Không lưu được trong trình duyệt. Có thể tải báo cáo để giữ kết quả.';}};
       $('#assessment-edit').onclick=()=>{form.hidden=false;invalidate();$('#assessment-task').focus();};$('#assessment-new').onclick=render;
       out.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'});
@@ -154,7 +182,7 @@ function assessmentComparable(a,b){
 async function assessmentHistory(token){
   const unique=assessmentAll();
   const backup='<details class="history-backup"><summary>Sao lưu / Nhập hồ sơ</summary>'+panel('Sao lưu và khôi phục','',`<div class="actions"><button class="button" id="assessment-backup" ${unique.length?'':'disabled'}>Tải toàn bộ hồ sơ JSON</button><a class="button" href="#check">Tạo hồ sơ mới</a></div><div class="field"><label for="assessment-import">Nhập một hồ sơ hoặc gói sao lưu JSON · tối đa 5 MiB</label><input id="assessment-import" type="file" accept=".json"></div><label class="check"><input id="assessment-import-persist" type="checkbox">Lưu hồ sơ nhập trên thiết bị này (mặc định chỉ trong tab).</label><p id="assessment-import-status" role="status"></p>`)+'</details>';
-  const rows=unique.length?`<div class="field"><label for="assessment-history-filter">Lọc theo mã pin / xe</label><input id="assessment-history-filter" type="search" placeholder="Nhập mã pin"></div><div class="table-wrap"><table><thead><tr><th>Chọn</th><th>Mã pin / xe</th><th>Ngày đo</th><th>Bài toán / mô hình</th><th>SOH</th><th>Thao tác</th></tr></thead><tbody>${unique.map(({record:r})=>`<tr data-battery="${esc(r.profile.battery_id.toLowerCase())}"><td><input type="checkbox" data-compare="${esc(r.id)}" aria-label="Chọn ${esc(r.profile.battery_id)} ngày ${esc(r.profile.measured_at)}"></td><td>${esc(r.profile.battery_id)}${r.sample?'<br><small>Mẫu minh họa</small>':''}${r.restored?'<br><small>Hồ sơ nhập · chưa xác thực</small>':''}</td><td>${esc(r.profile.measured_at)}</td><td>${esc(r.title)}<br><small>${esc(r.model)}</small></td><td>${fmt(r.results[0].soh_pct,2)} %</td><td><button class="button small" data-open-assessment="${esc(r.id)}">Mở báo cáo</button> <button class="button small" data-delete-assessment="${esc(r.id)}">Xóa</button></td></tr>`).join('')}</tbody></table></div><div class="actions"><button class="button" id="assessment-compare">Đối chiếu hai lần đo</button><button class="button" id="assessment-trend">Phân tích xu hướng từ hồ sơ đã chọn</button></div><div class="field"><label for="assessment-trend-threshold">Mốc SOH cần đối chiếu (%)</label><input id="assessment-trend-threshold" type="number" min="1" max="99" value="80"></div><p>Chọn đúng 2 hồ sơ để đối chiếu hoặc từ 5 hồ sơ khác ngày để phân tích xu hướng. Cần cùng pin, bài toán, mô hình, giai đoạn và điều kiện đo.</p>`:'<p>Chưa có hồ sơ. Sau khi phân tích, chọn “Lưu vào lịch sử”, hoặc nhập gói sao lưu bên trên.</p>';
+  const rows=unique.length?`<div class="field"><label for="assessment-history-filter">Tìm theo mã pin hoặc xe</label><input id="assessment-history-filter" type="search" placeholder="Nhập mã pin"></div><div class="table-wrap"><table><thead><tr><th>Chọn</th><th>Mã pin / xe</th><th>Ngày đo</th><th>Bài toán / mô hình</th><th>SOH</th><th>Thao tác</th></tr></thead><tbody>${unique.map(({record:r})=>`<tr data-battery="${esc(r.profile.battery_id.toLowerCase())}"><td><input type="checkbox" data-compare="${esc(r.id)}" aria-label="Chọn ${esc(r.profile.battery_id)} ngày ${esc(r.profile.measured_at)}"></td><td>${esc(r.profile.battery_id)}${r.sample?'<br><small>Mẫu minh họa</small>':''}${r.restored?'<br><small>Hồ sơ nhập · chưa xác thực</small>':''}</td><td>${esc(r.profile.measured_at)}</td><td>${esc(r.title)}<br><small>${esc(r.model)}</small></td><td>${fmt(r.results[0].soh_pct,2)} %</td><td><button class="button small" data-open-assessment="${esc(r.id)}">Mở báo cáo</button> <button class="button small" data-delete-assessment="${esc(r.id)}">Xóa</button></td></tr>`).join('')}</tbody></table></div><div class="actions"><button class="button" id="assessment-compare">Đối chiếu hai lần đo</button><button class="button" id="assessment-trend">Phân tích xu hướng từ hồ sơ đã chọn</button></div><div class="field"><label for="assessment-trend-threshold">Mốc SOH cần đối chiếu (%)</label><input id="assessment-trend-threshold" type="number" min="1" max="99" value="80"></div><p>Dùng 2 hồ sơ để so sánh hoặc từ 5 ngày đo để xem xu hướng. Chọn cùng pin và điều kiện đo.</p>`:'<p>Chưa có hồ sơ. Sau khi phân tích, chọn “Lưu vào lịch sử”, hoặc nhập gói sao lưu bên trên.</p>';
   if(!put(header('Lịch sử','')+panel('Kết quả đã lưu',`${unique.length} hồ sơ · tối đa 100 hồ sơ mỗi nơi lưu`,rows)+backup+'<div id="assessment-comparison" aria-live="polite"></div><div id="assessment-history-report"></div>',token))return;
   $('#assessment-backup').onclick=()=>assessmentDownload(JSON.stringify({format:'vincent-assessments',version:1,records:unique.map(x=>x.record)},null,2),'application/json','sao_luu_ho_so_pin.json');
   $('#assessment-import').onchange=async()=>{
